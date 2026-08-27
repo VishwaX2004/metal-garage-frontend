@@ -7,7 +7,6 @@ import {
     ArrowRight,
     Eye,
     EyeOff,
-    LockKeyhole,
     Mail,
 } from "lucide-react";
 
