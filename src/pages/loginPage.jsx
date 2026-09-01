@@ -12,41 +12,88 @@ import {
 
 export default function LoginPage() {
 
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
-    async function handleLogin() {
+    async function login() {
 
         try {
 
+            setLoading(true);
+
             const response = await axios.post(
-                import.meta.env.VITE_API_URL + "api/users/login",
+                `${import.meta.env.VITE_API_URL}/api/users/login`,
                 {
-                    username: username,
-                    password: password
+                    email: email.trim(),
+                    password: password,
                 }
             );
 
-            toast.success("Login successful!");
-
-            localStorage.setItem("token", response.data.token);
+        
+            localStorage.setItem(
+                "token",
+                response.data.token
+            );
 
             const user = response.data.user;
 
             if (user.role === "admin") {
-                navigate("/admin");
+                navigate("/admin")
             } else {
-                navigate("/");
+                navigate("/")
             }
 
-        } catch (error) {
-            toast.error("Invalid username or password");
-            console.log(error);
-        }
 
+            if (!user) {
+                console.error(
+                    "Login successful, but user data was not returned:",
+                    response.data
+                );
+
+                toast.error(
+                    "Login successful, but user information was not received."
+                );
+
+                return;
+            }
+
+            toast.success("Login successful!");
+
+
+        } catch (error) {
+
+            console.error("Login Error:", error);
+
+            if (error.response) {
+
+                toast.error(
+                    error.response.data?.message ||
+                    "Invalid email or password"
+                );
+
+            } else if (error.request) {
+
+                toast.error(
+                    "Cannot connect to the server"
+                );
+
+            } else {
+
+                toast.error(
+                    "Something went wrong"
+                );
+
+            }
+
+        } finally {
+
+            setLoading(false);
+
+        }
     }
 
     return (
@@ -59,9 +106,7 @@ export default function LoginPage() {
             <div className="relative z-10 flex h-screen w-full flex-col">
 
                 {/* Top bar */}
-                <div className="flex h-[20px] shrink-0 items-center justify-between px-5 sm:px-8 lg:px-10">
-
-                </div>
+                <div className="flex h-[20px] shrink-0 items-center justify-between px-5 sm:px-8 lg:px-10" />
 
                 {/* Content */}
                 <div className="flex min-h-0 flex-1 items-stretch justify-center px-0 pb-0 sm:px-5 sm:pb-5 lg:px-8">
@@ -94,7 +139,7 @@ export default function LoginPage() {
                                 <img
                                     src="/logo.png"
                                     alt="Metal Garage"
-                                    className="h-[38px] w-[100px] object-contain mb-1"
+                                    className="mb-1 h-[38px] w-[100px] object-contain"
                                 />
 
                                 <div className="flex items-center gap-2 rounded-full border border-[#F5F5DC]/15 bg-[#F5F5DC]/[0.03] px-2.5 py-1.5">
@@ -139,19 +184,16 @@ export default function LoginPage() {
 
                             </div>
 
-                            {/* Hot Wheels Card Showcase — now has real room to breathe */}
+                            {/* Showcase */}
                             <div className="relative z-10 my-2 flex min-h-0 flex-1 items-center justify-center">
 
-                                {/* Glow */}
                                 <div className="absolute h-[300px] w-[300px] rounded-full bg-[radial-gradient(circle,rgba(255,143,0,0.16)_0%,transparent_68%)] lg:h-[360px] lg:w-[360px]" />
 
-                                {/* Collector rings */}
                                 <div className="absolute h-[230px] w-[230px] rounded-full border border-[#FF8F00]/20 lg:h-[290px] lg:w-[290px]" />
 
                                 <div className="absolute h-[290px] w-[290px] animate-[spin_40s_linear_infinite] rounded-full border border-dashed border-[#FF8F00]/10 lg:h-[350px] lg:w-[350px]" />
 
-                                {/* Hot Wheels image */}
-                                <div className="relative z-10 flex h-full w-full items-center justify-center mb-5">
+                                <div className="relative z-10 mb-5 flex h-full w-full items-center justify-center">
 
                                     <img
                                         src="/loginbg.png"
@@ -161,7 +203,6 @@ export default function LoginPage() {
 
                                 </div>
 
-                                {/* Labels */}
                                 <span className="absolute left-0 top-[2%] hidden font-mono text-[8px] tracking-[0.1em] text-[#FFB04D] lg:flex lg:items-center lg:gap-1.5">
 
                                     <span className="h-px w-3.5 bg-[#FFB04D]" />
@@ -226,20 +267,22 @@ export default function LoginPage() {
                         {/* RIGHT SIDE */}
                         <div className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-[#F7F5EC] md:flex-[0_0_43%]">
 
-                            {/* Top bar — pinned to top of right side only, doesn't affect content below */}
-                            <div className="relative z-5 flex h-[54px] shrink-0 items-center px-6 sm:px-10 lg:px-12 mt-5">
+                            {/* Top bar */}
+                            <div className="relative z-10 mt-5 flex h-[54px] shrink-0 items-center px-6 sm:px-10 lg:px-12">
 
                                 <button
                                     type="button"
                                     onClick={() => navigate("/")}
                                     className="group flex items-center gap-2 text-[12px] tracking-wide text-[#0A0A0A]/50 transition-colors duration-200 hover:text-[#CC7000]"
                                 >
+
                                     <ArrowLeft
                                         size={15}
                                         className="transition-transform duration-200 group-hover:-translate-x-1"
                                     />
 
                                     Back to Metal Garage
+
                                 </button>
 
                             </div>
@@ -253,7 +296,7 @@ export default function LoginPage() {
                                 }}
                             />
 
-                            {/* Content — centered in remaining space below the top bar */}
+                            {/* Content */}
                             <div className="relative flex min-h-0 flex-1 items-center justify-center px-6 pb-6 sm:px-10 sm:pb-10 lg:px-12">
 
                                 <div className="relative z-10 w-full max-w-[350px]">
@@ -276,13 +319,17 @@ export default function LoginPage() {
                                         </h2>
 
                                         <p className="text-[12px] text-[#0A0A0A]/60">
+
                                             New to Metal Garage?{" "}
+
                                             <button
                                                 type="button"
+                                                onClick={() => navigate("/register")}
                                                 className="font-semibold text-[#CC7000] transition-colors hover:text-[#FF8F00]"
                                             >
                                                 Create an account
                                             </button>
+
                                         </p>
 
                                     </div>
@@ -291,24 +338,27 @@ export default function LoginPage() {
                                     <form
                                         onSubmit={(e) => {
                                             e.preventDefault();
-                                            handleLogin();
+                                            login();
                                         }}
                                     >
 
-                                        {/* Username */}
+                                        {/* Email */}
                                         <div className="group relative mb-6">
 
                                             <input
-                                                type="text"
+                                                type="email"
                                                 placeholder=" "
                                                 required
-                                                value={username}
-                                                onChange={(e) => setUsername(e.target.value)}
+                                                autoComplete="email"
+                                                value={email}
+                                                onChange={(e) =>
+                                                    setEmail(e.target.value)
+                                                }
                                                 className="peer w-full border-0 border-b-[1.5px] border-[#0A0A0A]/10 bg-transparent px-0 pb-2.5 pt-2 pr-8 text-[14px] text-[#0A0A0A] outline-none transition-colors duration-300 focus:border-[#FF8F00]"
                                             />
 
                                             <label className="pointer-events-none absolute left-0 top-2 text-[13.5px] text-[#0A0A0A]/40 transition-all duration-200 peer-focus:-top-2 peer-focus:font-mono peer-focus:text-[9px] peer-focus:uppercase peer-focus:tracking-[0.08em] peer-focus:text-[#CC7000] peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:font-mono peer-[:not(:placeholder-shown)]:text-[9px] peer-[:not(:placeholder-shown)]:uppercase peer-[:not(:placeholder-shown)]:tracking-[0.08em] peer-[:not(:placeholder-shown)]:text-[#CC7000]">
-                                                Username
+                                                Email
                                             </label>
 
                                             <Mail
@@ -325,11 +375,18 @@ export default function LoginPage() {
                                         <div className="group relative mb-4">
 
                                             <input
-                                                type={showPassword ? "text" : "password"}
+                                                type={
+                                                    showPassword
+                                                        ? "text"
+                                                        : "password"
+                                                }
                                                 placeholder=" "
                                                 required
+                                                autoComplete="current-password"
                                                 value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
+                                                onChange={(e) =>
+                                                    setPassword(e.target.value)
+                                                }
                                                 className="peer w-full border-0 border-b-[1.5px] border-[#0A0A0A]/10 bg-transparent px-0 pb-2.5 pt-2 pr-8 text-[14px] text-[#0A0A0A] outline-none transition-colors duration-300 focus:border-[#FF8F00]"
                                             />
 
@@ -339,7 +396,11 @@ export default function LoginPage() {
 
                                             <button
                                                 type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
+                                                onClick={() =>
+                                                    setShowPassword(
+                                                        !showPassword
+                                                    )
+                                                }
                                                 aria-label={
                                                     showPassword
                                                         ? "Hide password"
@@ -347,11 +408,19 @@ export default function LoginPage() {
                                                 }
                                                 className="absolute right-0 top-1.5 text-[#0A0A0A]/35 transition-colors hover:text-[#CC7000]"
                                             >
+
                                                 {showPassword ? (
-                                                    <EyeOff size={16} strokeWidth={1.8} />
+                                                    <EyeOff
+                                                        size={16}
+                                                        strokeWidth={1.8}
+                                                    />
                                                 ) : (
-                                                    <Eye size={16} strokeWidth={1.8} />
+                                                    <Eye
+                                                        size={16}
+                                                        strokeWidth={1.8}
+                                                    />
                                                 )}
+
                                             </button>
 
                                             <div className="pointer-events-none absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r from-[#CC7000] to-[#FF8F00] transition-all duration-300 group-focus-within:w-full" />
@@ -389,19 +458,24 @@ export default function LoginPage() {
                                         {/* Login */}
                                         <button
                                             type="submit"
-                                            className="group relative flex w-full items-center justify-center overflow-hidden rounded-md bg-[#0A0A0A] px-4 py-3.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#F7F5EC] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_25px_rgba(0,0,0,0.25)]"
+                                            disabled={loading}
+                                            className="group relative flex w-full items-center justify-center overflow-hidden rounded-md bg-[#0A0A0A] px-4 py-3.5 text-[11.5px] font-bold uppercase tracking-[0.14em] text-[#F7F5EC] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_25px_rgba(0,0,0,0.25)] disabled:cursor-not-allowed disabled:opacity-60"
                                         >
 
                                             <span className="absolute left-[-40%] top-0 h-full w-[35%] -skew-x-[20deg] bg-gradient-to-r from-transparent via-[#FF8F00]/55 to-transparent transition-all duration-[550ms] group-hover:left-[120%]" />
 
                                             <span className="relative z-10 flex items-center gap-2.5">
 
-                                                Sign In
+                                                {loading
+                                                    ? "Signing In..."
+                                                    : "Sign In"}
 
-                                                <ArrowRight
-                                                    size={14}
-                                                    className="transition-transform duration-200 group-hover:translate-x-1"
-                                                />
+                                                {!loading && (
+                                                    <ArrowRight
+                                                        size={14}
+                                                        className="transition-transform duration-200 group-hover:translate-x-1"
+                                                    />
+                                                )}
 
                                             </span>
 
@@ -459,7 +533,6 @@ export default function LoginPage() {
 
                                     </button>
 
-
                                     {/* Terms */}
                                     <p className="text-center text-[10.5px] leading-[1.4] text-[#0A0A0A]/50">
 
@@ -513,3 +586,4 @@ export default function LoginPage() {
         </div>
     );
 }
+

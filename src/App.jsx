@@ -1,12 +1,12 @@
-import { useState } from 'react'
 import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import HomePage from './pages/homePage'
 import LoginPage from './pages/loginPage'
+import AdminPage from './pages/adminPage'
+import ProductPage from './pages/productPage'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <BrowserRouter>
@@ -17,13 +17,13 @@ function App() {
 
         <Route path="/*" element={<HomePage />} />
 
-        <Route path="/about" element={<h1>Shop</h1>} />
+        <Route path="/products" element={<ProductPage />} />
 
         <Route path="/contact" element={<h1>Contact</h1>} />
 
         <Route path="/login" element={<LoginPage />} />
 
-        <Route path="/admin/*" element={<h1>Admin</h1>} />
+        <Route path="/admin/*" element={<AdminPage />} />
 
         <Route path="/register" element={<h1>Register</h1>} />
 
