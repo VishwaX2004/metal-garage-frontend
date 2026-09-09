@@ -1,204 +1,159 @@
 import axios from "axios";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
-
+import { useEffect, useState } from "react";
 import {
-    FaArrowLeft,
-    FaBox,
-    FaCalendarAlt,
-    FaCar,
-    FaCheck,
-    FaCloudUploadAlt,
-    FaCubes,
-    FaEdit,
-    FaImage,
-    FaInfoCircle,
-    FaLayerGroup,
-    FaPalette,
-    FaSave,
-    FaTag,
-    FaTimes,
-    FaTrash,
-    FaTruck,
-} from "react-icons/fa";
-
+    useNavigate,
+    useLocation,
+} from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { motion } from "framer-motion";
 import mediaUpload from "../../utils/mediaUpload";
 
 
-/* =========================================================
-   MAIN COMPONENT
-========================================================= */
+export default function AdminUpdateProduct() {
 
-export default function AdminUpdateProductPage() {
-
-    const location = useLocation();
     const navigate = useNavigate();
 
-    const fileInputRef = useRef(null);
+    // =========================================================
+    // GET PRODUCT FROM ROUTER STATE
+    // =========================================================
 
-    /*
-     * Product received from product list
-     */
-    const product = location.state || null;
+    const location = useLocation();
 
+    const productFromState =
+        location.state;
 
-    /* =====================================================
-       BASIC PRODUCT INFORMATION
-    ===================================================== */
-
-    const [productID, setProductID] = useState(
-        product?.productID || ""
-    );
-
-    const [name, setName] = useState(
-        product?.name || ""
-    );
-
-    const [altNames, setAltNames] = useState(
-        Array.isArray(product?.altNames)
-            ? product.altNames.join(", ")
-            : product?.altNames || ""
-    );
-
-    const [description, setDescription] = useState(
-        product?.description || ""
-    );
+    const id =
+        productFromState?.productID ||
+        productFromState?._id;
 
 
-    /* =====================================================
-       PRICING
-    ===================================================== */
+    // =========================================================
+    // BASIC INFORMATION
+    // =========================================================
 
-    const [price, setPrice] = useState(
-        product?.price ?? ""
-    );
+    const [productID, setProductID] =
+        useState("");
 
-    const [labelledPrice, setLabelledPrice] = useState(
-        product?.labelledPrice ?? ""
-    );
+    const [name, setName] =
+        useState("");
 
+    const [altNames, setAltNames] =
+        useState("");
 
-    /* =====================================================
-       PRODUCT CLASSIFICATION
-    ===================================================== */
-
-    const [category, setCategory] = useState(
-        product?.category || ""
-    );
-
-    const [productType, setProductType] = useState(
-        product?.productType || ""
-    );
-
-    const [carCount, setCarCount] = useState(
-        product?.carCount ?? 1
-    );
+    const [description, setDescription] =
+        useState("");
 
 
-    /* =====================================================
-       INVENTORY
-    ===================================================== */
+    // =========================================================
+    // IMAGES
+    // =========================================================
 
-    const [quantity, setQuantity] = useState(
-        product?.quantity ?? 0
-    );
+    const [images, setImages] =
+        useState([]);
 
-
-    /* =====================================================
-       CAR INFORMATION
-    ===================================================== */
-
-    const [year, setYear] = useState(
-        product?.year ?? ""
-    );
-
-    const [series, setSeries] = useState(
-        product?.series || ""
-    );
-
-    const [casting, setCasting] = useState(
-        product?.casting || ""
-    );
-
-    const [manufacturer, setManufacturer] = useState(
-        product?.manufacturer || ""
-    );
-
-    const [model, setModel] = useState(
-        product?.model || ""
-    );
-
-    const [vehicleType, setVehicleType] = useState(
-        product?.vehicleType || "Other"
-    );
-
-    const [color, setColor] = useState(
-        product?.color || ""
-    );
-
-    const [scale, setScale] = useState(
-        product?.scale || "1:64"
-    );
-
-    const [seriesNumber, setSeriesNumber] = useState(
-        product?.seriesNumber || ""
-    );
+    const [existingImages, setExistingImages] =
+        useState([]);
 
 
-    /* =====================================================
-       CONDITION / PACKAGING
-    ===================================================== */
+    // =========================================================
+    // PRODUCT INFORMATION
+    // =========================================================
 
-    const [condition, setCondition] = useState(
-        product?.condition || "New"
-    );
+    const [category, setCategory] =
+        useState("Main Line");
 
-    const [packaging, setPackaging] = useState(
-        product?.packaging || "Carded"
-    );
+    const [productType, setProductType] =
+        useState("Single Car");
 
-
-    /* =====================================================
-       STATUS
-    ===================================================== */
-
-    const [featured, setFeatured] = useState(
-        Boolean(product?.featured)
-    );
-
-    const [status, setStatus] = useState(
-        product?.status || "Active"
-    );
+    const [carCount, setCarCount] =
+        useState(1);
 
 
-    /* =====================================================
-       IMAGES
-    ===================================================== */
+    // =========================================================
+    // PRICING
+    // =========================================================
 
-    const [existingImages, setExistingImages] = useState(
-        Array.isArray(product?.images)
-            ? product.images.filter(
-                  (image) =>
-                      typeof image === "string" &&
-                      image.trim()
-              )
-            : []
-    );
+    const [price, setPrice] =
+        useState(0);
 
-    const [newImages, setNewImages] = useState([]);
+    const [labelledPrice, setLabelledPrice] =
+        useState(0);
+
+    const [quantity, setQuantity] =
+        useState(0);
 
 
-    /* =====================================================
-       LOADING
-    ===================================================== */
+    // =========================================================
+    // VEHICLE DETAILS
+    // =========================================================
 
-    const [loading, setLoading] = useState(false);
+    const [year, setYear] =
+        useState(new Date().getFullYear());
+
+    const [series, setSeries] =
+        useState("");
+
+    const [casting, setCasting] =
+        useState("");
+
+    const [manufacturer, setManufacturer] =
+        useState("");
+
+    const [model, setModel] =
+        useState("");
+
+    const [vehicleType, setVehicleType] =
+        useState("Other");
+
+    const [color, setColor] =
+        useState("");
+
+    const [scale, setScale] =
+        useState("1:64");
+
+    const [seriesNumber, setSeriesNumber] =
+        useState("");
 
 
-    /* =====================================================
-       CONSTANTS
-    ===================================================== */
+    // =========================================================
+    // CONDITION / PACKAGING
+    // =========================================================
+
+    const [condition, setCondition] =
+        useState("New");
+
+    const [packaging, setPackaging] =
+        useState("Carded");
+
+
+    // =========================================================
+    // OPTIONS
+    // =========================================================
+
+    const [inStock, setInStock] =
+        useState(true);
+
+    const [featured, setFeatured] =
+        useState(false);
+
+    const [status, setStatus] =
+        useState("Active");
+
+
+    // =========================================================
+    // LOADING
+    // =========================================================
+
+    const [setloading, setIsloading] =
+        useState(false);
+
+    const [loadingProduct, setLoadingProduct] =
+        useState(true);
+
+
+    // =========================================================
+    // OPTIONS
+    // =========================================================
 
     const categories = [
         "Main Line",
@@ -241,17 +196,6 @@ export default function AdminUpdateProductPage() {
         "Multi Pack",
     ];
 
-    const scales = [
-        "1:18",
-        "1:24",
-        "1:32",
-        "1:43",
-        "1:64",
-        "1:72",
-        "1:87",
-        "Other",
-    ];
-
     const statuses = [
         "Active",
         "Inactive",
@@ -260,351 +204,360 @@ export default function AdminUpdateProductPage() {
     ];
 
 
-    /* =====================================================
-       SAFETY CHECK
-    ===================================================== */
+    // =========================================================
+    // LOAD PRODUCT
+    // =========================================================
 
     useEffect(() => {
 
-        if (!product?.productID) {
+        async function loadProduct() {
 
-            toast.error(
-                "Product information is missing."
-            );
+            const token =
+                localStorage.getItem(
+                    "token"
+                );
 
-            navigate("/admin/products");
-        }
-
-    }, [product, navigate]);
-
-
-    /* =====================================================
-       AUTOMATIC INVENTORY STATUS
-    ===================================================== */
-
-    useEffect(() => {
-
-        const numericQuantity =
-            Number(quantity) || 0;
-
-        if (numericQuantity <= 0) {
-
-            setStatus("Out of Stock");
-
-        } else if (status === "Out of Stock") {
-
-            setStatus("Active");
-
-        }
-
-    }, [quantity]);
+            if (!token) {
+                navigate("/login");
+                return;
+            }
 
 
-    /* =====================================================
-       IMAGE SELECTION
-    ===================================================== */
+            // IMPORTANT FIX
+            //
+            // AdminProductPage sends:
+            //
+            // navigate("/admin/update-product", {
+            //     state: item
+            // })
+            //
+            // Therefore we use id from location.state.
 
-    function handleImageSelect(event) {
+            if (!id) {
 
-        const files = Array.from(
-            event.target.files || []
-        );
+                toast.error(
+                    "Product ID is missing."
+                );
 
-        if (files.length === 0) {
-            return;
-        }
+                navigate(
+                    "/admin/products"
+                );
 
-
-        const allowedTypes = [
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-        ];
-
-
-        const invalidFiles = files.filter(
-            (file) =>
-                !allowedTypes.includes(
-                    file.type
-                )
-        );
+                return;
+            }
 
 
-        if (invalidFiles.length > 0) {
+            try {
 
-            toast.error(
-                "Only JPG, PNG and WEBP images are allowed."
-            );
-
-            event.target.value = "";
-
-            return;
-        }
+                setLoadingProduct(true);
 
 
-        /*
-         * Maximum 5 MB per image
-         */
-
-        const oversizedFiles = files.filter(
-            (file) =>
-                file.size >
-                5 * 1024 * 1024
-        );
+                const apiUrl =
+                    import.meta.env
+                        .VITE_API_URL;
 
 
-        if (oversizedFiles.length > 0) {
+                if (!apiUrl) {
 
-            toast.error(
-                "Each image must be smaller than 5 MB."
-            );
-
-            event.target.value = "";
-
-            return;
-        }
+                    throw new Error(
+                        "VITE_API_URL is not configured."
+                    );
+                }
 
 
-        /*
-         * Prevent duplicate file selection
-         */
+                const response =
+                    await axios.get(
+                        `${apiUrl}/api/products/${encodeURIComponent(
+                            id
+                        )}`,
+                        {
+                            headers: {
+                                Authorization:
+                                    `Bearer ${token}`,
+                            },
+                        }
+                    );
 
-        setNewImages((current) => {
 
-            const existingKeys = new Set(
-                current.map(
-                    (file) =>
-                        `${file.name}-${file.size}-${file.lastModified}`
-                )
-            );
+                const product =
+                    response.data?.product ||
+                    response.data;
 
-            const uniqueFiles = files.filter(
-                (file) =>
-                    !existingKeys.has(
-                        `${file.name}-${file.size}-${file.lastModified}`
+
+                if (!product) {
+
+                    throw new Error(
+                        "Product data was not found."
+                    );
+                }
+
+
+                // =================================================
+                // BASIC INFORMATION
+                // =================================================
+
+                setProductID(
+                    product.productID ||
+                        ""
+                );
+
+                setName(
+                    product.name ||
+                        ""
+                );
+
+                setAltNames(
+                    Array.isArray(
+                        product.altNames
                     )
+                        ? product.altNames.join(
+                              ", "
+                          )
+                        : product.altNames ||
+                          ""
+                );
+
+                setDescription(
+                    product.description ||
+                        ""
+                );
+
+
+                // =================================================
+                // EXISTING IMAGES
+                // =================================================
+
+                setExistingImages(
+                    Array.isArray(
+                        product.images
+                    )
+                        ? product.images
+                        : []
+                );
+
+
+                // =================================================
+                // PRODUCT INFORMATION
+                // =================================================
+
+                setCategory(
+                    product.category ||
+                        "Main Line"
+                );
+
+                setProductType(
+                    product.productType ||
+                        "Single Car"
+                );
+
+                setCarCount(
+                    Number(
+                        product.carCount
+                    ) || 1
+                );
+
+
+                // =================================================
+                // PRICING
+                // =================================================
+
+                setPrice(
+                    Number(
+                        product.price
+                    ) || 0
+                );
+
+                setLabelledPrice(
+                    Number(
+                        product.labelledPrice
+                    ) || 0
+                );
+
+                setQuantity(
+                    Number(
+                        product.quantity
+                    ) || 0
+                );
+
+
+                // =================================================
+                // VEHICLE DETAILS
+                // =================================================
+
+                setYear(
+                    Number(
+                        product.year
+                    ) ||
+                        new Date().getFullYear()
+                );
+
+                setSeries(
+                    product.series ||
+                        ""
+                );
+
+                setCasting(
+                    product.casting ||
+                        ""
+                );
+
+                setManufacturer(
+                    product.manufacturer ||
+                        ""
+                );
+
+                setModel(
+                    product.model ||
+                        ""
+                );
+
+                setVehicleType(
+                    product.vehicleType ||
+                        "Other"
+                );
+
+                setColor(
+                    product.color ||
+                        ""
+                );
+
+                setScale(
+                    product.scale ||
+                        "1:64"
+                );
+
+                setSeriesNumber(
+                    product.seriesNumber ||
+                        ""
+                );
+
+
+                // =================================================
+                // CONDITION / PACKAGING
+                // =================================================
+
+                setCondition(
+                    product.condition ||
+                        "New"
+                );
+
+                setPackaging(
+                    product.packaging ||
+                        "Carded"
+                );
+
+
+                // =================================================
+                // OPTIONS
+                // =================================================
+
+                setInStock(
+                    product.inStock !==
+                        undefined
+                        ? product.inStock
+                        : Number(
+                              product.quantity
+                          ) > 0
+                );
+
+                setFeatured(
+                    product.featured ||
+                        false
+                );
+
+                setStatus(
+                    product.status ||
+                        "Active"
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Error loading product:",
+                    error
+                );
+
+                console.error(
+                    "Server response:",
+                    error?.response?.data
+                );
+
+
+                const message =
+                    error?.response?.data
+                        ?.message ||
+                    error?.response?.data
+                        ?.error ||
+                    error?.message ||
+                    "Error loading product.";
+
+
+                toast.error(message);
+
+                navigate(
+                    "/admin/products"
+                );
+
+            } finally {
+
+                setLoadingProduct(false);
+
+            }
+        }
+
+
+        loadProduct();
+
+    }, [id, navigate]);
+
+
+    // =========================================================
+    // IMAGE SELECTION
+    // =========================================================
+
+    function handleImageChange(e) {
+
+        const selectedFiles =
+            Array.from(
+                e.target.files || []
             );
 
-            return [
-                ...current,
-                ...uniqueFiles,
-            ];
-        });
-
-
-        event.target.value = "";
-    }
-
-
-    /* =====================================================
-       REMOVE NEW IMAGE
-    ===================================================== */
-
-    function removeNewImage(index) {
-
-        setNewImages((current) =>
-            current.filter(
-                (_, i) =>
-                    i !== index
-            )
+        setImages(
+            selectedFiles
         );
     }
 
 
-    /* =====================================================
-       REMOVE EXISTING IMAGE
-    ===================================================== */
+    // =========================================================
+    // REMOVE EXISTING IMAGE
+    // =========================================================
 
     function removeExistingImage(index) {
 
-        setExistingImages((current) =>
-            current.filter(
-                (_, i) =>
-                    i !== index
-            )
+        setExistingImages(
+            (currentImages) =>
+                currentImages.filter(
+                    (_, imageIndex) =>
+                        imageIndex !==
+                        index
+                )
         );
     }
 
 
-    /* =====================================================
-       VALIDATION
-    ===================================================== */
-
-    function validateProduct() {
-
-        if (!productID.trim()) {
-
-            toast.error(
-                "Product ID is required."
-            );
-
-            return false;
-        }
-
-
-        if (!name.trim()) {
-
-            toast.error(
-                "Product name is required."
-            );
-
-            return false;
-        }
-
-
-        if (!description.trim()) {
-
-            toast.error(
-                "Product description is required."
-            );
-
-            return false;
-        }
-
-
-        if (
-            price === "" ||
-            Number.isNaN(Number(price)) ||
-            Number(price) < 0
-        ) {
-
-            toast.error(
-                "Enter a valid selling price."
-            );
-
-            return false;
-        }
-
-
-        if (
-            labelledPrice === "" ||
-            Number.isNaN(
-                Number(labelledPrice)
-            ) ||
-            Number(labelledPrice) < 0
-        ) {
-
-            toast.error(
-                "Enter a valid labelled price."
-            );
-
-            return false;
-        }
-
-
-        if (!category) {
-
-            toast.error(
-                "Select a product category."
-            );
-
-            return false;
-        }
-
-
-        if (!productType) {
-
-            toast.error(
-                "Select a product type."
-            );
-
-            return false;
-        }
-
-
-        if (
-            carCount === "" ||
-            Number(carCount) < 1
-        ) {
-
-            toast.error(
-                "Car count must be at least 1."
-            );
-
-            return false;
-        }
-
-
-        if (
-            quantity === "" ||
-            Number(quantity) < 0
-        ) {
-
-            toast.error(
-                "Quantity cannot be negative."
-            );
-
-            return false;
-        }
-
-
-        if (!year || Number(year) < 1900) {
-
-            toast.error(
-                "Enter a valid vehicle year."
-            );
-
-            return false;
-        }
-
-
-        if (!series.trim()) {
-
-            toast.error(
-                "Series is required."
-            );
-
-            return false;
-        }
-
-
-        if (!casting.trim()) {
-
-            toast.error(
-                "Casting is required."
-            );
-
-            return false;
-        }
-
-
-        if (
-            existingImages.length === 0 &&
-            newImages.length === 0
-        ) {
-
-            toast.error(
-                "Product must have at least one image."
-            );
-
-            return false;
-        }
-
-
-        return true;
-    }
-
-
-    /* =====================================================
-       UPDATE PRODUCT
-    ===================================================== */
+    // =========================================================
+    // UPDATE PRODUCT
+    // =========================================================
 
     async function updateProduct() {
 
-        if (loading) {
-            return;
-        }
-
-
         const token =
-            localStorage.getItem("token");
+            localStorage.getItem(
+                "token"
+            );
 
 
         if (!token) {
-
-            toast.error(
-                "Your session has expired. Please login again."
-            );
 
             navigate("/login");
 
@@ -612,146 +565,174 @@ export default function AdminUpdateProductPage() {
         }
 
 
-        if (!validateProduct()) {
+        // =====================================================
+        // VALIDATION
+        // =====================================================
+
+        if (!productID.trim()) {
+
+            toast.error(
+                "Enter a product ID."
+            );
+
+            return;
+        }
+
+
+        if (!name.trim()) {
+
+            toast.error(
+                "Enter a product name."
+            );
+
+            return;
+        }
+
+
+        if (!description.trim()) {
+
+            toast.error(
+                "Enter a product description."
+            );
+
+            return;
+        }
+
+
+        if (
+            images.length === 0 &&
+            existingImages.length === 0
+        ) {
+
+            toast.error(
+                "Please keep at least one product image."
+            );
+
+            return;
+        }
+
+
+        if (Number(price) < 0) {
+
+            toast.error(
+                "Enter a valid selling price."
+            );
+
+            return;
+        }
+
+
+        if (
+            Number(labelledPrice) < 0
+        ) {
+
+            toast.error(
+                "Enter a valid labelled price."
+            );
+
+            return;
+        }
+
+
+        if (Number(quantity) < 0) {
+
+            toast.error(
+                "Enter a valid quantity."
+            );
+
+            return;
+        }
+
+
+        if (Number(carCount) < 1) {
+
+            toast.error(
+                "Car count must be at least 1."
+            );
+
+            return;
+        }
+
+
+        if (!series.trim()) {
+
+            toast.error(
+                "Enter the series."
+            );
+
+            return;
+        }
+
+
+        if (!casting.trim()) {
+
+            toast.error(
+                "Enter the casting."
+            );
+
             return;
         }
 
 
         try {
 
-            setLoading(true);
+            setIsloading(true);
 
 
-            /* =============================================
-               IMAGE UPLOAD
-            ============================================= */
+            // =================================================
+            // UPLOAD NEW IMAGES
+            // =================================================
 
-            let uploadedImageUrls = [];
-
-
-            if (newImages.length > 0) {
-
-                toast.loading(
-                    "Uploading new images...",
-                    {
-                        id: "image-upload",
-                    }
-                );
+            let newImageUrls = [];
 
 
-                const uploadResults =
+            if (images.length > 0) {
+
+                const uploadPromises =
+                    images.map(
+                        (file) =>
+                            mediaUpload(
+                                file
+                            )
+                    );
+
+
+                newImageUrls =
                     await Promise.all(
-                        newImages.map(
-                            async (file) => {
-
-                                try {
-
-                                    const result =
-                                        await mediaUpload(
-                                            file
-                                        );
-
-                                    return result;
-
-                                } catch (uploadError) {
-
-                                    console.error(
-                                        `Failed to upload ${file.name}:`,
-                                        uploadError
-                                    );
-
-                                    throw new Error(
-                                        `Failed to upload ${file.name}: ${
-                                            uploadError?.message ||
-                                            "Unknown upload error"
-                                        }`
-                                    );
-                                }
-                            }
-                        )
+                        uploadPromises
                     );
 
 
-                /*
-                 * mediaUpload should normally return
-                 * a string URL.
-                 */
-
-                uploadedImageUrls =
-                    uploadResults.map(
-                        (result) => {
-
-                            if (
-                                typeof result ===
-                                "string"
-                            ) {
-
-                                return result;
-                            }
-
-
-                            if (
-                                result?.publicUrl &&
-                                typeof result.publicUrl ===
-                                    "string"
-                            ) {
-
-                                return result.publicUrl;
-                            }
-
-
-                            if (
-                                result?.url &&
-                                typeof result.url ===
-                                    "string"
-                            ) {
-
-                                return result.url;
-                            }
-
-
-                            return null;
-                        }
-                    );
-
-
-                const invalidUpload =
-                    uploadedImageUrls.some(
+                if (
+                    !newImageUrls.every(
                         (url) =>
-                            typeof url !==
-                                "string" ||
-                            !url.trim()
-                    );
-
-
-                if (invalidUpload) {
+                            typeof url ===
+                                "string" &&
+                            url.trim() !==
+                                ""
+                    )
+                ) {
 
                     throw new Error(
                         "Image upload returned an invalid URL."
                     );
                 }
-
-
-                toast.success(
-                    "Images uploaded successfully.",
-                    {
-                        id: "image-upload",
-                    }
-                );
             }
 
 
-            /* =============================================
-               FINAL IMAGE LIST
-            ============================================= */
+            // =================================================
+            // FINAL IMAGE LIST
+            // =================================================
 
             const finalImages = [
                 ...existingImages,
-                ...uploadedImageUrls,
+                ...newImageUrls,
             ];
 
 
-            if (finalImages.length === 0) {
+            if (
+                finalImages.length === 0
+            ) {
 
                 throw new Error(
                     "At least one product image is required."
@@ -759,9 +740,9 @@ export default function AdminUpdateProductPage() {
             }
 
 
-            /* =============================================
-               ALT NAMES
-            ============================================= */
+            // =================================================
+            // ALTERNATIVE NAMES
+            // =================================================
 
             const altNameList =
                 altNames
@@ -773,46 +754,49 @@ export default function AdminUpdateProductPage() {
                     .filter(Boolean);
 
 
-            /* =============================================
-               QUANTITY
-            ============================================= */
+            // =================================================
+            // STOCK / STATUS
+            // =================================================
 
             const finalQuantity =
-                Math.max(
-                    0,
-                    Number(quantity) || 0
-                );
+                Number(quantity) || 0;
 
 
-            /* =============================================
-               INVENTORY STATUS
-            ============================================= */
+            let finalInStock =
+                inStock;
 
-            const finalInStock =
-                finalQuantity > 0;
-
-
-            let finalStatus = status;
+            let finalStatus =
+                status;
 
 
-            if (finalQuantity <= 0) {
+            if (
+                finalQuantity <= 0
+            ) {
+
+                finalInStock = false;
 
                 finalStatus =
                     "Out of Stock";
 
-            } else if (
-                finalStatus ===
-                "Out of Stock"
-            ) {
+            } else {
 
-                finalStatus =
-                    "Active";
+                finalInStock = true;
+
+
+                if (
+                    finalStatus ===
+                    "Out of Stock"
+                ) {
+
+                    finalStatus =
+                        "Active";
+                }
             }
 
 
-            /* =============================================
-               PRODUCT DATA
-            ============================================= */
+            // =================================================
+            // PRODUCT DATA
+            // =================================================
 
             const productData = {
 
@@ -836,16 +820,15 @@ export default function AdminUpdateProductPage() {
                 productType,
 
                 carCount:
-                    Math.max(
-                        1,
-                        Number(carCount) || 1
-                    ),
+                    Number(carCount),
 
                 price:
                     Number(price),
 
                 labelledPrice:
-                    Number(labelledPrice),
+                    Number(
+                        labelledPrice
+                    ),
 
                 quantity:
                     finalQuantity,
@@ -870,7 +853,9 @@ export default function AdminUpdateProductPage() {
                 color:
                     color.trim(),
 
-                scale,
+                scale:
+                    scale.trim() ||
+                    "1:64",
 
                 seriesNumber:
                     seriesNumber.trim(),
@@ -882,26 +867,20 @@ export default function AdminUpdateProductPage() {
                 inStock:
                     finalInStock,
 
-                featured:
-                    Boolean(featured),
+                featured,
 
                 status:
                     finalStatus,
             };
 
 
-            console.log(
-                "Updating Metal-Garage product:",
-                productData
-            );
-
-
-            /* =============================================
-               API URL
-            ============================================= */
+            // =================================================
+            // API URL
+            // =================================================
 
             const apiUrl =
-                import.meta.env.VITE_API_URL;
+                import.meta.env
+                    .VITE_API_URL;
 
 
             if (!apiUrl) {
@@ -912,30 +891,18 @@ export default function AdminUpdateProductPage() {
             }
 
 
-            /*
-             * IMPORTANT:
-             * Product ID in URL is the original ID.
-             */
-
-            const updateUrl =
-                `${apiUrl.replace(/\/$/, "")}/api/products/${encodeURIComponent(
-                    productID.trim()
-                )}`;
-
-
-            console.log(
-                "PUT URL:",
-                updateUrl
-            );
-
-
-            /* =============================================
-               API REQUEST
-            ============================================= */
+            // =================================================
+            // UPDATE PRODUCT
+            // =================================================
 
             await axios.put(
-                updateUrl,
+
+                `${apiUrl}/api/products/${encodeURIComponent(
+                    id
+                )}`,
+
                 productData,
+
                 {
                     headers: {
                         Authorization:
@@ -964,58 +931,10 @@ export default function AdminUpdateProductPage() {
                 error
             );
 
-
             console.error(
                 "Server response:",
                 error?.response?.data
             );
-
-
-            if (
-                error?.response?.status ===
-                    401 ||
-                error?.response?.status ===
-                    403
-            ) {
-
-                toast.error(
-                    error?.response?.data
-                        ?.message ||
-                        "You are not authorized. Please login again."
-                );
-
-                return;
-            }
-
-
-            if (
-                error?.response?.status ===
-                404
-            ) {
-
-                toast.error(
-                    error?.response?.data
-                        ?.message ||
-                        "Product not found."
-                );
-
-                return;
-            }
-
-
-            if (
-                error?.response?.status ===
-                409
-            ) {
-
-                toast.error(
-                    error?.response?.data
-                        ?.message ||
-                        "Product ID already exists."
-                );
-
-                return;
-            }
 
 
             const message =
@@ -1031,200 +950,135 @@ export default function AdminUpdateProductPage() {
 
         } finally {
 
-            setLoading(false);
+            setIsloading(false);
+
         }
     }
 
 
-    /* =====================================================
-       CALCULATED DATA
-    ===================================================== */
+    // =========================================================
+    // SUMMARY VALUES
+    // =========================================================
 
-    const discountPercentage =
-        useMemo(() => {
-
-            const labelled =
-                Number(labelledPrice);
-
-            const selling =
-                Number(price);
-
-            if (
-                labelled <= 0 ||
-                selling < 0 ||
-                selling >= labelled
-            ) {
-
-                return 0;
-            }
-
-            return Math.round(
-                ((labelled - selling) /
-                    labelled) *
-                    100
-            );
-
-        }, [
-            labelledPrice,
-            price,
-        ]);
+    const discount =
+        Number(labelledPrice) >
+        Number(price)
+            ? Math.round(
+                  (
+                      (
+                          Number(
+                              labelledPrice
+                          ) -
+                          Number(price)
+                      ) /
+                      Number(
+                          labelledPrice
+                      )
+                  ) *
+                      100
+              )
+            : 0;
 
 
-    const finalImageCount =
+    const totalImages =
         existingImages.length +
-        newImages.length;
+        images.length;
 
 
-    const stockStatus =
-        Number(quantity) > 0
-            ? "In Stock"
-            : "Out of Stock";
+    // =========================================================
+    // LOADING
+    // =========================================================
 
-
-    /* =====================================================
-       PRODUCT NOT FOUND
-    ===================================================== */
-
-    if (!product?.productID) {
+    if (loadingProduct) {
 
         return (
+            <div className="flex min-h-full w-full items-center justify-center bg-[#ECE8D6] text-[#0A0A0A]">
 
-            <div className="flex min-h-screen items-center justify-center bg-primary px-5 text-accent">
+                <motion.div
+                    initial={{
+                        opacity: 0,
+                        y: 10,
+                    }}
+                    animate={{
+                        opacity: 1,
+                        y: 0,
+                    }}
+                    className="text-center"
+                >
 
-                <div className="w-full max-w-md rounded-[28px] border border-accent/10 bg-white p-8 text-center shadow-[0_25px_80px_-35px_rgba(8,6,22,0.45)]">
+                    <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-black/10 border-t-[#FF8F00]" />
 
-                    <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent text-primary">
-
-                        <FaTimes className="text-xl" />
-
-                    </div>
-
-
-                    <h1 className="text-2xl font-semibold">
-
-                        Product Not Found
-
-                    </h1>
-
-
-                    <p className="mt-3 text-sm leading-6 text-accent/55">
-
-                        Product information is missing.
-                        Please return to the product
-                        list and select a product again.
-
+                    <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-black/45">
+                        Loading Product
                     </p>
 
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate(
-                                "/admin/products"
-                            )
-                        }
-                        className="mt-7 inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-3 text-xs font-bold uppercase tracking-wider text-primary transition hover:-translate-y-0.5 hover:shadow-lg"
-                    >
-
-                        <FaArrowLeft />
-
-                        Back to Products
-
-                    </button>
-
-                </div>
+                </motion.div>
 
             </div>
         );
     }
 
 
-    /* =====================================================
-       UI
-    ===================================================== */
+    // =========================================================
+    // PAGE
+    // =========================================================
 
     return (
 
-        <div className="min-h-full w-full bg-primary px-4 py-6 text-accent sm:px-6 lg:px-8">
+        <div className="min-h-full w-full bg-[#ECE8D6] text-[#0A0A0A]">
 
-            <div className="mx-auto max-w-7xl">
+            {/* =================================================
+                HEADER
+            ================================================= */}
 
+            <motion.div
+                initial={{
+                    opacity: 0,
+                    y: -15,
+                }}
+                animate={{
+                    opacity: 1,
+                    y: 0,
+                }}
+                transition={{
+                    duration: 0.4,
+                }}
+                className="border-b border-black/10 bg-[#F5F5DC]"
+            >
 
-                {/* =================================================
-                    HEADER
-                ================================================= */}
+                <div className="mx-auto max-w-[1500px] px-5 py-7 sm:px-7 lg:px-9">
 
-                <div className="mb-8">
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            navigate(
-                                "/admin/products"
-                            )
-                        }
-                        disabled={loading}
-                        className="mb-6 inline-flex items-center gap-2 rounded-xl border border-accent/15 bg-white/50 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-accent transition hover:border-accent/30 hover:bg-white disabled:opacity-50"
-                    >
-
-                        <FaArrowLeft />
-
-                        Back to Products
-
-                    </button>
-
-
-                    <div className="mb-3 flex items-center gap-3">
-
-                        <span className="h-px w-10 bg-accent/40" />
-
-                        <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-accent/60">
-
-                            METAL-GARAGE / ADMIN
-
-                        </span>
-
-                    </div>
-
-
-                    <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+                    <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
 
                         <div>
 
-                            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+                            <p className="mb-2 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-black/45">
+                                ADMIN / PRODUCTS / EDIT
+                            </p>
 
-                                Update Product
-
+                            <h1 className="font-sans text-3xl font-bold uppercase tracking-tight leading-none sm:text-4xl">
+                                Edit Product
                             </h1>
 
-
-                            <p className="mt-2 max-w-2xl text-sm leading-6 text-accent/60">
-
-                                Update your die-cast product
-                                information, pricing,
-                                inventory, vehicle details,
-                                images and collection status.
-
+                            <p className="mt-3 max-w-2xl text-sm leading-6 text-black/50">
+                                Update the die-cast vehicle listing,
+                                pricing, specifications, images and
+                                inventory information.
                             </p>
 
                         </div>
 
+                        <div className="flex items-center gap-2">
 
-                        <div className="flex items-center gap-2 rounded-full border border-accent/10 bg-white/60 px-4 py-2">
+                            <div className="flex items-center gap-2 rounded-md border border-black/10 bg-[#ECE8D6] px-3 py-2">
 
-                            <span
-                                className={`h-2 w-2 rounded-full ${
-                                    Number(quantity) > 0
-                                        ? "bg-green-500"
-                                        : "bg-red-500"
-                                }`}
-                            />
+                                <span className="h-2 w-2 rounded-full bg-[#FF8F00]" />
 
-                            <span className="text-[10px] font-bold uppercase tracking-wider">
+                                <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-black/55">
+                                    Editing Listing
+                                </span>
 
-                                {stockStatus}
-
-                            </span>
+                            </div>
 
                         </div>
 
@@ -1232,1212 +1086,1209 @@ export default function AdminUpdateProductPage() {
 
                 </div>
 
-
-                {/* =================================================
-                    MAIN CARD
-                ================================================= */}
-
-                <div className="overflow-hidden rounded-[28px] border border-accent/15 bg-white/40 shadow-[0_25px_80px_-35px_rgba(8,6,22,0.35)]">
+            </motion.div>
 
 
-                    <div className="p-5 sm:p-7 lg:p-9">
+            {/* =================================================
+                MAIN CONTENT
+            ================================================= */}
 
-                        <div className="grid grid-cols-1 gap-10 xl:grid-cols-12">
+            <div className="mx-auto max-w-[1500px] px-5 py-7 sm:px-7 lg:px-9 lg:py-9">
+
+                <motion.div
+                    initial={{
+                        opacity: 0,
+                        y: 20,
+                    }}
+                    animate={{
+                        opacity: 1,
+                        y: 0,
+                    }}
+                    transition={{
+                        duration: 0.5,
+                        delay: 0.05,
+                    }}
+                    className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.7fr)_390px]"
+                >
+
+                    {/* =================================================
+                        LEFT
+                    ================================================= */}
+
+                    <div className="space-y-5">
+
+                        {/* BASIC */}
+
+                        <FormPanel
+                            number="01"
+                            title="Basic Information"
+                            description="Core product identification"
+                        >
+
+                            <div className="grid gap-5 md:grid-cols-2">
+
+                                <InputField
+                                    label="Product ID"
+                                    placeholder="DC-001"
+                                    value={productID}
+                                    onChange={(e) =>
+                                        setProductID(
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+                                <InputField
+                                    label="Product Name"
+                                    placeholder="1969 Dodge Charger"
+                                    value={name}
+                                    onChange={(e) =>
+                                        setName(
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+                            </div>
+
+                            <div className="mt-5">
+
+                                <InputField
+                                    label="Alternative Names"
+                                    placeholder="Dodge Charger, Muscle Car"
+                                    value={altNames}
+                                    onChange={(e) =>
+                                        setAltNames(
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+                                <p className="mt-2 font-mono text-[9px] uppercase tracking-wider text-black/35">
+                                    Separate multiple names with commas
+                                </p>
+
+                            </div>
+
+                            <div className="mt-5">
+
+                                <label className="mb-2 block font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-black/50">
+                                    Description
+                                </label>
+
+                                <textarea
+                                    rows="6"
+                                    placeholder="Describe the car, casting, design, edition and important product details..."
+                                    value={description}
+                                    onChange={(e) =>
+                                        setDescription(
+                                            e.target.value
+                                        )
+                                    }
+                                    className="w-full resize-none rounded-md border border-black/10 bg-[#ECE8D6] px-4 py-3.5 text-sm leading-6 text-[#0A0A0A] outline-none placeholder:text-black/30 transition focus:border-[#FF8F00] focus:ring-2 focus:ring-[#FF8F00]/10"
+                                />
+
+                            </div>
+
+                        </FormPanel>
 
 
-                            {/* =================================================
-                                LEFT SIDE
-                            ================================================= */}
+                        {/* PRICING */}
 
-                            <div className="space-y-9 xl:col-span-8">
+                        <FormPanel
+                            number="02"
+                            title="Pricing & Inventory"
+                            description="Set product price and stock quantity"
+                        >
 
+                            <div className="grid gap-5 sm:grid-cols-2">
 
-                                {/* =================================================
-                                    01 BASIC INFORMATION
-                                ================================================= */}
+                                <PriceInput
+                                    label="Selling Price"
+                                    value={price}
+                                    onChange={(e) =>
+                                        setPrice(
+                                            e.target.value
+                                        )
+                                    }
+                                />
 
-                                <section>
+                                <PriceInput
+                                    label="Labelled Price"
+                                    value={labelledPrice}
+                                    onChange={(e) =>
+                                        setLabelledPrice(
+                                            e.target.value
+                                        )
+                                    }
+                                />
 
-                                    <SectionTitle
-                                        number="01"
-                                        title="Basic Information"
-                                        description="Core product information"
-                                        icon={<FaInfoCircle />}
+                            </div>
+
+                            <div className="mt-5 grid gap-5 sm:grid-cols-2">
+
+                                <NumberInput
+                                    label="Quantity"
+                                    value={quantity}
+                                    min="0"
+                                    onChange={(e) =>
+                                        setQuantity(
+                                            Math.max(
+                                                0,
+                                                Number(
+                                                    e.target.value
+                                                )
+                                            )
+                                        )
+                                    }
+                                />
+
+                                <NumberInput
+                                    label="Manufacturing Year"
+                                    value={year}
+                                    min="1900"
+                                    onChange={(e) =>
+                                        setYear(
+                                            Number(
+                                                e.target.value
+                                            )
+                                        )
+                                    }
+                                />
+
+                            </div>
+
+                            <div className="mt-5 flex flex-wrap gap-2">
+
+                                <InfoBadge
+                                    label="Selling"
+                                    value={`Rs. ${Number(
+                                        price || 0
+                                    ).toLocaleString()}`}
+                                />
+
+                                <InfoBadge
+                                    label="Stock"
+                                    value={`${quantity} units`}
+                                />
+
+                                {discount > 0 && (
+                                    <InfoBadge
+                                        label="Discount"
+                                        value={`${discount}% OFF`}
+                                        orange
                                     />
+                                )}
+
+                            </div>
+
+                        </FormPanel>
 
 
-                                    <div className="grid gap-5 md:grid-cols-2">
+                        {/* IMAGES */}
 
-                                        <InputField
-                                            label="Product ID"
-                                            placeholder="MG-001"
-                                            value={productID}
-                                            onChange={(e) =>
-                                                setProductID(
-                                                    e.target.value
-                                                )
-                                            }
-                                            disabled
+                        <FormPanel
+                            number="03"
+                            title="Product Images"
+                            description="Upload clear product photographs"
+                        >
+
+                            <label
+                                htmlFor="product-images"
+                                className="group flex min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-black/20 bg-[#ECE8D6] p-8 text-center transition hover:border-[#FF8F00] hover:bg-[#DFDABF]/50"
+                            >
+
+                                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-[#0A0A0A] text-[#FF8F00] transition group-hover:bg-[#FF8F00] group-hover:text-[#0A0A0A]">
+
+                                    <svg
+                                        className="h-5 w-5"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="1.5"
+                                            d="M3 16.5l4.5-4.5a2.25 2.25 0 013.182 0L15 16.5m-3-3l1.318-1.318a2.25 2.25 0 013.182 0L21 16.5M4.5 19.5h15A1.5 1.5 0 0021 18V6a1.5 1.5 0 00-1.5-1.5h-15A1.5 1.5 0 003 6v12a1.5 1.5 0 001.5 1.5z"
                                         />
 
+                                    </svg>
 
-                                        <InputField
-                                            label="Product Name"
-                                            placeholder="1969 Dodge Charger R/T"
-                                            value={name}
-                                            onChange={(e) =>
-                                                setName(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
+                                </div>
 
-                                    </div>
+                                <p className="text-sm font-semibold">
+                                    {images.length > 0
+                                        ? `${images.length} new image${images.length > 1 ? "s" : ""} selected`
+                                        : "Upload new product images"}
+                                </p>
 
+                                <p className="mt-2 font-mono text-[9px] uppercase tracking-wider text-black/35">
+                                    JPG / PNG / WEBP
+                                </p>
 
-                                    <div className="mt-5">
+                                <input
+                                    id="product-images"
+                                    type="file"
+                                    multiple
+                                    accept="image/png,image/jpeg,image/webp"
+                                    onChange={
+                                        handleImageChange
+                                    }
+                                    className="hidden"
+                                />
 
-                                        <InputField
-                                            label="Alternative Names"
-                                            placeholder="Dodge Charger, Charger R/T"
-                                            value={altNames}
-                                            onChange={(e) =>
-                                                setAltNames(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-
-
-                                        <p className="mt-1 text-[10px] text-accent/40">
-
-                                            Separate multiple names
-                                            with commas.
-
-                                        </p>
-
-                                    </div>
+                            </label>
 
 
-                                    <div className="mt-5">
+                            {/* EXISTING IMAGES */}
 
-                                        <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.18em] text-accent/65">
+                            {existingImages.length > 0 && (
 
-                                            Description
+                                <div className="mt-4">
 
-                                        </label>
+                                    <p className="mb-2 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-black/40">
+                                        Existing Images
+                                    </p>
 
+                                    <div className="space-y-2">
 
-                                        <textarea
-                                            rows="6"
-                                            placeholder="Describe the die-cast car, casting details, special features and collection information..."
-                                            value={description}
-                                            onChange={(e) =>
-                                                setDescription(
-                                                    e.target.value
-                                                )
-                                            }
-                                            className="w-full resize-none rounded-2xl border border-accent/15 bg-primary px-4 py-3.5 text-sm leading-6 text-accent outline-none placeholder:text-accent/35 transition focus:border-accent/35 focus:ring-4 focus:ring-accent/10"
-                                        />
+                                        {existingImages.map(
+                                            (
+                                                image,
+                                                index
+                                            ) => (
 
-                                    </div>
+                                                <motion.div
+                                                    initial={{
+                                                        opacity: 0,
+                                                        x: -10,
+                                                    }}
+                                                    animate={{
+                                                        opacity: 1,
+                                                        x: 0,
+                                                    }}
+                                                    key={`${image}-${index}`}
+                                                    className="flex items-center justify-between gap-3 rounded-md border border-black/10 bg-[#ECE8D6] px-3 py-2.5"
+                                                >
 
-                                </section>
+                                                    <div className="flex min-w-0 items-center gap-3">
 
-
-                                {/* =================================================
-                                    02 PRICING
-                                ================================================= */}
-
-                                <section>
-
-                                    <SectionTitle
-                                        number="02"
-                                        title="Pricing"
-                                        description="Set product selling and labelled prices"
-                                        icon={<FaTag />}
-                                    />
-
-
-                                    <div className="grid gap-5 sm:grid-cols-2">
-
-                                        <PriceInput
-                                            label="Selling Price"
-                                            value={price}
-                                            onChange={(e) =>
-                                                setPrice(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-
-
-                                        <PriceInput
-                                            label="Labelled Price"
-                                            value={labelledPrice}
-                                            onChange={(e) =>
-                                                setLabelledPrice(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-
-                                    </div>
-
-
-                                    {discountPercentage > 0 && (
-
-                                        <div className="mt-4 flex items-center justify-between rounded-xl border border-green-200 bg-green-50 px-4 py-3">
-
-                                            <span className="text-xs font-semibold text-green-700">
-
-                                                Current Discount
-
-                                            </span>
-
-
-                                            <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
-
-                                                {discountPercentage}%
-
-                                            </span>
-
-                                        </div>
-
-                                    )}
-
-                                </section>
-
-
-                                {/* =================================================
-                                    03 IMAGES
-                                ================================================= */}
-
-                                <section>
-
-                                    <SectionTitle
-                                        number="03"
-                                        title="Product Images"
-                                        description="Manage existing and new product photographs"
-                                        icon={<FaImage />}
-                                    />
-
-
-                                    {/* EXISTING */}
-
-                                    {existingImages.length > 0 && (
-
-                                        <div className="mb-6">
-
-                                            <div className="mb-3 flex items-center justify-between">
-
-                                                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent/65">
-
-                                                    Existing Images
-
-                                                </p>
-
-
-                                                <span className="text-[10px] text-accent/40">
-
-                                                    {existingImages.length}
-                                                    {" "}
-                                                    saved
-
-                                                </span>
-
-                                            </div>
-
-
-                                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-
-                                                {existingImages.map(
-                                                    (
-                                                        image,
-                                                        index
-                                                    ) => (
-
-                                                        <div
-                                                            key={`${image}-${index}`}
-                                                            className="group relative aspect-square overflow-hidden rounded-2xl border border-accent/10 bg-white shadow-sm"
-                                                        >
+                                                        <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-black/5">
 
                                                             <img
                                                                 src={image}
                                                                 alt={`Product ${index + 1}`}
-                                                                className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                                                                onError={(e) => {
-                                                                    e.currentTarget.style.display =
-                                                                        "none";
-                                                                }}
+                                                                className="h-full w-full object-cover"
                                                             />
 
-
-                                                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-3 pt-10">
-
-                                                                <span className="text-[9px] font-bold uppercase tracking-wider text-white">
-
-                                                                    Image{" "}
-                                                                    {index + 1}
-
-                                                                </span>
-
-                                                            </div>
-
-
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    removeExistingImage(
-                                                                        index
-                                                                    )
-                                                                }
-                                                                disabled={loading}
-                                                                className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-xs text-red-600 shadow-lg transition hover:scale-105 hover:bg-red-50 disabled:opacity-50"
-                                                                title="Remove image"
-                                                            >
-
-                                                                <FaTrash />
-
-                                                            </button>
-
                                                         </div>
 
-                                                    )
-                                                )}
-
-                                            </div>
-
-                                        </div>
-
-                                    )}
-
-
-                                    {/* UPLOAD AREA */}
-
-                                    <label
-                                        htmlFor="product-images"
-                                        className="group flex min-h-[190px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-accent/20 bg-primary/60 p-8 text-center transition duration-300 hover:border-accent/40 hover:bg-white/60"
-                                    >
-
-                                        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-primary shadow-lg transition duration-300 group-hover:-translate-y-1 group-hover:scale-105">
-
-                                            <FaCloudUploadAlt className="text-xl" />
-
-                                        </div>
-
-
-                                        <p className="text-sm font-bold">
-
-                                            Add New Images
-
-                                        </p>
-
-
-                                        <p className="mt-1 text-xs text-accent/50">
-
-                                            Existing images will remain
-                                            unless you remove them.
-
-                                        </p>
-
-
-                                        <p className="mt-2 text-[10px] text-accent/40">
-
-                                            JPG, PNG or WEBP •
-                                            Maximum 5 MB each
-
-                                        </p>
-
-
-                                        <input
-                                            ref={fileInputRef}
-                                            id="product-images"
-                                            type="file"
-                                            multiple
-                                            accept="image/png,image/jpeg,image/webp"
-                                            onChange={
-                                                handleImageSelect
-                                            }
-                                            className="hidden"
-                                        />
-
-                                    </label>
-
-
-                                    {/* NEW IMAGES */}
-
-                                    {newImages.length > 0 && (
-
-                                        <div className="mt-5">
-
-                                            <div className="mb-3 flex items-center justify-between">
-
-                                                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent/65">
-
-                                                    New Images
-
-                                                </p>
-
-
-                                                <span className="text-[10px] text-accent/40">
-
-                                                    {newImages.length}
-                                                    {" "}
-                                                    selected
-
-                                                </span>
-
-                                            </div>
-
-
-                                            <div className="space-y-2">
-
-                                                {newImages.map(
-                                                    (
-                                                        image,
-                                                        index
-                                                    ) => (
-
-                                                        <div
-                                                            key={`${image.name}-${image.lastModified}-${index}`}
-                                                            className="flex items-center gap-3 rounded-xl border border-accent/10 bg-primary px-3 py-2 transition hover:border-accent/20"
-                                                        >
-
-                                                            <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white">
-
-                                                                <img
-                                                                    src={URL.createObjectURL(
-                                                                        image
-                                                                    )}
-                                                                    alt={image.name}
-                                                                    className="h-full w-full object-cover"
-                                                                />
-
-                                                            </div>
-
-
-                                                            <div className="min-w-0 flex-1">
-
-                                                                <p className="truncate text-xs font-semibold">
-
-                                                                    {image.name}
-
-                                                                </p>
-
-
-                                                                <p className="mt-0.5 text-[10px] text-accent/40">
-
-                                                                    {(
-                                                                        image.size /
-                                                                        1024 /
-                                                                        1024
-                                                                    ).toFixed(
-                                                                        2
-                                                                    )}
-                                                                    {" "}
-                                                                    MB
-
-                                                                </p>
-
-                                                            </div>
-
-
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    removeNewImage(
-                                                                        index
-                                                                    )
-                                                                }
-                                                                disabled={loading}
-                                                                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs text-red-600 transition hover:bg-red-50 disabled:opacity-50"
-                                                            >
-
-                                                                <FaTimes />
-
-                                                            </button>
-
-                                                        </div>
-
-                                                    )
-                                                )}
-
-                                            </div>
-
-                                        </div>
-
-                                    )}
-
-                                </section>
-
-
-                                {/* =================================================
-                                    04 VEHICLE INFORMATION
-                                ================================================= */}
-
-                                <section>
-
-                                    <SectionTitle
-                                        number="04"
-                                        title="Vehicle Information"
-                                        description="Detailed die-cast vehicle information"
-                                        icon={<FaCar />}
-                                    />
-
-
-                                    <div className="grid gap-5 md:grid-cols-2">
-
-
-                                        <InputField
-                                            label="Series"
-                                            placeholder="Hot Wheels Mainline"
-                                            value={series}
-                                            onChange={(e) =>
-                                                setSeries(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-
-
-                                        <InputField
-                                            label="Casting"
-                                            placeholder="Dodge Charger R/T"
-                                            value={casting}
-                                            onChange={(e) =>
-                                                setCasting(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-
-
-                                        <InputField
-                                            label="Manufacturer"
-                                            placeholder="Mattel"
-                                            value={manufacturer}
-                                            onChange={(e) =>
-                                                setManufacturer(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-
-
-                                        <InputField
-                                            label="Model"
-                                            placeholder="Charger R/T"
-                                            value={model}
-                                            onChange={(e) =>
-                                                setModel(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-
-
-                                        <InputField
-                                            label="Vehicle Color"
-                                            placeholder="Black"
-                                            value={color}
-                                            onChange={(e) =>
-                                                setColor(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-
-
-                                        <InputField
-                                            label="Series Number"
-                                            placeholder="123/250"
-                                            value={seriesNumber}
-                                            onChange={(e) =>
-                                                setSeriesNumber(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-
-                                    </div>
-
-                                </section>
-
-
-                                {/* =================================================
-                                    05 COLLECTION DETAILS
-                                ================================================= */}
-
-                                <section>
-
-                                    <SectionTitle
-                                        number="05"
-                                        title="Collection Details"
-                                        description="Configure scale, condition and packaging"
-                                        icon={<FaLayerGroup />}
-                                    />
-
-
-                                    <div className="grid gap-5 md:grid-cols-2">
-
-
-                                        <SelectField
-                                            label="Vehicle Type"
-                                            value={vehicleType}
-                                            onChange={(e) =>
-                                                setVehicleType(
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-
-                                            {vehicleTypes.map(
-                                                (item) => (
-
-                                                    <option
-                                                        key={item}
-                                                        value={item}
+                                                        <span className="truncate text-xs font-medium">
+                                                            Image{" "}
+                                                            {index + 1}
+                                                        </span>
+
+                                                    </div>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            removeExistingImage(
+                                                                index
+                                                            )
+                                                        }
+                                                        className="shrink-0 rounded-md border border-black/10 px-2.5 py-1.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-black/45 transition hover:border-[#FF3B00] hover:bg-[#FF3B00]/10 hover:text-[#FF3B00]"
                                                     >
-                                                        {item}
-                                                    </option>
+                                                        Remove
+                                                    </button>
 
-                                                )
-                                            )}
+                                                </motion.div>
 
-                                        </SelectField>
-
-
-                                        <SelectField
-                                            label="Scale"
-                                            value={scale}
-                                            onChange={(e) =>
-                                                setScale(
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-
-                                            {scales.map(
-                                                (item) => (
-
-                                                    <option
-                                                        key={item}
-                                                        value={item}
-                                                    >
-                                                        {item}
-                                                    </option>
-
-                                                )
-                                            )}
-
-                                        </SelectField>
-
-
-                                        <SelectField
-                                            label="Condition"
-                                            value={condition}
-                                            onChange={(e) =>
-                                                setCondition(
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-
-                                            {conditions.map(
-                                                (item) => (
-
-                                                    <option
-                                                        key={item}
-                                                        value={item}
-                                                    >
-                                                        {item}
-                                                    </option>
-
-                                                )
-                                            )}
-
-                                        </SelectField>
-
-
-                                        <SelectField
-                                            label="Packaging"
-                                            value={packaging}
-                                            onChange={(e) =>
-                                                setPackaging(
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-
-                                            {packagingTypes.map(
-                                                (item) => (
-
-                                                    <option
-                                                        key={item}
-                                                        value={item}
-                                                    >
-                                                        {item}
-                                                    </option>
-
-                                                )
-                                            )}
-
-                                        </SelectField>
-
-                                    </div>
-
-                                </section>
-
-                            </div>
-
-
-                            {/* =================================================
-                                RIGHT SIDE
-                            ================================================= */}
-
-                            <div className="space-y-6 xl:col-span-4">
-
-
-                                {/* =================================================
-                                    CLASSIFICATION
-                                ================================================= */}
-
-                                <section className="rounded-2xl border border-accent/15 bg-primary/70 p-5 sm:p-6">
-
-                                    <SectionTitle
-                                        number="06"
-                                        title="Classification"
-                                        description="Organize this product"
-                                        icon={<FaCubes />}
-                                    />
-
-
-                                    <div className="space-y-5">
-
-
-                                        <SelectField
-                                            label="Category"
-                                            value={category}
-                                            onChange={(e) =>
-                                                setCategory(
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-
-                                            <option value="">
-                                                Select category
-                                            </option>
-
-
-                                            {categories.map(
-                                                (item) => (
-
-                                                    <option
-                                                        key={item}
-                                                        value={item}
-                                                    >
-                                                        {item}
-                                                    </option>
-
-                                                )
-                                            )}
-
-                                        </SelectField>
-
-
-                                        <SelectField
-                                            label="Product Type"
-                                            value={productType}
-                                            onChange={(e) =>
-                                                setProductType(
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-
-                                            <option value="">
-                                                Select product type
-                                            </option>
-
-
-                                            {productTypes.map(
-                                                (item) => (
-
-                                                    <option
-                                                        key={item}
-                                                        value={item}
-                                                    >
-                                                        {item}
-                                                    </option>
-
-                                                )
-                                            )}
-
-                                        </SelectField>
-
-
-                                        <NumberField
-                                            label="Car Count"
-                                            min="1"
-                                            value={carCount}
-                                            onChange={(e) =>
-                                                setCarCount(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-
-
-                                        <NumberField
-                                            label="Release Year"
-                                            min="1900"
-                                            max="2100"
-                                            value={year}
-                                            onChange={(e) =>
-                                                setYear(
-                                                    e.target.value
-                                                )
-                                            }
-                                        />
-
-                                    </div>
-
-                                </section>
-
-
-                                {/* =================================================
-                                    INVENTORY
-                                ================================================= */}
-
-                                <section className="rounded-2xl border border-accent/15 bg-white/60 p-5 sm:p-6">
-
-                                    <SectionTitle
-                                        number="07"
-                                        title="Inventory"
-                                        description="Manage available stock"
-                                        icon={<FaBox />}
-                                    />
-
-
-                                    <NumberField
-                                        label="Available Quantity"
-                                        min="0"
-                                        value={quantity}
-                                        onChange={(e) =>
-                                            setQuantity(
-                                                e.target.value
                                             )
-                                        }
-                                    />
-
-
-                                    <div className="mt-4 rounded-xl border border-accent/10 bg-primary p-4">
-
-                                        <div className="flex items-center justify-between">
-
-                                            <span className="text-[10px] font-bold uppercase tracking-wider text-accent/50">
-
-                                                Stock Status
-
-                                            </span>
-
-
-                                            <span
-                                                className={`rounded-full px-3 py-1 text-[10px] font-bold ${
-                                                    Number(quantity) >
-                                                    0
-                                                        ? "bg-green-100 text-green-700"
-                                                        : "bg-red-100 text-red-700"
-                                                }`}
-                                            >
-
-                                                {Number(quantity) >
-                                                0
-                                                    ? "IN STOCK"
-                                                    : "OUT OF STOCK"}
-
-                                            </span>
-
-                                        </div>
-
-
-                                        <p className="mt-3 text-xs leading-5 text-accent/50">
-
-                                            Stock status is automatically
-                                            calculated from the available
-                                            quantity.
-
-                                        </p>
+                                        )}
 
                                     </div>
-
-                                </section>
-
-
-                                {/* =================================================
-                                    STATUS
-                                ================================================= */}
-
-                                <section className="rounded-2xl border border-accent/15 bg-accent p-6 text-primary shadow-xl">
-
-                                    <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-primary/50">
-
-                                        Product Status
-
-                                    </p>
-
-
-                                    <div className="mt-5">
-
-                                        <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.18em] text-primary/60">
-
-                                            Status
-
-                                        </label>
-
-
-                                        <select
-                                            value={status}
-                                            onChange={(e) =>
-                                                setStatus(
-                                                    e.target.value
-                                                )
-                                            }
-                                            disabled={
-                                                Number(quantity) <= 0
-                                            }
-                                            className="h-12 w-full rounded-xl border border-primary/20 bg-primary/10 px-4 text-sm font-semibold text-primary outline-none transition focus:border-primary/40 disabled:cursor-not-allowed disabled:opacity-50"
-                                        >
-
-                                            {statuses.map(
-                                                (item) => (
-
-                                                    <option
-                                                        key={item}
-                                                        value={item}
-                                                        className="text-accent"
-                                                    >
-                                                        {item}
-                                                    </option>
-
-                                                )
-                                            )}
-
-                                        </select>
-
-                                    </div>
-
-
-                                    {/* FEATURED */}
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setFeatured(
-                                                (current) =>
-                                                    !current
-                                            )
-                                        }
-                                        disabled={loading}
-                                        className={`mt-5 flex w-full items-center justify-between rounded-xl border px-4 py-3 transition ${
-                                            featured
-                                                ? "border-primary/30 bg-primary/15"
-                                                : "border-primary/10 bg-primary/5"
-                                        }`}
-                                    >
-
-                                        <div className="text-left">
-
-                                            <p className="text-xs font-bold">
-
-                                                Featured Product
-
-                                            </p>
-
-
-                                            <p className="mt-1 text-[9px] text-primary/50">
-
-                                                Show this product in
-                                                featured collections.
-
-                                            </p>
-
-                                        </div>
-
-
-                                        <div
-                                            className={`flex h-6 w-11 items-center rounded-full p-1 transition ${
-                                                featured
-                                                    ? "bg-primary"
-                                                    : "bg-primary/20"
-                                            }`}
-                                        >
-
-                                            <div
-                                                className={`h-4 w-4 rounded-full transition ${
-                                                    featured
-                                                        ? "translate-x-5 bg-accent"
-                                                        : "translate-x-0 bg-primary/70"
-                                                }`}
-                                            />
-
-                                        </div>
-
-                                    </button>
-
-                                </section>
-
-
-                                {/* =================================================
-                                    SUMMARY
-                                ================================================= */}
-
-                                <section className="rounded-2xl bg-accent p-6 text-primary shadow-xl">
-
-                                    <div className="flex items-center gap-3">
-
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-
-                                            <FaCar />
-
-                                        </div>
-
-
-                                        <div>
-
-                                            <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-primary/50">
-
-                                                Product Summary
-
-                                            </p>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    <h3 className="mt-5 break-words text-2xl font-light">
-
-                                        {name ||
-                                            "Your product"}
-
-                                    </h3>
-
-
-                                    <div className="mt-6 space-y-3 border-t border-primary/10 pt-5">
-
-
-                                        <SummaryRow
-                                            label="Product ID"
-                                            value={
-                                                productID ||
-                                                "Not set"
-                                            }
-                                        />
-
-
-                                        <SummaryRow
-                                            label="Category"
-                                            value={
-                                                category ||
-                                                "Not selected"
-                                            }
-                                        />
-
-
-                                        <SummaryRow
-                                            label="Type"
-                                            value={
-                                                productType ||
-                                                "Not selected"
-                                            }
-                                        />
-
-
-                                        <SummaryRow
-                                            label="Series"
-                                            value={
-                                                series ||
-                                                "Not set"
-                                            }
-                                        />
-
-
-                                        <SummaryRow
-                                            label="Casting"
-                                            value={
-                                                casting ||
-                                                "Not set"
-                                            }
-                                        />
-
-
-                                        <SummaryRow
-                                            label="Vehicle"
-                                            value={
-                                                vehicleType ||
-                                                "Other"
-                                            }
-                                        />
-
-
-                                        <SummaryRow
-                                            label="Scale"
-                                            value={
-                                                scale ||
-                                                "1:64"
-                                            }
-                                        />
-
-
-                                        <SummaryRow
-                                            label="Year"
-                                            value={
-                                                year ||
-                                                "Not set"
-                                            }
-                                        />
-
-
-                                        <SummaryRow
-                                            label="Condition"
-                                            value={
-                                                condition ||
-                                                "New"
-                                            }
-                                        />
-
-
-                                        <SummaryRow
-                                            label="Quantity"
-                                            value={
-                                                quantity || 0
-                                            }
-                                        />
-
-
-                                        <SummaryRow
-                                            label="Images"
-                                            value={
-                                                finalImageCount
-                                            }
-                                        />
-
-
-                                        <SummaryRow
-                                            label="Featured"
-                                            value={
-                                                featured
-                                                    ? "Yes"
-                                                    : "No"
-                                            }
-                                        />
-
-                                    </div>
-
-                                </section>
-
-
-                                {/* =================================================
-                                    UPDATE NOTE
-                                ================================================= */}
-
-                                <div className="rounded-2xl border border-accent/10 bg-white/60 p-5">
-
-                                    <div className="flex items-center gap-2">
-
-                                        <FaInfoCircle className="text-xs text-accent/50" />
-
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent/60">
-
-                                            Update Note
-
-                                        </p>
-
-                                    </div>
-
-
-                                    <p className="mt-3 text-xs leading-5 text-accent/55">
-
-                                        Existing images are preserved
-                                        automatically. Only images
-                                        removed from this page will
-                                        be removed from the product
-                                        record. Newly selected images
-                                        are uploaded to Supabase when
-                                        you save the product.
-
-                                    </p>
 
                                 </div>
 
+                            )}
+
+
+                            {/* NEW IMAGES */}
+
+                            {images.length > 0 && (
+
+                                <div className="mt-4 space-y-2">
+
+                                    <p className="mb-2 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-black/40">
+                                        New Images
+                                    </p>
+
+                                    {images.map(
+                                        (
+                                            image,
+                                            index
+                                        ) => (
+
+                                            <motion.div
+                                                initial={{
+                                                    opacity: 0,
+                                                    x: -10,
+                                                }}
+                                                animate={{
+                                                    opacity: 1,
+                                                    x: 0,
+                                                }}
+                                                key={`${image.name}-${index}`}
+                                                className="flex items-center justify-between gap-3 rounded-md border border-black/10 bg-[#ECE8D6] px-3 py-2.5"
+                                            >
+
+                                                <div className="flex min-w-0 items-center gap-3">
+
+                                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#0A0A0A] text-[#FF8F00]">
+
+                                                        <svg
+                                                            className="h-3.5 w-3.5"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                        >
+
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth="1.5"
+                                                                d="M4 16l4-4 4 4 3-3 5 5M5 19h14a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v12a1 1 0 001 1z"
+                                                            />
+
+                                                        </svg>
+
+                                                    </div>
+
+                                                    <span className="truncate text-xs font-medium">
+                                                        {image.name}
+                                                    </span>
+
+                                                </div>
+
+                                                <span className="shrink-0 font-mono text-[9px] text-black/35">
+
+                                                    {(
+                                                        image.size /
+                                                        1024 /
+                                                        1024
+                                                    ).toFixed(
+                                                        2
+                                                    )}{" "}
+                                                    MB
+
+                                                </span>
+
+                                            </motion.div>
+
+                                        )
+                                    )}
+
+                                </div>
+
+                            )}
+
+                        </FormPanel>
+
+
+                        {/* VEHICLE DETAILS */}
+
+                        <FormPanel
+                            number="04"
+                            title="Vehicle Details"
+                            description="Technical and identification details"
+                        >
+
+                            <div className="grid gap-5 md:grid-cols-2">
+
+                                <InputField
+                                    label="Series"
+                                    placeholder="Hot Wheels Mainline"
+                                    value={series}
+                                    onChange={(e) =>
+                                        setSeries(
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+                                <InputField
+                                    label="Casting"
+                                    placeholder="Dodge Charger R/T"
+                                    value={casting}
+                                    onChange={(e) =>
+                                        setCasting(
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+                                <InputField
+                                    label="Manufacturer"
+                                    placeholder="Mattel"
+                                    value={manufacturer}
+                                    onChange={(e) =>
+                                        setManufacturer(
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+                                <InputField
+                                    label="Model"
+                                    placeholder="Dodge Charger"
+                                    value={model}
+                                    onChange={(e) =>
+                                        setModel(
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+                                <SelectField
+                                    label="Vehicle Type"
+                                    value={vehicleType}
+                                    onChange={(e) =>
+                                        setVehicleType(
+                                            e.target.value
+                                        )
+                                    }
+                                >
+
+                                    {vehicleTypes.map(
+                                        (item) => (
+                                            <option
+                                                key={item}
+                                                value={item}
+                                            >
+                                                {item}
+                                            </option>
+                                        )
+                                    )}
+
+                                </SelectField>
+
+                                <InputField
+                                    label="Color"
+                                    placeholder="Red"
+                                    value={color}
+                                    onChange={(e) =>
+                                        setColor(
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
+                                <SelectField
+                                    label="Scale"
+                                    value={scale}
+                                    onChange={(e) =>
+                                        setScale(
+                                            e.target.value
+                                        )
+                                    }
+                                >
+
+                                    <option value="1:18">
+                                        1:18
+                                    </option>
+
+                                    <option value="1:24">
+                                        1:24
+                                    </option>
+
+                                    <option value="1:32">
+                                        1:32
+                                    </option>
+
+                                    <option value="1:43">
+                                        1:43
+                                    </option>
+
+                                    <option value="1:64">
+                                        1:64
+                                    </option>
+
+                                    <option value="1:87">
+                                        1:87
+                                    </option>
+
+                                </SelectField>
+
+                                <InputField
+                                    label="Series Number"
+                                    placeholder="HW-2026-045"
+                                    value={seriesNumber}
+                                    onChange={(e) =>
+                                        setSeriesNumber(
+                                            e.target.value
+                                        )
+                                    }
+                                />
+
                             </div>
 
-                        </div>
+                        </FormPanel>
+
+
+                        {/* PRODUCT / PACKAGING */}
+
+                        <FormPanel
+                            number="05"
+                            title="Product & Packaging"
+                            description="Collection and packaging information"
+                        >
+
+                            <div className="grid gap-5 md:grid-cols-2">
+
+                                <SelectField
+                                    label="Category"
+                                    value={category}
+                                    onChange={(e) =>
+                                        setCategory(
+                                            e.target.value
+                                        )
+                                    }
+                                >
+
+                                    {categories.map(
+                                        (item) => (
+                                            <option
+                                                key={item}
+                                                value={item}
+                                            >
+                                                {item}
+                                            </option>
+                                        )
+                                    )}
+
+                                </SelectField>
+
+
+                                <SelectField
+                                    label="Product Type"
+                                    value={productType}
+                                    onChange={(e) =>
+                                        setProductType(
+                                            e.target.value
+                                        )
+                                    }
+                                >
+
+                                    {productTypes.map(
+                                        (item) => (
+                                            <option
+                                                key={item}
+                                                value={item}
+                                            >
+                                                {item}
+                                            </option>
+                                        )
+                                    )}
+
+                                </SelectField>
+
+
+                                <NumberInput
+                                    label="Car Count"
+                                    value={carCount}
+                                    min="1"
+                                    onChange={(e) =>
+                                        setCarCount(
+                                            Math.max(
+                                                1,
+                                                Number(
+                                                    e.target.value
+                                                )
+                                            )
+                                        )
+                                    }
+                                />
+
+
+                                <SelectField
+                                    label="Condition"
+                                    value={condition}
+                                    onChange={(e) =>
+                                        setCondition(
+                                            e.target.value
+                                        )
+                                    }
+                                >
+
+                                    {conditions.map(
+                                        (item) => (
+                                            <option
+                                                key={item}
+                                                value={item}
+                                            >
+                                                {item}
+                                            </option>
+                                        )
+                                    )}
+
+                                </SelectField>
+
+
+                                <SelectField
+                                    label="Packaging"
+                                    value={packaging}
+                                    onChange={(e) =>
+                                        setPackaging(
+                                            e.target.value
+                                        )
+                                    }
+                                >
+
+                                    {packagingTypes.map(
+                                        (item) => (
+                                            <option
+                                                key={item}
+                                                value={item}
+                                            >
+                                                {item}
+                                            </option>
+                                        )
+                                    )}
+
+                                </SelectField>
+
+
+                                <SelectField
+                                    label="Status"
+                                    value={status}
+                                    onChange={(e) =>
+                                        setStatus(
+                                            e.target.value
+                                        )
+                                    }
+                                >
+
+                                    {statuses.map(
+                                        (item) => (
+                                            <option
+                                                key={item}
+                                                value={item}
+                                            >
+                                                {item}
+                                            </option>
+                                        )
+                                    )}
+
+                                </SelectField>
+
+                            </div>
+
+                        </FormPanel>
 
                     </div>
 
 
                     {/* =================================================
-                        FOOTER
+                        RIGHT SIDE
                     ================================================= */}
 
-                    <div className="border-t border-accent/15 bg-white/20 px-5 py-5 sm:px-7 lg:px-9">
+                    <div className="space-y-5 xl:sticky xl:top-5">
 
-                        <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                        {/* SUMMARY */}
+
+                        <motion.section
+                            initial={{
+                                opacity: 0,
+                                x: 15,
+                            }}
+                            animate={{
+                                opacity: 1,
+                                x: 0,
+                            }}
+                            transition={{
+                                duration: 0.45,
+                                delay: 0.15,
+                            }}
+                            className="border border-black/10 bg-[#F5F5DC]"
+                        >
+
+                            <div className="border-b border-black/10 px-5 py-4">
+
+                                <div className="flex items-center gap-3">
+
+                                    <div className="flex h-8 w-8 items-center justify-center rounded bg-[#0A0A0A] font-mono text-[9px] font-semibold text-[#FF8F00]">
+                                        06
+                                    </div>
+
+                                    <div>
+
+                                        <h2 className="text-sm font-bold uppercase tracking-tight">
+                                            Product Summary
+                                        </h2>
+
+                                        <p className="mt-1 text-[10px] text-black/40">
+                                            Live product overview
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
 
 
-                            <button
-                                type="button"
-                                disabled={loading}
-                                onClick={() =>
-                                    navigate(
-                                        "/admin/products"
-                                    )
-                                }
-                                className="rounded-xl border border-accent/20 bg-primary px-7 py-3.5 text-[10px] font-bold uppercase tracking-[0.18em] text-accent transition hover:border-accent/40 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
-                            >
+                            <div className="p-5">
 
-                                Cancel
+                                <div className="space-y-0">
 
-                            </button>
+                                    <SummaryRow
+                                        label="Product ID"
+                                        value={
+                                            productID ||
+                                            "Not set"
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Name"
+                                        value={
+                                            name ||
+                                            "Not set"
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Category"
+                                        value={
+                                            category
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Product Type"
+                                        value={
+                                            productType
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Car Count"
+                                        value={
+                                            carCount
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Series"
+                                        value={
+                                            series ||
+                                            "Not set"
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Casting"
+                                        value={
+                                            casting ||
+                                            "Not set"
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Vehicle"
+                                        value={
+                                            vehicleType
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Scale"
+                                        value={
+                                            scale
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Condition"
+                                        value={
+                                            condition
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Packaging"
+                                        value={
+                                            packaging
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Quantity"
+                                        value={
+                                            quantity
+                                        }
+                                    />
+
+                                    <SummaryRow
+                                        label="Images"
+                                        value={
+                                            totalImages
+                                        }
+                                    />
+
+                                </div>
+
+                            </div>
+
+                        </motion.section>
 
 
-                            <button
-                                type="button"
-                                disabled={loading}
-                                onClick={
-                                    updateProduct
-                                }
-                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-8 py-3.5 text-[10px] font-bold uppercase tracking-[0.18em] text-primary shadow-lg transition duration-300 hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
-                            >
+                        {/* PRICE */}
 
-                                {loading ? (
+                        <motion.section
+                            initial={{
+                                opacity: 0,
+                                x: 15,
+                            }}
+                            animate={{
+                                opacity: 1,
+                                x: 0,
+                            }}
+                            transition={{
+                                duration: 0.45,
+                                delay: 0.2,
+                            }}
+                            className="overflow-hidden bg-[#0A0A0A] text-[#F5F5DC]"
+                        >
 
-                                    <>
+                            <div className="p-6">
 
-                                        <Spinner />
+                                <div className="flex items-start justify-between gap-3">
 
-                                        Updating Product...
+                                    <div>
 
-                                    </>
+                                        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-[#F5F5DC]/40">
+                                            Pricing
+                                        </p>
 
-                                ) : (
+                                        <p className="mt-3 font-mono text-3xl font-semibold tracking-tight">
+                                            Rs.{" "}
+                                            {Number(
+                                                price ||
+                                                0
+                                            ).toLocaleString()}
+                                        </p>
 
-                                    <>
+                                    </div>
 
-                                        <FaSave />
+                                    {discount >
+                                        0 && (
 
-                                        Update Product
+                                        <span className="rounded bg-[#FF8F00] px-2 py-1 font-mono text-[9px] font-bold text-[#0A0A0A]">
+                                            {discount}% OFF
+                                        </span>
 
-                                    </>
+                                    )}
+
+                                </div>
+
+
+                                {Number(
+                                    labelledPrice
+                                ) >
+                                    Number(
+                                        price
+                                    ) && (
+
+                                    <div className="mt-2 font-mono text-[10px] text-[#F5F5DC]/35 line-through">
+
+                                        Rs.{" "}
+                                        {Number(
+                                            labelledPrice
+                                        ).toLocaleString()}
+
+                                    </div>
+
                                 )}
 
-                            </button>
 
-                        </div>
+                                <div className="mt-6 grid grid-cols-2 border-t border-[#F5F5DC]/10 pt-5">
+
+                                    <div>
+
+                                        <p className="font-mono text-[9px] uppercase tracking-wider text-[#F5F5DC]/35">
+                                            Stock
+                                        </p>
+
+                                        <p className="mt-2 font-mono text-sm font-semibold">
+                                            {quantity} units
+                                        </p>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <p className="font-mono text-[9px] uppercase tracking-wider text-[#F5F5DC]/35">
+                                            Status
+                                        </p>
+
+                                        <div className="mt-2 flex items-center gap-2">
+
+                                            <span
+                                                className={`h-1.5 w-1.5 rounded-full ${
+                                                    quantity <=
+                                                    0
+                                                        ? "bg-[#FF3B00]"
+                                                        : status ===
+                                                          "Active"
+                                                        ? "bg-[#2F7A45]"
+                                                        : "bg-[#FF8F00]"
+                                                }`}
+                                            />
+
+                                            <span className="font-mono text-[10px] font-semibold uppercase">
+                                                {quantity <=
+                                                0
+                                                    ? "Out of Stock"
+                                                    : status}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </motion.section>
+
+
+                        {/* OPTIONS */}
+
+                        <motion.section
+                            initial={{
+                                opacity: 0,
+                                x: 15,
+                            }}
+                            animate={{
+                                opacity: 1,
+                                x: 0,
+                            }}
+                            transition={{
+                                duration: 0.45,
+                                delay: 0.25,
+                            }}
+                            className="border border-black/10 bg-[#F5F5DC]"
+                        >
+
+                            <div className="border-b border-black/10 px-5 py-4">
+
+                                <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-black/45">
+                                    Product Options
+                                </p>
+
+                            </div>
+
+
+                            <div className="p-5">
+
+                                <ToggleOption
+                                    label="In Stock"
+                                    description="Product is available for purchase"
+                                    checked={
+                                        inStock
+                                    }
+                                    onChange={(e) =>
+                                        setInStock(
+                                            e.target.checked
+                                        )
+                                    }
+                                />
+
+                                <div className="my-5 h-px bg-black/10" />
+
+                                <ToggleOption
+                                    label="Featured Product"
+                                    description="Show product in featured sections"
+                                    checked={
+                                        featured
+                                    }
+                                    onChange={(e) =>
+                                        setFeatured(
+                                            e.target.checked
+                                        )
+                                    }
+                                />
+
+                            </div>
+
+                        </motion.section>
+
+
+                        {/* PREVIEW */}
+
+                        <section className="border border-black/10 bg-[#F5F5DC]">
+
+                            <div className="border-b border-black/10 px-5 py-4">
+
+                                <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.15em] text-black/45">
+                                    Listing Preview
+                                </p>
+
+                            </div>
+
+
+                            <div className="p-5">
+
+                                <div className="flex gap-4">
+
+                                    <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md bg-[#ECE8D6]">
+
+                                        {existingImages.length >
+                                        0 ? (
+
+                                            <img
+                                                src={
+                                                    existingImages[0]
+                                                }
+                                                alt="Preview"
+                                                className="h-full w-full object-cover"
+                                            />
+
+                                        ) : images.length >
+                                          0 ? (
+
+                                            <img
+                                                src={URL.createObjectURL(
+                                                    images[0]
+                                                )}
+                                                alt="Preview"
+                                                className="h-full w-full object-cover"
+                                            />
+
+                                        ) : (
+
+                                            <svg
+                                                className="h-8 w-8 text-black/15"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="1.2"
+                                                    d="M4 16l4-4 4 4 3-3 5 5M5 19h14a1.5 1.5 0 001.5-1.5V6A1.5 1.5 0 0020 4.5H5A1.5 1.5 0 003.5 6v12A1.5 1.5 0 005 19z"
+                                                />
+
+                                            </svg>
+
+                                        )}
+
+                                    </div>
+
+
+                                    <div className="min-w-0">
+
+                                        <p className="font-mono text-[9px] uppercase tracking-wider text-black/35">
+                                            {category}
+                                        </p>
+
+                                        <h3 className="mt-1 truncate text-sm font-semibold">
+                                            {name ||
+                                                "Product Name"}
+                                        </h3>
+
+                                        <p className="mt-2 font-mono text-sm font-semibold">
+                                            Rs.{" "}
+                                            {Number(
+                                                price ||
+                                                0
+                                            ).toLocaleString()}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+                </motion.div>
+
+            </div>
+
+
+            {/* =================================================
+                FOOTER ACTION BAR
+            ================================================= */}
+
+            <div className="border-t border-black/10 bg-[#F5F5DC]">
+
+                <div className="mx-auto flex max-w-[1500px] flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7 lg:px-9">
+
+                    <div>
+
+                        <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-black/35">
+                            PRODUCT UPDATE
+                        </p>
+
+                        <p className="mt-1 text-xs text-black/50">
+                            Review the information before saving.
+                        </p>
+
+                    </div>
+
+
+                    <div className="flex flex-col gap-2 sm:flex-row">
+
+                        <button
+                            type="button"
+                            disabled={
+                                setloading
+                            }
+                            onClick={() =>
+                                navigate(
+                                    "/admin/products"
+                                )
+                            }
+                            className="inline-flex items-center justify-center gap-2 rounded-md border border-black/15 px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#0A0A0A] transition hover:border-black hover:bg-[#ECE8D6] disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Cancel
+                        </button>
+
+
+                        <motion.button
+                            type="button"
+                            disabled={
+                                setloading
+                            }
+                            onClick={
+                                updateProduct
+                            }
+                            whileHover={{
+                                y: -2,
+                            }}
+                            whileTap={{
+                                scale: 0.98,
+                            }}
+                            className="inline-flex items-center justify-center gap-2 rounded-md bg-[#0A0A0A] px-7 py-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#F5F5DC] shadow-sm transition hover:bg-[#FF8F00] hover:text-[#0A0A0A] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+
+                            {setloading
+                                ? "Updating Product..."
+                                : "Update Product →"}
+
+                        </motion.button>
 
                     </div>
 
@@ -2450,84 +2301,99 @@ export default function AdminUpdateProductPage() {
 }
 
 
-/* =========================================================
-   SECTION TITLE
-========================================================= */
+// =========================================================
+// FORM PANEL
+// =========================================================
 
-function SectionTitle({
+function FormPanel({
     number,
     title,
     description,
-    icon,
+    children,
 }) {
 
     return (
 
-        <div className="mb-5 flex items-center gap-3">
+        <motion.section
+            initial={{
+                opacity: 0,
+                y: 12,
+            }}
+            animate={{
+                opacity: 1,
+                y: 0,
+            }}
+            transition={{
+                duration: 0.35,
+            }}
+            className="border border-black/10 bg-[#F5F5DC]"
+        >
 
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-[10px] text-primary">
+            <div className="border-b border-black/10 px-5 py-4 sm:px-6">
 
-                {icon || number}
+                <div className="flex items-center gap-3">
+
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-[#0A0A0A] font-mono text-[9px] font-semibold text-[#FF8F00]">
+                        {number}
+                    </div>
+
+                    <div>
+
+                        <h2 className="text-sm font-bold uppercase tracking-tight">
+                            {title}
+                        </h2>
+
+                        <p className="mt-1 text-[10px] text-black/40">
+                            {description}
+                        </p>
+
+                    </div>
+
+                </div>
 
             </div>
 
 
-            <div>
+            <div className="p-5 sm:p-6">
 
-                <h2 className="text-sm font-bold tracking-tight text-accent">
-
-                    {title}
-
-                </h2>
-
-
-                <p className="mt-1 text-[10px] text-accent/55">
-
-                    {description}
-
-                </p>
+                {children}
 
             </div>
 
-        </div>
+        </motion.section>
     );
 }
 
 
-/* =========================================================
-   INPUT FIELD
-========================================================= */
+// =========================================================
+// INPUT
+// =========================================================
 
 function InputField({
     label,
     placeholder,
     value,
     onChange,
-    disabled = false,
 }) {
 
     return (
 
         <div>
 
-            <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.18em] text-accent/70">
-
+            <label className="mb-2 block font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-black/50">
                 {label}
-
             </label>
-
 
             <input
                 type="text"
-                placeholder={placeholder}
+                placeholder={
+                    placeholder
+                }
                 value={value}
-                onChange={onChange}
-                disabled={disabled}
-                className={`h-12 w-full rounded-xl border border-accent/15 px-4 text-sm font-medium text-accent outline-none placeholder:text-accent/35 transition focus:border-accent/40 focus:ring-4 focus:ring-accent/10 ${
-                    disabled
-                        ? "cursor-not-allowed bg-accent/5 text-accent/50"
-                        : "bg-primary"
-                }`}
+                onChange={
+                    onChange
+                }
+                className="h-11 w-full rounded-md border border-black/10 bg-[#ECE8D6] px-3.5 text-sm font-medium text-[#0A0A0A] outline-none placeholder:text-black/30 transition focus:border-[#FF8F00] focus:ring-2 focus:ring-[#FF8F00]/10"
             />
 
         </div>
@@ -2535,36 +2401,33 @@ function InputField({
 }
 
 
-/* =========================================================
-   NUMBER FIELD
-========================================================= */
+// =========================================================
+// NUMBER INPUT
+// =========================================================
 
-function NumberField({
+function NumberInput({
     label,
     value,
+    min = 0,
     onChange,
-    min = "0",
-    max,
 }) {
 
     return (
 
         <div>
 
-            <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.18em] text-accent/70">
-
+            <label className="mb-2 block font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-black/50">
                 {label}
-
             </label>
-
 
             <input
                 type="number"
                 min={min}
-                max={max}
                 value={value}
-                onChange={onChange}
-                className="h-12 w-full rounded-xl border border-accent/15 bg-primary px-4 text-sm font-medium text-accent outline-none transition placeholder:text-accent/35 focus:border-accent/40 focus:ring-4 focus:ring-accent/10"
+                onChange={
+                    onChange
+                }
+                className="h-11 w-full rounded-md border border-black/10 bg-[#ECE8D6] px-3.5 text-sm font-medium text-[#0A0A0A] outline-none transition focus:border-[#FF8F00] focus:ring-2 focus:ring-[#FF8F00]/10"
             />
 
         </div>
@@ -2572,9 +2435,9 @@ function NumberField({
 }
 
 
-/* =========================================================
-   PRICE INPUT
-========================================================= */
+// =========================================================
+// PRICE INPUT
+// =========================================================
 
 function PriceInput({
     label,
@@ -2586,21 +2449,15 @@ function PriceInput({
 
         <div>
 
-            <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.18em] text-accent/70">
-
+            <label className="mb-2 block font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-black/50">
                 {label}
-
             </label>
-
 
             <div className="relative">
 
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-accent/50">
-
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono text-[10px] font-semibold text-black/40">
                     Rs.
-
                 </span>
-
 
                 <input
                     type="number"
@@ -2608,8 +2465,10 @@ function PriceInput({
                     step="0.01"
                     placeholder="0.00"
                     value={value}
-                    onChange={onChange}
-                    className="h-12 w-full rounded-xl border border-accent/15 bg-primary pl-11 pr-4 text-sm font-medium text-accent outline-none placeholder:text-accent/35 transition focus:border-accent/40 focus:ring-4 focus:ring-accent/10"
+                    onChange={
+                        onChange
+                    }
+                    className="h-11 w-full rounded-md border border-black/10 bg-[#ECE8D6] pl-11 pr-3.5 text-sm font-medium text-[#0A0A0A] outline-none placeholder:text-black/30 transition focus:border-[#FF8F00] focus:ring-2 focus:ring-[#FF8F00]/10"
                 />
 
             </div>
@@ -2619,9 +2478,9 @@ function PriceInput({
 }
 
 
-/* =========================================================
-   SELECT FIELD
-========================================================= */
+// =========================================================
+// SELECT
+// =========================================================
 
 function SelectField({
     label,
@@ -2634,17 +2493,16 @@ function SelectField({
 
         <div>
 
-            <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.18em] text-accent/70">
-
+            <label className="mb-2 block font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-black/50">
                 {label}
-
             </label>
-
 
             <select
                 value={value}
-                onChange={onChange}
-                className="h-12 w-full rounded-xl border border-accent/15 bg-primary px-4 text-sm font-medium text-accent outline-none transition focus:border-accent/40 focus:ring-4 focus:ring-accent/10"
+                onChange={
+                    onChange
+                }
+                className="h-11 w-full rounded-md border border-black/10 bg-[#ECE8D6] px-3.5 text-sm font-medium text-[#0A0A0A] outline-none transition focus:border-[#FF8F00] focus:ring-2 focus:ring-[#FF8F00]/10"
             >
 
                 {children}
@@ -2656,9 +2514,9 @@ function SelectField({
 }
 
 
-/* =========================================================
-   SUMMARY ROW
-========================================================= */
+// =========================================================
+// SUMMARY ROW
+// =========================================================
 
 function SummaryRow({
     label,
@@ -2667,19 +2525,14 @@ function SummaryRow({
 
     return (
 
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 border-b border-black/[0.07] py-3 last:border-b-0">
 
-            <span className="shrink-0 text-[10px] uppercase tracking-wider text-primary/45">
-
+            <span className="shrink-0 font-mono text-[9px] uppercase tracking-wider text-black/40">
                 {label}
-
             </span>
 
-
-            <span className="max-w-[65%] truncate text-right text-xs font-medium text-primary/85">
-
+            <span className="max-w-[58%] truncate text-right text-xs font-semibold text-black/75">
                 {value}
-
             </span>
 
         </div>
@@ -2687,15 +2540,93 @@ function SummaryRow({
 }
 
 
-/* =========================================================
-   SPINNER
-========================================================= */
+// =========================================================
+// INFO BADGE
+// =========================================================
 
-function Spinner() {
+function InfoBadge({
+    label,
+    value,
+    orange = false,
+}) {
 
     return (
 
-        <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+        <div
+            className={`rounded-md border px-3 py-2 ${
+                orange
+                    ? "border-[#FF8F00]/30 bg-[#FF8F00]/10"
+                    : "border-black/10 bg-[#ECE8D6]"
+            }`}
+        >
 
+            <p className="font-mono text-[8px] uppercase tracking-wider text-black/35">
+                {label}
+            </p>
+
+            <p
+                className={`mt-1 font-mono text-[10px] font-semibold ${
+                    orange
+                        ? "text-[#CC7000]"
+                        : "text-black/70"
+                }`}
+            >
+                {value}
+            </p>
+
+        </div>
     );
 }
+
+
+// =========================================================
+// TOGGLE
+// =========================================================
+
+function ToggleOption({
+    label,
+    description,
+    checked,
+    onChange,
+}) {
+
+    return (
+
+        <label className="flex cursor-pointer items-center justify-between gap-4">
+
+            <div className="min-w-0">
+
+                <p className="text-xs font-semibold text-[#0A0A0A]">
+                    {label}
+                </p>
+
+                <p className="mt-1 text-[10px] leading-4 text-black/40">
+                    {description}
+                </p>
+
+            </div>
+
+
+            <div className="relative shrink-0">
+
+                <input
+                    type="checkbox"
+                    checked={
+                        checked
+                    }
+                    onChange={
+                        onChange
+                    }
+                    className="peer sr-only"
+                />
+
+                <div className="h-5 w-9 rounded-full border border-black/15 bg-black/10 transition peer-checked:border-[#FF8F00] peer-checked:bg-[#FF8F00]" />
+
+                <div className="absolute left-1 top-1 h-3 w-3 rounded-full bg-white shadow-sm transition peer-checked:translate-x-4" />
+
+            </div>
+
+        </label>
+    );
+}
+
