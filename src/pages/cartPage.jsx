@@ -2439,7 +2439,7 @@ export default function CartPage() {
                                             scale: 0.98,
                                         }}
                                         onClick={() =>
-                                            navigate("/")
+                                            navigate("/products")
                                         }
                                         className="
                                             inline-flex

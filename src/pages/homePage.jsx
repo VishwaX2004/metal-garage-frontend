@@ -52,10 +52,7 @@ export default function HomePage() {
 
         setNewArrivalProducts(shuffledArrivals.slice(0, 4));
       } catch (error) {
-        console.error(
-          "Failed to fetch products:",
-          error
-        );
+        console.error("Failed to fetch products:", error);
 
         setProducts([]);
         setTrendingProducts([]);
@@ -68,7 +65,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-[#F5F5DC] text-[#0A0A0A] font-['Work_Sans',sans-serif]">
-
       {/* Google Fonts */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -200,7 +196,6 @@ export default function HomePage() {
         aria-hidden="true"
       >
         <defs>
-
           <g id="car-a">
             <path
               d="M30 130 C34 100 55 92 80 90 L120 60 C132 50 150 44 172 44 L250 44 C268 44 282 52 292 66 L316 92 C336 94 356 100 366 122 L366 138 L338 138 C338 122 326 110 310 110 C294 110 282 122 282 138 L150 138 C150 122 138 110 122 110 C106 110 94 122 94 138 L30 138 Z"
@@ -379,7 +374,6 @@ export default function HomePage() {
               strokeWidth="3"
             />
           </g>
-
         </defs>
       </svg>
 
@@ -389,7 +383,6 @@ export default function HomePage() {
         className="fixed right-[22px] top-1/2 z-[500] hidden h-[280px] w-[34px] -translate-y-1/2 flex-col items-center xl:flex"
       >
         <div className="relative h-full w-[2px] rounded-full bg-black/15">
-
           <div className="absolute left-[-4px] top-0 h-[14%] w-[10px] bg-[repeating-linear-gradient(45deg,#FF3B00_0_3px,transparent_3px_6px)] opacity-50" />
 
           <div className="absolute bottom-0 left-0 h-[62%] w-full rounded-full bg-gradient-to-b from-[#FF3B00] via-[#FF8F00] to-[#FF8F00]" />
@@ -415,19 +408,23 @@ export default function HomePage() {
 
           <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-10 px-5 lg:grid-cols-2 min-[981px]:px-10">
 
+            {/* ================= HERO LEFT ================= */}
             <div>
 
               <div className="mb-[22px] flex items-center gap-[10px]">
+
                 <span className="h-[7px] w-[7px] rounded-full bg-[#FF8F00]" />
 
                 <span className="mg-mono text-[12px] tracking-[.22em] text-[#FF8F00]">
                   PREMIUM DIE-CAST · EST. GARAGE 01
                 </span>
+
               </div>
 
               <h1 className="mg-display mb-[22px] text-[clamp(42px,5.2vw,74px)] text-[#F5F5DC]">
                 Build your
                 <br />
+
                 <span className="text-[#FF8F00]">
                   collection.
                 </span>
@@ -492,70 +489,35 @@ export default function HomePage() {
 
             </div>
 
+            {/* ================= HERO RIGHT ================= */}
             <div className="relative order-first flex items-center justify-center lg:order-none">
 
               <div className="absolute h-[112%] w-[112%] rounded-[6px] border border-[#F5F5DC]/15">
                 <div className="absolute inset-[14px] rounded border border-dashed border-[#F5F5DC]/10" />
               </div>
 
-              <span className="mg-mono absolute left-[-2%] top-[16%] flex items-center gap-1.5 text-[10px] tracking-[.1em] text-[#FF8F00]">
+              <div className="pointer-events-none absolute h-[75%] w-[75%] rounded-full bg-[#FF8F00]/10 blur-[80px]" />
+
+              <span className="mg-mono absolute left-[-2%] top-[16%] z-20 flex items-center gap-1.5 text-[10px] tracking-[.1em] text-[#FF8F00]">
                 <span className="h-px w-4 bg-[#FF8F00]" />
                 SCALE 1:18 — ALLOY BODY
               </span>
 
-              <span className="mg-mono absolute bottom-[20%] right-[-4%] flex items-center gap-1.5 text-[10px] tracking-[.1em] text-[#FF8F00]">
+              <span className="mg-mono absolute bottom-[20%] right-[-4%] z-20 flex items-center gap-1.5 text-[10px] tracking-[.1em] text-[#FF8F00]">
                 <span className="h-px w-4 bg-[#FF8F00]" />
                 LTD. RUN — SERIAL 0042
               </span>
 
-              <svg
-                viewBox="0 0 400 180"
-                fill="none"
-                className="mg-float relative z-10 w-[92%] drop-shadow-[0_30px_50px_rgba(0,0,0,.55)]"
-              >
+              <div className="relative z-10 flex w-full items-center justify-center">
 
-                <path
-                  d="M30 130 C34 100 55 92 80 90 L120 60 C132 50 150 44 172 44 L250 44 C268 44 282 52 292 66 L316 92 C336 94 356 100 366 122 L366 138 L338 138 C338 122 326 110 310 110 C294 110 282 122 282 138 L150 138 C150 122 138 110 122 110 C106 110 94 122 94 138 L30 138 Z"
-                  fill="#F5F5DC"
-                  stroke="#0A0A0A"
-                  strokeWidth="2"
+                {/* HERO IMAGE — ADJUSTED SIZE ONLY */}
+                <img
+                  src="/hero.png"
+                  alt="Hot Wheels collectible car"
+                  className="mg-float h-[300px] w-[78%] max-w-[540px] object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,.65)] transition-transform duration-500 hover:scale-[1.03] sm:h-[340px] lg:h-[390px]"
                 />
 
-                <path
-                  d="M132 62 L168 48 L246 48 L286 68 L296 90 L136 90 Z"
-                  fill="#0A0A0A"
-                />
-
-                <path
-                  d="M170 54 L206 50 L206 84 L150 84 Z"
-                  fill="#FF8F00"
-                  opacity=".85"
-                />
-
-                <circle cx="122" cy="138" r="30" fill="#0A0A0A" />
-                <circle cx="122" cy="138" r="13" fill="#F5F5DC" />
-                <circle cx="122" cy="138" r="4" fill="#FF8F00" />
-
-                <circle cx="310" cy="138" r="30" fill="#0A0A0A" />
-                <circle cx="310" cy="138" r="13" fill="#F5F5DC" />
-                <circle cx="310" cy="138" r="4" fill="#FF8F00" />
-
-                <path
-                  d="M292 66 L316 92"
-                  stroke="#FF8F00"
-                  strokeWidth="2"
-                />
-
-                <rect
-                  x="330"
-                  y="118"
-                  width="22"
-                  height="6"
-                  rx="2"
-                  fill="#FF8F00"
-                />
-
-              </svg>
+              </div>
 
             </div>
 
@@ -597,18 +559,19 @@ export default function HomePage() {
             <div className="grid grid-cols-2 gap-[14px] lg:grid-cols-6 lg:grid-rows-[220px_220px]">
 
               {[
-                ["FLAGSHIP LINE", "Hot Wheels", "car-a"],
-                ["DIE-CAST ALLOY", "Premium", "car-b"],
-                ["TOKYO GARAGE", "JDM Legends", "car-c"],
+                ["FLAGSHIP LINE", "Hot Wheels", "car-a", "/home1.png"],
+                ["DIE-CAST ALLOY", "Premium", "car-b", "/home2.png"],
+                ["TOKYO GARAGE", "JDM Legends", "car-c", "/home3.png"],
                 ["AMERICANA", "Muscle Cars", "car-d"],
                 ["TOP TIER", "Supercars", "car-e"],
                 ["SERIAL NUMBERED", "Rare Finds", "car-f"],
-              ].map(([label, title, car], index) => (
+              ].map(([label, title, car, image], index) => (
 
-                <div
+                <a
                   key={title}
+                  href={index < 3 ? "/products" : "#"}
                   className={[
-                    "group relative h-[200px] overflow-hidden rounded-[6px] bg-[#0A0A0A] lg:h-auto",
+                    "group relative block h-[200px] overflow-hidden rounded-[6px] bg-[#0A0A0A] lg:h-auto",
                     index === 0
                       ? "lg:col-span-3 lg:row-span-2"
                       : index === 1 || index === 2
@@ -617,18 +580,29 @@ export default function HomePage() {
                   ].join(" ")}
                 >
 
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,143,0,.16),transparent_55%),repeating-linear-gradient(60deg,rgba(245,245,220,.035)_0_1px,transparent_1px_22px),linear-gradient(160deg,#1c1a17,#0a0a0a_70%)] transition-transform duration-500 group-hover:scale-[1.06]" />
+                  <div
+                    className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-[1.06]"
+                    style={
+                      image
+                        ? {
+                            backgroundImage: `linear-gradient(rgba(10,10,10,.20), rgba(10,10,10,.72)), url(${image})`,
+                          }
+                        : undefined
+                    }
+                  />
 
-                  <div className="absolute bottom-[6px] right-[10px] w-[56%] text-[#F5F5DC] opacity-[.16]">
+                  {!image && (
+                    <div className="absolute bottom-[6px] right-[10px] w-[56%] text-[#F5F5DC] opacity-[.16]">
 
-                    <svg
-                      viewBox="0 0 400 180"
-                      className="w-full"
-                    >
-                      <use href={`#${car}`} />
-                    </svg>
+                      <svg
+                        viewBox="0 0 400 180"
+                        className="w-full"
+                      >
+                        <use href={`#${car}`} />
+                      </svg>
 
-                  </div>
+                    </div>
+                  )}
 
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
@@ -648,7 +622,7 @@ export default function HomePage() {
 
                   </div>
 
-                </div>
+                </a>
 
               ))}
 
@@ -691,10 +665,6 @@ export default function HomePage() {
               </div>
 
             </div>
-
-            {/* =====================================================
-                RANDOM 4 PRODUCTS
-            ===================================================== */}
 
             <div className="grid grid-cols-2 gap-[14px] lg:grid-cols-4 lg:gap-[22px]">
 
@@ -739,11 +709,14 @@ export default function HomePage() {
               </div>
 
               <h2 className="mg-display mb-5 text-[clamp(32px,3.6vw,50px)]">
+
                 Rare finds.
                 <br />
+
                 <span className="text-[#FF8F00]">
                   Serious collections.
                 </span>
+
               </h2>
 
               <p className="mb-[34px] max-w-[420px] text-[15.5px] leading-[1.65] text-[#F5F5DC]/70">
@@ -764,19 +737,24 @@ export default function HomePage() {
 
             </div>
 
-            <div className="relative flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_60%_50%,rgba(255,143,0,.14),transparent_60%),repeating-linear-gradient(-45deg,rgba(245,245,220,.03)_0_1px,transparent_1px_26px),#111]">
+            {/* ================= RARE FINDS RIGHT IMAGE ================= */}
+            <div className="relative flex min-h-[420px] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_60%_50%,rgba(255,143,0,.14),transparent_60%),repeating-linear-gradient(-45deg,rgba(245,245,220,.03)_0_1px,transparent_1px_26px),#111]">
 
+              {/* Rotating technical ring */}
               <div className="mg-spin absolute h-[420px] w-[420px] rounded-full border border-[#FF8F00]/15" />
 
+              {/* Inner technical ring */}
               <div className="absolute h-[340px] w-[340px] rounded-full border border-[#FF8F00]/30" />
 
-              <svg
-                viewBox="0 0 400 180"
-                fill="none"
-                className="relative z-10 w-[76%] drop-shadow-[0_20px_40px_rgba(0,0,0,.6)]"
-              >
-                <use href="#car-f-lg" />
-              </svg>
+              {/* Orange ambient glow */}
+              <div className="pointer-events-none absolute h-[55%] w-[55%] rounded-full bg-[#FF8F00]/10 blur-[70px]" />
+
+              {/* HOME5 IMAGE */}
+              <img
+                src="/home5.png"
+                alt="Rare collectible die-cast car"
+                className="mg-float relative z-10 w-[88%] max-w-[650px] object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,.65)] transition-transform duration-500 hover:scale-[1.04]"
+              />
 
             </div>
 
@@ -827,6 +805,7 @@ export default function HomePage() {
                   aria-label="Previous"
                   className="flex h-11 w-11 items-center justify-center rounded-full border border-black/15 transition-all hover:border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FF8F00]"
                 >
+
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -836,6 +815,7 @@ export default function HomePage() {
                   >
                     <path d="M15 18l-6-6 6-6" />
                   </svg>
+
                 </button>
 
                 <button
@@ -843,6 +823,7 @@ export default function HomePage() {
                   aria-label="Next"
                   className="flex h-11 w-11 items-center justify-center rounded-full border border-black/15 transition-all hover:border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FF8F00]"
                 >
+
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -852,15 +833,12 @@ export default function HomePage() {
                   >
                     <path d="M9 6l6 6-6 6" />
                   </svg>
+
                 </button>
 
               </div>
 
             </div>
-
-            {/* =====================================================
-                RANDOM 4 PRODUCTS
-            ===================================================== */}
 
             <div className="mg-scrollbar flex gap-[22px] overflow-x-auto pb-2">
 
@@ -888,7 +866,7 @@ export default function HomePage() {
 
         </section>
 
-        {/* ================= EDITORIAL ================= */}
+        {/* ================= EDITORIAL / OUR STORY ================= */}
         <section
           id="about"
           className="bg-[#ECE8D6] px-0 py-[70px] lg:py-[110px]"
@@ -896,6 +874,7 @@ export default function HomePage() {
 
           <div className="mx-auto grid max-w-[1320px] items-center gap-[60px] px-5 lg:grid-cols-2 lg:px-10">
 
+            {/* ================= OUR STORY IMAGE ================= */}
             <div className="relative flex aspect-[4/3.3] items-center justify-center overflow-hidden rounded-[6px] bg-[#0A0A0A]">
 
               <div
@@ -907,30 +886,12 @@ export default function HomePage() {
                 }}
               />
 
-              <div className="relative z-10 flex gap-[26px]">
-
-                <svg
-                  viewBox="0 0 400 180"
-                  className="w-[90px] drop-shadow-[0_10px_16px_rgba(0,0,0,.5)]"
-                >
-                  <use href="#car-a" />
-                </svg>
-
-                <svg
-                  viewBox="0 0 400 180"
-                  className="w-[90px] drop-shadow-[0_10px_16px_rgba(0,0,0,.5)]"
-                >
-                  <use href="#car-c" />
-                </svg>
-
-                <svg
-                  viewBox="0 0 400 180"
-                  className="w-[90px] drop-shadow-[0_10px_16px_rgba(0,0,0,.5)]"
-                >
-                  <use href="#car-e" />
-                </svg>
-
-              </div>
+              {/* HOME4 IMAGE */}
+              <img
+                src="/home4.png"
+                alt="Metal Garage collectible car collection"
+                className="mg-float relative z-10 h-full w-full object-contain p-6 drop-shadow-[0_20px_35px_rgba(0,0,0,.55)] transition-transform duration-500 hover:scale-[1.03]"
+              />
 
             </div>
 
@@ -947,9 +908,12 @@ export default function HomePage() {
               </div>
 
               <h2 className="mg-display mb-5 text-[clamp(30px,3.2vw,44px)]">
+
                 Welcome to
                 <br />
+
                 the garage.
+
               </h2>
 
               <p className="mb-[30px] max-w-[460px] text-[15.5px] leading-[1.7] text-black/70">
@@ -1089,12 +1053,14 @@ export default function HomePage() {
             </div>
 
             <h2 className="mg-display mb-5 text-[clamp(30px,4vw,52px)]">
+
               More than a collection.
               <br />
 
               <span className="text-[#FF8F00]">
                 It's a passion.
               </span>
+
             </h2>
 
             <p className="mb-[38px] text-[16px] leading-[1.6] text-[#F5F5DC]/70">
@@ -1117,7 +1083,7 @@ export default function HomePage() {
 
       <Footer />
 
+
     </div>
   );
 }
-
