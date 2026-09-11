@@ -65,7 +65,10 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-[#F5F5DC] text-[#0A0A0A] font-['Work_Sans',sans-serif]">
-      {/* Google Fonts */}
+      {/* =====================================================
+          GOOGLE FONTS + ANIMATIONS
+      ====================================================== */}
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
@@ -77,6 +80,10 @@ export default function HomePage() {
           background: #FF8F00;
           color: #0A0A0A;
         }
+
+        /* =====================================================
+           EXISTING TYPOGRAPHY
+        ====================================================== */
 
         .mg-display {
           font-family: 'Oswald', sans-serif;
@@ -90,6 +97,10 @@ export default function HomePage() {
           font-family: 'JetBrains Mono', monospace;
           letter-spacing: .04em;
         }
+
+        /* =====================================================
+           EXISTING BRACKET
+        ====================================================== */
 
         .mg-bracket {
           position: relative;
@@ -121,6 +132,10 @@ export default function HomePage() {
           border-right: 2px solid;
         }
 
+        /* =====================================================
+           EXISTING TICKS
+        ====================================================== */
+
         .mg-ticks {
           background: repeating-linear-gradient(
             90deg,
@@ -137,8 +152,12 @@ export default function HomePage() {
           );
         }
 
+        /* =====================================================
+           EXISTING ANIMATIONS
+        ====================================================== */
+
         @keyframes mgFloat {
-          0%,100% {
+          0%, 100% {
             transform: translateY(0);
           }
 
@@ -148,7 +167,7 @@ export default function HomePage() {
         }
 
         @keyframes mgPulse {
-          0%,100% {
+          0%, 100% {
             opacity: .65;
           }
 
@@ -167,6 +186,156 @@ export default function HomePage() {
           }
         }
 
+        /* =====================================================
+           NEW PAGE ANIMATIONS
+        ====================================================== */
+
+        @keyframes mgFadeUp {
+          0% {
+            opacity: 0;
+            transform: translateY(35px);
+          }
+
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes mgFadeDown {
+          0% {
+            opacity: 0;
+            transform: translateY(-30px);
+          }
+
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes mgFadeLeft {
+          0% {
+            opacity: 0;
+            transform: translateX(-40px);
+          }
+
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes mgFadeRight {
+          0% {
+            opacity: 0;
+            transform: translateX(40px);
+          }
+
+          100% {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes mgScaleIn {
+          0% {
+            opacity: 0;
+            transform: scale(.88);
+          }
+
+          100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes mgScaleSoft {
+          0% {
+            transform: scale(.96);
+            opacity: 0;
+          }
+
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        @keyframes mgRevealLine {
+          0% {
+            transform: scaleX(0);
+            transform-origin: left;
+            opacity: 0;
+          }
+
+          100% {
+            transform: scaleX(1);
+            transform-origin: left;
+            opacity: 1;
+          }
+        }
+
+        @keyframes mgGlow {
+          0%, 100% {
+            box-shadow: 0 0 0 rgba(255,143,0,0);
+          }
+
+          50% {
+            box-shadow: 0 0 30px rgba(255,143,0,.18);
+          }
+        }
+
+        @keyframes mgShine {
+          0% {
+            transform: translateX(-120%);
+          }
+
+          100% {
+            transform: translateX(120%);
+          }
+        }
+
+        @keyframes mgSoftPulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+
+          50% {
+            transform: scale(1.025);
+          }
+        }
+
+        @keyframes mgRotateSlow {
+          from {
+            transform: rotate(0deg);
+          }
+
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes mgBounceArrow {
+          0%, 100% {
+            transform: translateX(0);
+          }
+
+          50% {
+            transform: translateX(5px);
+          }
+        }
+
+        @keyframes mgTextGlow {
+          0%, 100% {
+            text-shadow: 0 0 0 rgba(255,143,0,0);
+          }
+
+          50% {
+            text-shadow: 0 0 18px rgba(255,143,0,.28);
+          }
+        }
+
         .mg-float {
           animation: mgFloat 4s ease-in-out infinite;
         }
@@ -179,6 +348,350 @@ export default function HomePage() {
           animation: mgSpin 18s linear infinite;
         }
 
+        /* =====================================================
+           PAGE ENTRANCE
+        ====================================================== */
+
+        .mg-page-enter {
+          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .mg-hero-left {
+          animation: mgFadeLeft .9s cubic-bezier(.22,1,.36,1) .1s both;
+        }
+
+        .mg-hero-right {
+          animation: mgFadeRight 1s cubic-bezier(.22,1,.36,1) .15s both;
+        }
+
+        .mg-hero-label {
+          animation: mgFadeDown .7s ease .25s both;
+        }
+
+        .mg-hero-title {
+          animation:
+            mgFadeUp .8s cubic-bezier(.22,1,.36,1) .35s both,
+            mgTextGlow 4s ease-in-out 1.5s infinite;
+        }
+
+        .mg-hero-description {
+          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) .5s both;
+        }
+
+        .mg-hero-buttons {
+          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) .65s both;
+        }
+
+        .mg-hero-stats {
+          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) .8s both;
+        }
+
+        /* =====================================================
+           BUTTON ANIMATIONS
+        ====================================================== */
+
+        .mg-button {
+          position: relative;
+          overflow: hidden;
+          isolation: isolate;
+        }
+
+        .mg-button::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -120%;
+          width: 70%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.28),
+            transparent
+          );
+          transform: skewX(-20deg);
+          transition: none;
+          pointer-events: none;
+        }
+
+        .mg-button:hover::before {
+          animation: mgShine .7s ease;
+        }
+
+        .mg-button:active {
+          transform: translateY(1px) scale(.98);
+        }
+
+        /* =====================================================
+           SECTION ANIMATIONS
+        ====================================================== */
+
+        .mg-section-title {
+          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .mg-section-description {
+          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) .15s both;
+        }
+
+        .mg-section-line {
+          animation: mgRevealLine 1s cubic-bezier(.22,1,.36,1) .1s both;
+        }
+
+        /* =====================================================
+           CATEGORY CARDS
+        ====================================================== */
+
+        .mg-category-card {
+          animation: mgScaleIn .7s cubic-bezier(.22,1,.36,1) both;
+          transition:
+            transform .5s cubic-bezier(.22,1,.36,1),
+            box-shadow .5s ease;
+        }
+
+        .mg-category-card:nth-child(1) {
+          animation-delay: .05s;
+        }
+
+        .mg-category-card:nth-child(2) {
+          animation-delay: .12s;
+        }
+
+        .mg-category-card:nth-child(3) {
+          animation-delay: .19s;
+        }
+
+        .mg-category-card:nth-child(4) {
+          animation-delay: .26s;
+        }
+
+        .mg-category-card:nth-child(5) {
+          animation-delay: .33s;
+        }
+
+        .mg-category-card:nth-child(6) {
+          animation-delay: .40s;
+        }
+
+        .mg-category-card:hover {
+          transform: translateY(-7px);
+          box-shadow: 0 18px 35px rgba(10,10,10,.16);
+        }
+
+        .mg-category-card:hover .mg-category-label {
+          transform: translateX(4px);
+        }
+
+        .mg-category-label {
+          transition: transform .3s ease;
+        }
+
+        /* =====================================================
+           PRODUCT SECTION
+        ====================================================== */
+
+        .mg-products-wrapper {
+          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .mg-product-item {
+          animation: mgFadeUp .7s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .mg-product-item:nth-child(1) {
+          animation-delay: .05s;
+        }
+
+        .mg-product-item:nth-child(2) {
+          animation-delay: .12s;
+        }
+
+        .mg-product-item:nth-child(3) {
+          animation-delay: .19s;
+        }
+
+        .mg-product-item:nth-child(4) {
+          animation-delay: .26s;
+        }
+
+        /* =====================================================
+           RARE FINDS
+        ====================================================== */
+
+        .mg-rare-content {
+          animation: mgFadeLeft .9s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .mg-rare-image {
+          animation: mgFadeRight .9s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .mg-rare-car {
+          animation:
+            mgScaleSoft .9s cubic-bezier(.22,1,.36,1) .2s both,
+            mgFloat 4s ease-in-out 1.1s infinite;
+        }
+
+        .mg-rare-glow {
+          animation: mgSoftPulse 4s ease-in-out infinite;
+        }
+
+        /* =====================================================
+           NEW ARRIVALS
+        ====================================================== */
+
+        .mg-arrivals-header {
+          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .mg-arrival-item {
+          animation: mgFadeRight .7s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .mg-arrival-item:nth-child(1) {
+          animation-delay: .05s;
+        }
+
+        .mg-arrival-item:nth-child(2) {
+          animation-delay: .14s;
+        }
+
+        .mg-arrival-item:nth-child(3) {
+          animation-delay: .23s;
+        }
+
+        .mg-arrival-item:nth-child(4) {
+          animation-delay: .32s;
+        }
+
+        /* =====================================================
+           SLIDER BUTTONS
+        ====================================================== */
+
+        .mg-slider-button {
+          transition:
+            transform .25s ease,
+            background-color .25s ease,
+            border-color .25s ease,
+            color .25s ease;
+        }
+
+        .mg-slider-button:hover {
+          transform: translateY(-3px);
+        }
+
+        .mg-slider-button:active {
+          transform: translateY(0) scale(.94);
+        }
+
+        .mg-slider-button:hover svg {
+          animation: mgBounceArrow .6s ease infinite;
+        }
+
+        /* =====================================================
+           STORY SECTION
+        ====================================================== */
+
+        .mg-story-image {
+          animation: mgFadeLeft .9s cubic-bezier(.22,1,.36,1) both;
+          transition:
+            transform .6s cubic-bezier(.22,1,.36,1),
+            box-shadow .6s ease;
+        }
+
+        .mg-story-image:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 25px 45px rgba(10,10,10,.15);
+        }
+
+        .mg-story-content {
+          animation: mgFadeRight .9s cubic-bezier(.22,1,.36,1) .15s both;
+        }
+
+        /* =====================================================
+           WHY US
+        ====================================================== */
+
+        .mg-why-item {
+          animation: mgFadeUp .7s cubic-bezier(.22,1,.36,1) both;
+          transition:
+            transform .4s cubic-bezier(.22,1,.36,1),
+            background-color .3s ease;
+        }
+
+        .mg-why-item:nth-child(1) {
+          animation-delay: .05s;
+        }
+
+        .mg-why-item:nth-child(2) {
+          animation-delay: .14s;
+        }
+
+        .mg-why-item:nth-child(3) {
+          animation-delay: .23s;
+        }
+
+        .mg-why-item:nth-child(4) {
+          animation-delay: .32s;
+        }
+
+        .mg-why-item:hover {
+          transform: translateY(-6px);
+        }
+
+        .mg-why-icon {
+          transition:
+            transform .4s cubic-bezier(.22,1,.36,1),
+            filter .4s ease;
+        }
+
+        .mg-why-item:hover .mg-why-icon {
+          transform: scale(1.12) rotate(-5deg);
+          filter: drop-shadow(0 5px 8px rgba(255,143,0,.25));
+        }
+
+        /* =====================================================
+           COMMUNITY
+        ====================================================== */
+
+        .mg-community {
+          animation: mgFadeUp .9s cubic-bezier(.22,1,.36,1) both;
+        }
+
+        .mg-community-title {
+          animation:
+            mgFadeUp .8s cubic-bezier(.22,1,.36,1) .15s both,
+            mgSoftPulse 5s ease-in-out 1.2s infinite;
+        }
+
+        .mg-community-text {
+          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) .3s both;
+        }
+
+        .mg-community-button {
+          animation: mgScaleIn .7s cubic-bezier(.22,1,.36,1) .45s both;
+        }
+
+        /* =====================================================
+           DECORATIVE ANIMATIONS
+        ====================================================== */
+
+        .mg-orange-dot {
+          animation: mgPulse 2s ease-in-out infinite;
+        }
+
+        .mg-tech-ring {
+          animation: mgRotateSlow 25s linear infinite;
+        }
+
+        .mg-tech-ring-reverse {
+          animation: mgRotateSlow 35s linear infinite reverse;
+        }
+
+        /* =====================================================
+           SCROLLBAR
+        ====================================================== */
+
         .mg-scrollbar::-webkit-scrollbar {
           display: none;
         }
@@ -186,9 +699,45 @@ export default function HomePage() {
         .mg-scrollbar {
           scrollbar-width: none;
         }
+
+        /* =====================================================
+           ACCESSIBILITY
+        ====================================================== */
+
+        @media (prefers-reduced-motion: reduce) {
+          *,
+          *::before,
+          *::after {
+            animation-duration: .01ms !important;
+            animation-iteration-count: 1 !important;
+            scroll-behavior: auto !important;
+            transition-duration: .01ms !important;
+          }
+        }
+
+        /* =====================================================
+           MOBILE ANIMATION OPTIMIZATION
+        ====================================================== */
+
+        @media (max-width: 768px) {
+          .mg-category-card:hover {
+            transform: translateY(-3px);
+          }
+
+          .mg-why-item:hover {
+            transform: translateY(-3px);
+          }
+
+          .mg-story-image:hover {
+            transform: translateY(-3px);
+          }
+        }
       `}</style>
 
-      {/* Hidden SVG car library */}
+      {/* =====================================================
+          HIDDEN SVG CAR LIBRARY
+      ====================================================== */}
+
       <svg
         width="0"
         height="0"
@@ -377,7 +926,10 @@ export default function HomePage() {
         </defs>
       </svg>
 
-      {/* RPM gauge */}
+      {/* =====================================================
+          RPM GAUGE
+      ====================================================== */}
+
       <div
         aria-hidden="true"
         className="fixed right-[22px] top-1/2 z-[500] hidden h-[280px] w-[34px] -translate-y-1/2 flex-col items-center xl:flex"
@@ -397,9 +949,12 @@ export default function HomePage() {
 
       <Header />
 
-      <main className="w-full">
+      <main className="w-full mg-page-enter">
 
-        {/* ================= HERO ================= */}
+        {/* =====================================================
+            HERO
+        ====================================================== */}
+
         <section className="relative overflow-hidden bg-[#0A0A0A] px-0 pb-[90px] pt-[170px] text-[#F5F5DC]">
 
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_78%_40%,rgba(255,143,0,.10),transparent_55%),repeating-linear-gradient(115deg,rgba(245,245,220,.025)_0_1px,transparent_1px_64px)]" />
@@ -408,20 +963,19 @@ export default function HomePage() {
 
           <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-10 px-5 lg:grid-cols-2 min-[981px]:px-10">
 
-            {/* ================= HERO LEFT ================= */}
-            <div>
+            {/* HERO LEFT */}
 
-              <div className="mb-[22px] flex items-center gap-[10px]">
+            <div className="mg-hero-left">
 
-                <span className="h-[7px] w-[7px] rounded-full bg-[#FF8F00]" />
+              <div className="mg-hero-label mb-[22px] flex items-center gap-[10px]">
+                <span className="mg-orange-dot h-[7px] w-[7px] rounded-full bg-[#FF8F00]" />
 
                 <span className="mg-mono text-[12px] tracking-[.22em] text-[#FF8F00]">
                   PREMIUM DIE-CAST · EST. GARAGE 01
                 </span>
-
               </div>
 
-              <h1 className="mg-display mb-[22px] text-[clamp(42px,5.2vw,74px)] text-[#F5F5DC]">
+              <h1 className="mg-display mg-hero-title mb-[22px] text-[clamp(42px,5.2vw,74px)] text-[#F5F5DC]">
                 Build your
                 <br />
 
@@ -430,30 +984,30 @@ export default function HomePage() {
                 </span>
               </h1>
 
-              <p className="mb-[38px] max-w-[440px] text-[17px] leading-[1.6] text-[#F5F5DC]/70">
+              <p className="mg-hero-description mb-[38px] max-w-[440px] text-[17px] leading-[1.6] text-[#F5F5DC]/70">
                 Discover legendary die-cast cars, rare releases, and collector
                 favorites — all in one garage.
               </p>
 
-              <div className="flex flex-wrap gap-4">
+              <div className="mg-hero-buttons flex flex-wrap gap-4">
 
                 <a
                   href="#shop"
-                  className="inline-flex items-center gap-[10px] rounded-[2px] border border-transparent bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#ffa733] hover:shadow-[0_10px_24px_rgba(255,143,0,.25)]"
+                  className="mg-button inline-flex items-center gap-[10px] rounded-[2px] border border-transparent bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#ffa733] hover:shadow-[0_10px_24px_rgba(255,143,0,.25)]"
                 >
                   Shop Collection
                 </a>
 
                 <a
                   href="#rare"
-                  className="inline-flex items-center gap-[10px] rounded-[2px] border border-[#F5F5DC]/15 px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#F5F5DC] transition-all duration-200 hover:border-[#FF8F00] hover:text-[#FF8F00]"
+                  className="mg-button inline-flex items-center gap-[10px] rounded-[2px] border border-[#F5F5DC]/15 px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#F5F5DC] transition-all duration-200 hover:border-[#FF8F00] hover:text-[#FF8F00]"
                 >
                   Explore Rare Finds
                 </a>
 
               </div>
 
-              <div className="mt-[52px] flex gap-9 border-t border-[#F5F5DC]/15 pt-7">
+              <div className="mg-hero-stats mt-[52px] flex gap-9 border-t border-[#F5F5DC]/15 pt-7">
 
                 <div>
                   <div className="mg-mono text-[26px] text-[#F5F5DC]">
@@ -489,14 +1043,15 @@ export default function HomePage() {
 
             </div>
 
-            {/* ================= HERO RIGHT ================= */}
-            <div className="relative order-first flex items-center justify-center lg:order-none">
+            {/* HERO RIGHT */}
+
+            <div className="mg-hero-right relative order-first flex items-center justify-center lg:order-none">
 
               <div className="absolute h-[112%] w-[112%] rounded-[6px] border border-[#F5F5DC]/15">
                 <div className="absolute inset-[14px] rounded border border-dashed border-[#F5F5DC]/10" />
               </div>
 
-              <div className="pointer-events-none absolute h-[75%] w-[75%] rounded-full bg-[#FF8F00]/10 blur-[80px]" />
+              <div className="pointer-events-none absolute h-[75%] w-[75%] rounded-full bg-[#FF8F00]/10 blur-[80px] mg-rare-glow" />
 
               <span className="mg-mono absolute left-[-2%] top-[16%] z-20 flex items-center gap-1.5 text-[10px] tracking-[.1em] text-[#FF8F00]">
                 <span className="h-px w-4 bg-[#FF8F00]" />
@@ -510,7 +1065,6 @@ export default function HomePage() {
 
               <div className="relative z-10 flex w-full items-center justify-center">
 
-                {/* HERO IMAGE — ADJUSTED SIZE ONLY */}
                 <img
                   src="/hero.png"
                   alt="Hot Wheels collectible car"
@@ -525,7 +1079,10 @@ export default function HomePage() {
 
         </section>
 
-        {/* ================= CATEGORIES ================= */}
+        {/* =====================================================
+            CATEGORIES
+        ====================================================== */}
+
         <section
           id="collections"
           className="px-0 py-[70px] lg:py-[110px]"
@@ -539,17 +1096,17 @@ export default function HomePage() {
                 01 — CATEGORIES
               </span>
 
-              <div className="mg-ticks h-2 flex-1" />
+              <div className="mg-ticks mg-section-line h-2 flex-1" />
 
             </div>
 
             <div className="mb-14 max-w-[640px]">
 
-              <h2 className="mg-display mb-[14px] text-[clamp(30px,3.4vw,44px)]">
+              <h2 className="mg-display mg-section-title mb-[14px] text-[clamp(30px,3.4vw,44px)]">
                 Explore the garage
               </h2>
 
-              <p className="text-[15.5px] leading-[1.6] text-black/60">
+              <p className="mg-section-description text-[15.5px] leading-[1.6] text-black/60">
                 Six curated corners of the collection, from pocket-sized JDM
                 icons to full-throttle supercars.
               </p>
@@ -571,7 +1128,7 @@ export default function HomePage() {
                   key={title}
                   href={index < 3 ? "/products" : "#"}
                   className={[
-                    "group relative block h-[200px] overflow-hidden rounded-[6px] bg-[#0A0A0A] lg:h-auto",
+                    "mg-category-card group relative block h-[200px] overflow-hidden rounded-[6px] bg-[#0A0A0A] lg:h-auto",
                     index === 0
                       ? "lg:col-span-3 lg:row-span-2"
                       : index === 1 || index === 2
@@ -608,7 +1165,7 @@ export default function HomePage() {
 
                   <div className="absolute bottom-5 left-[22px] right-[22px] text-[#F5F5DC]">
 
-                    <span className="mg-mono mb-1.5 block text-[10.5px] text-[#FF8F00]">
+                    <span className="mg-category-label mg-mono mb-1.5 block text-[10.5px] text-[#FF8F00]">
                       {label}
                     </span>
 
@@ -632,7 +1189,10 @@ export default function HomePage() {
 
         </section>
 
-        {/* ================= PRODUCTS ================= */}
+        {/* =====================================================
+            PRODUCTS / TRENDING
+        ====================================================== */}
+
         <section
           id="shop"
           className="bg-[#ECE8D6] px-0 py-[70px] lg:py-[110px]"
@@ -640,7 +1200,7 @@ export default function HomePage() {
 
           <div className="mx-auto max-w-[1320px] px-5 lg:px-10">
 
-            <div className="mb-[56px]">
+            <div className="mg-products-wrapper mb-[56px]">
 
               <div className="mb-[18px] flex items-center gap-[6px]">
 
@@ -648,17 +1208,17 @@ export default function HomePage() {
                   02 — TRENDING
                 </span>
 
-                <div className="mg-ticks h-2 flex-1" />
+                <div className="mg-ticks mg-section-line h-2 flex-1" />
 
               </div>
 
               <div className="max-w-[640px]">
 
-                <h2 className="mg-display mb-[14px] text-[clamp(30px,3.4vw,44px)]">
+                <h2 className="mg-display mg-section-title mb-[14px] text-[clamp(30px,3.4vw,44px)]">
                   Hot in the garage
                 </h2>
 
-                <p className="text-[15.5px] leading-[1.6] text-black/60">
+                <p className="mg-section-description text-[15.5px] leading-[1.6] text-black/60">
                   The four models collectors keep coming back for, this week.
                 </p>
 
@@ -668,17 +1228,22 @@ export default function HomePage() {
 
             <div className="grid grid-cols-2 gap-[14px] lg:grid-cols-4 lg:gap-[22px]">
 
-              {trendingProducts.map((product) => (
+              {trendingProducts.map((product, index) => (
 
-                <ProdcutCard
+                <div
                   key={
                     product?.productID ||
                     product?._id ||
                     product?.id ||
                     product?.name
                   }
-                  product={product}
-                />
+                  className="mg-product-item"
+                  style={{
+                    animationDelay: `${index * 0.09}s`,
+                  }}
+                >
+                  <ProdcutCard product={product} />
+                </div>
 
               ))}
 
@@ -688,7 +1253,10 @@ export default function HomePage() {
 
         </section>
 
-        {/* ================= RARE FINDS ================= */}
+        {/* =====================================================
+            RARE FINDS
+        ====================================================== */}
+
         <section
           id="rare"
           className="bg-[#0A0A0A] p-0 text-[#F5F5DC]"
@@ -696,7 +1264,7 @@ export default function HomePage() {
 
           <div className="grid min-h-[520px] grid-cols-1 lg:grid-cols-2">
 
-            <div className="relative z-10 flex flex-col justify-center px-7 py-[60px] lg:px-[60px] lg:py-[90px]">
+            <div className="mg-rare-content relative z-10 flex flex-col justify-center px-7 py-[60px] lg:px-[60px] lg:py-[90px]">
 
               <div className="mb-[18px] flex items-center gap-[6px]">
 
@@ -704,7 +1272,7 @@ export default function HomePage() {
                   03 — RARE FINDS
                 </span>
 
-                <div className="mg-ticks-dark h-2 flex-1" />
+                <div className="mg-ticks-dark mg-section-line h-2 flex-1" />
 
               </div>
 
@@ -728,7 +1296,7 @@ export default function HomePage() {
 
                 <a
                   href="#arrivals"
-                  className="inline-flex items-center gap-[10px] rounded-[2px] border border-transparent bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all hover:-translate-y-0.5 hover:bg-[#ffa733]"
+                  className="mg-button inline-flex items-center gap-[10px] rounded-[2px] border border-transparent bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all hover:-translate-y-0.5 hover:bg-[#ffa733]"
                 >
                   Discover Rare Cars
                 </a>
@@ -737,23 +1305,18 @@ export default function HomePage() {
 
             </div>
 
-            {/* ================= RARE FINDS RIGHT IMAGE ================= */}
-            <div className="relative flex min-h-[420px] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_60%_50%,rgba(255,143,0,.14),transparent_60%),repeating-linear-gradient(-45deg,rgba(245,245,220,.03)_0_1px,transparent_1px_26px),#111]">
+            <div className="mg-rare-image relative flex min-h-[420px] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_60%_50%,rgba(255,143,0,.14),transparent_60%),repeating-linear-gradient(-45deg,rgba(245,245,220,.03)_0_1px,transparent_1px_26px),#111]">
 
-              {/* Rotating technical ring */}
-              <div className="mg-spin absolute h-[420px] w-[420px] rounded-full border border-[#FF8F00]/15" />
+              <div className="mg-tech-ring absolute h-[420px] w-[420px] rounded-full border border-[#FF8F00]/15" />
 
-              {/* Inner technical ring */}
-              <div className="absolute h-[340px] w-[340px] rounded-full border border-[#FF8F00]/30" />
+              <div className="mg-tech-ring-reverse absolute h-[340px] w-[340px] rounded-full border border-[#FF8F00]/30" />
 
-              {/* Orange ambient glow */}
-              <div className="pointer-events-none absolute h-[55%] w-[55%] rounded-full bg-[#FF8F00]/10 blur-[70px]" />
+              <div className="mg-rare-glow pointer-events-none absolute h-[55%] w-[55%] rounded-full bg-[#FF8F00]/10 blur-[70px]" />
 
-              {/* HOME5 IMAGE */}
               <img
                 src="/home5.png"
                 alt="Rare collectible die-cast car"
-                className="mg-float relative z-10 w-[88%] max-w-[650px] object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,.65)] transition-transform duration-500 hover:scale-[1.04]"
+                className="mg-rare-car relative z-10 w-[88%] max-w-[650px] object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,.65)] transition-transform duration-500 hover:scale-[1.04]"
               />
 
             </div>
@@ -762,7 +1325,10 @@ export default function HomePage() {
 
         </section>
 
-        {/* ================= NEW ARRIVALS ================= */}
+        {/* =====================================================
+            NEW ARRIVALS
+        ====================================================== */}
+
         <section
           id="arrivals"
           className="px-0 py-[70px] lg:py-[110px]"
@@ -770,7 +1336,7 @@ export default function HomePage() {
 
           <div className="mx-auto max-w-[1320px] px-5 lg:px-10">
 
-            <div className="mb-[56px] flex flex-wrap items-end justify-between gap-6">
+            <div className="mg-arrivals-header mb-[56px] flex flex-wrap items-end justify-between gap-6">
 
               <div>
 
@@ -780,17 +1346,17 @@ export default function HomePage() {
                     04 — NEW ARRIVALS
                   </span>
 
-                  <div className="mg-ticks h-2 w-[200px]" />
+                  <div className="mg-ticks mg-section-line h-2 w-[200px]" />
 
                 </div>
 
                 <div className="max-w-[640px]">
 
-                  <h2 className="mg-display mb-[14px] text-[clamp(30px,3.4vw,44px)]">
+                  <h2 className="mg-display mg-section-title mb-[14px] text-[clamp(30px,3.4vw,44px)]">
                     Just dropped
                   </h2>
 
-                  <p className="text-[15.5px] leading-[1.6] text-black/60">
+                  <p className="mg-section-description text-[15.5px] leading-[1.6] text-black/60">
                     The newest die-cast releases, fresh off the line.
                   </p>
 
@@ -803,7 +1369,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   aria-label="Previous"
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-black/15 transition-all hover:border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FF8F00]"
+                  className="mg-slider-button flex h-11 w-11 items-center justify-center rounded-full border border-black/15 transition-all hover:border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FF8F00]"
                 >
 
                   <svg
@@ -821,7 +1387,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   aria-label="Next"
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-black/15 transition-all hover:border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FF8F00]"
+                  className="mg-slider-button flex h-11 w-11 items-center justify-center rounded-full border border-black/15 transition-all hover:border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FF8F00]"
                 >
 
                   <svg
@@ -842,7 +1408,7 @@ export default function HomePage() {
 
             <div className="mg-scrollbar flex gap-[22px] overflow-x-auto pb-2">
 
-              {newArrivalProducts.map((product) => (
+              {newArrivalProducts.map((product, index) => (
 
                 <div
                   key={
@@ -851,11 +1417,12 @@ export default function HomePage() {
                     product?.id ||
                     product?.name
                   }
-                  className="min-w-[280px] snap-start"
+                  className="mg-arrival-item min-w-[280px] snap-start"
+                  style={{
+                    animationDelay: `${index * 0.1}s`,
+                  }}
                 >
-
                   <ProdcutCard product={product} />
-
                 </div>
 
               ))}
@@ -866,7 +1433,10 @@ export default function HomePage() {
 
         </section>
 
-        {/* ================= EDITORIAL / OUR STORY ================= */}
+        {/* =====================================================
+            OUR STORY
+        ====================================================== */}
+
         <section
           id="about"
           className="bg-[#ECE8D6] px-0 py-[70px] lg:py-[110px]"
@@ -874,8 +1444,7 @@ export default function HomePage() {
 
           <div className="mx-auto grid max-w-[1320px] items-center gap-[60px] px-5 lg:grid-cols-2 lg:px-10">
 
-            {/* ================= OUR STORY IMAGE ================= */}
-            <div className="relative flex aspect-[4/3.3] items-center justify-center overflow-hidden rounded-[6px] bg-[#0A0A0A]">
+            <div className="mg-story-image relative flex aspect-[4/3.3] items-center justify-center overflow-hidden rounded-[6px] bg-[#0A0A0A]">
 
               <div
                 className="absolute inset-0"
@@ -886,7 +1455,6 @@ export default function HomePage() {
                 }}
               />
 
-              {/* HOME4 IMAGE */}
               <img
                 src="/home4.png"
                 alt="Metal Garage collectible car collection"
@@ -895,7 +1463,7 @@ export default function HomePage() {
 
             </div>
 
-            <div>
+            <div className="mg-story-content">
 
               <div className="mb-[22px] flex items-center gap-[6px]">
 
@@ -903,7 +1471,7 @@ export default function HomePage() {
                   05 — OUR STORY
                 </span>
 
-                <div className="mg-ticks h-2 flex-1" />
+                <div className="mg-ticks mg-section-line h-2 flex-1" />
 
               </div>
 
@@ -924,7 +1492,7 @@ export default function HomePage() {
 
               <a
                 href="#"
-                className="inline-flex items-center gap-[10px] rounded-[2px] border border-black/15 px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] transition-all hover:border-[#FF8F00] hover:text-[#CC7000]"
+                className="mg-button inline-flex items-center gap-[10px] rounded-[2px] border border-black/15 px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] transition-all hover:border-[#FF8F00] hover:text-[#CC7000]"
               >
                 Our Story →
               </a>
@@ -935,7 +1503,10 @@ export default function HomePage() {
 
         </section>
 
-        {/* ================= WHY US ================= */}
+        {/* =====================================================
+            WHY US
+        ====================================================== */}
+
         <section className="px-0 py-[70px] lg:py-[110px]">
 
           <div className="mx-auto max-w-[1320px] px-5 lg:px-10">
@@ -946,13 +1517,13 @@ export default function HomePage() {
                 06 — WHY US
               </span>
 
-              <div className="mg-ticks h-2 flex-1" />
+              <div className="mg-ticks mg-section-line h-2 flex-1" />
 
             </div>
 
             <div className="mb-14 max-w-[640px]">
 
-              <h2 className="mg-display text-[clamp(30px,3.4vw,44px)]">
+              <h2 className="mg-display mg-section-title text-[clamp(30px,3.4vw,44px)]">
                 Why collectors choose Metal Garage
               </h2>
 
@@ -998,14 +1569,17 @@ export default function HomePage() {
                     </>
                   ),
                 },
-              ].map((item) => (
+              ].map((item, index) => (
 
                 <div
                   key={item.title}
-                  className="bg-[#F5F5DC] px-[30px] py-10"
+                  className="mg-why-item bg-[#F5F5DC] px-[30px] py-10"
+                  style={{
+                    animationDelay: `${index * 0.1}s`,
+                  }}
                 >
 
-                  <div className="mb-[22px] h-9 w-9 text-[#FF8F00]">
+                  <div className="mg-why-icon mb-[22px] h-9 w-9 text-[#FF8F00]">
 
                     <svg
                       viewBox="0 0 24 24"
@@ -1037,22 +1611,25 @@ export default function HomePage() {
 
         </section>
 
-        {/* ================= COMMUNITY ================= */}
+        {/* =====================================================
+            COMMUNITY
+        ====================================================== */}
+
         <section className="relative overflow-hidden bg-[#0A0A0A] px-0 py-[100px] text-center text-[#F5F5DC] lg:py-[130px]">
 
           <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(115deg,rgba(255,143,0,.035)_0_2px,transparent_2px_90px)]" />
 
-          <div className="relative z-10 mx-auto max-w-[640px] px-5">
+          <div className="mg-community relative z-10 mx-auto max-w-[640px] px-5">
 
             <div className="mb-[18px] flex justify-center">
 
-              <span className="mg-mono text-[11px] tracking-[.18em] text-[#FF8F00]">
+              <span className="mg-mono mg-orange-dot text-[11px] tracking-[.18em] text-[#FF8F00]">
                 07 — COMMUNITY
               </span>
 
             </div>
 
-            <h2 className="mg-display mb-5 text-[clamp(30px,4vw,52px)]">
+            <h2 className="mg-display mg-community-title mb-5 text-[clamp(30px,4vw,52px)]">
 
               More than a collection.
               <br />
@@ -1063,14 +1640,14 @@ export default function HomePage() {
 
             </h2>
 
-            <p className="mb-[38px] text-[16px] leading-[1.6] text-[#F5F5DC]/70">
+            <p className="mg-community-text mb-[38px] text-[16px] leading-[1.6] text-[#F5F5DC]/70">
               Join a growing community of collectors, discover new releases,
               and stay ahead of the latest drops.
             </p>
 
             <a
               href="#"
-              className="inline-flex items-center gap-[10px] rounded-[2px] bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all hover:-translate-y-0.5 hover:bg-[#ffa733]"
+              className="mg-button mg-community-button inline-flex items-center gap-[10px] rounded-[2px] bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all hover:-translate-y-0.5 hover:bg-[#ffa733]"
             >
               Join the Garage
             </a>
@@ -1082,8 +1659,6 @@ export default function HomePage() {
       </main>
 
       <Footer />
-
-
     </div>
   );
 }

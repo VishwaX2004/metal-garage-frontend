@@ -1150,15 +1150,15 @@ export default function ProductPage() {
                                 >
 
                                     <span>
-                                        ${priceRange.min}
+                                        Rs.{priceRange.min}
                                     </span>
 
                                     <span>
-                                        Up to ${currentMaxPrice}
+                                        Up to Rs.{currentMaxPrice}
                                     </span>
 
                                     <span>
-                                        ${priceRange.max}
+                                        Rs.{priceRange.max}
                                     </span>
 
                                 </div>

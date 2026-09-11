@@ -6,6 +6,7 @@ import LoginPage from './pages/loginPage'
 import AdminPage from './pages/adminPage'
 import ProductPage from './pages/productPage'
 import CartPage from './pages/cartPage'
+import AboutPage from './pages/aboutPage'
 
 function App() {
 
@@ -28,7 +29,7 @@ function App() {
 
         <Route path="/register" element={<h1>Register</h1>} />
 
-        <Route path="/about" element={<h1>About</h1>} />
+        <Route path="/about" element={<AboutPage />} />
 
         <Route path="/cart" element={<CartPage />} />
 
