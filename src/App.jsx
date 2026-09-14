@@ -15,58 +15,121 @@ import ProductPage from "./pages/productPage";
 import CartPage from "./pages/cartPage";
 import AboutPage from "./pages/aboutPage";
 import ProductOverview from "./pages/productOverview";
+import CheckoutPage from "./pages/checkoutPage";
+import OrderPage from "./pages/orderPage";
 
-function App() {
+export default function App() {
     return (
         <BrowserRouter>
 
-            <Toaster position="top-right" />
+            <Toaster
+                position="top-right"
+                reverseOrder={false}
+            />
 
             <Routes>
 
+                {/* =================================================
+                    HOME
+                ================================================== */}
+
                 <Route
-                    path="/*"
+                    path="/"
                     element={<HomePage />}
                 />
+
+                {/* =================================================
+                    PRODUCTS
+                ================================================== */}
 
                 <Route
                     path="/products"
                     element={<ProductPage />}
                 />
 
-                <Route
-                    path="/contact"
-                    element={<h1>Contact</h1>}
-                />
-
-                <Route
-                    path="/login"
-                    element={<LoginPage />}
-                />
-
-                <Route
-                    path="/admin/*"
-                    element={<AdminPage />}
-                />
-
-                <Route
-                    path="/register"
-                    element={<h1>Register</h1>}
-                />
-
-                <Route
-                    path="/about"
-                    element={<AboutPage />}
-                />
+                {/* =================================================
+                    PRODUCT DETAILS
+                ================================================== */}
 
                 <Route
                     path="/overview/:productID"
                     element={<ProductOverview />}
                 />
 
+                {/* =================================================
+                    CART
+                ================================================== */}
+
                 <Route
                     path="/cart"
                     element={<CartPage />}
+                />
+
+                {/* =================================================
+                    CHECKOUT
+                ================================================== */}
+
+                <Route
+                    path="/checkout"
+                    element={<CheckoutPage />}
+                />
+
+                {/* =================================================
+                    ORDERS
+                ================================================== */}
+
+                <Route
+                    path="/orders"
+                    element={<OrderPage />}
+                />
+
+                {/* =================================================
+                    LOGIN
+                ================================================== */}
+
+                <Route
+                    path="/login"
+                    element={<LoginPage />}
+                />
+
+                {/* =================================================
+                    REGISTER
+                ================================================== */}
+
+                <Route
+                    path="/register"
+                    element={
+                        <h1>Register</h1>
+                    }
+                />
+
+                {/* =================================================
+                    ABOUT
+                ================================================== */}
+
+                <Route
+                    path="/about"
+                    element={<AboutPage />}
+                />
+
+                {/* =================================================
+                    CONTACT
+                ================================================== */}
+
+                <Route
+                    path="/contact"
+                    element={
+                        <h1>Contact</h1>
+                    }
+                />
+
+                {/* =================================================
+                    ADMIN
+                ================================================== */}
+
+                <Route
+                    path="/admin/*"
+                    element={<AdminPage />}
                 />
 
             </Routes>
@@ -75,4 +138,3 @@ function App() {
     );
 }
 
-export default App;

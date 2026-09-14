@@ -22,7 +22,6 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import ProdcutCard from "../components/productCard";
 
-
 /* =========================================================
    CART SETTINGS
 ========================================================= */
@@ -37,9 +36,21 @@ const PROMO_CODES = {
 const CART_STORAGE_KEY = "cart";
 const SAVED_STORAGE_KEY = "savedForLater";
 
+/* =========================================================
+   AUTH HELPERS
+========================================================= */
+
+function getAuthToken() {
+    return (
+        localStorage.getItem("token") ||
+        localStorage.getItem("authToken") ||
+        localStorage.getItem("accessToken") ||
+        null
+    );
+}
 
 /* =========================================================
-   HELPERS
+   GENERAL HELPERS
 ========================================================= */
 
 function currency(value) {
@@ -51,7 +62,6 @@ function currency(value) {
         .replace(/(\.\d)0$/, "$1")}`;
 }
 
-
 function getProductId(product) {
     return (
         product?.productID ||
@@ -62,22 +72,9 @@ function getProductId(product) {
     );
 }
 
-
 function getProductPrice(product) {
     return Number(product?.price) || 0;
 }
-
-
-function getProductStock(product) {
-    const quantity = Number(product?.quantity);
-
-    if (Number.isFinite(quantity)) {
-        return Math.max(0, quantity);
-    }
-
-    return Infinity;
-}
-
 
 function getProductImage(product) {
     if (
@@ -90,7 +87,6 @@ function getProductImage(product) {
 
     return null;
 }
-
 
 function normalizeCartItem(item) {
     const product =
@@ -116,7 +112,6 @@ function normalizeCartItem(item) {
         cartQuantity: quantity,
     };
 }
-
 
 function readCart() {
     try {
@@ -150,30 +145,6 @@ function readCart() {
     }
 }
 
-
-/*
- * IMPORTANT:
- * This function only saves the cart and notifies
- * OTHER components about the update.
- *
- * The CartPage itself ignores the event that it
- * generated. This prevents the removed item from
- * being immediately restored/re-normalized.
- */
-function saveCart(cart) {
-    localStorage.setItem(
-        CART_STORAGE_KEY,
-        JSON.stringify(cart)
-    );
-
-    window.dispatchEvent(
-        new CustomEvent("cartUpdated", {
-            detail: cart,
-        })
-    );
-}
-
-
 function getAvailableStock(product) {
     const stock = Number(
         product?.quantity
@@ -186,14 +157,12 @@ function getAvailableStock(product) {
     return Infinity;
 }
 
-
 /* =========================================================
    PAGE
 ========================================================= */
 
 export default function CartPage() {
     const navigate = useNavigate();
-
 
     /* =========================================================
        CART STATE
@@ -202,17 +171,8 @@ export default function CartPage() {
     const [cartItems, setCartItems] =
         useState(() => readCart());
 
-    /*
-     * FIX:
-     * Used to identify cartUpdated events generated
-     * by this CartPage itself.
-     *
-     * Without this, saveCart() -> cartUpdated ->
-     * setCartItems() -> saveCart() could repeatedly
-     * update the cart.
-     */
-    const isOwnCartUpdateRef = useRef(false);
-
+    const isOwnCartUpdateRef =
+        useRef(false);
 
     const [discountRate, setDiscountRate] =
         useState(0);
@@ -226,6 +186,8 @@ export default function CartPage() {
     const [promoSuccess, setPromoSuccess] =
         useState(false);
 
+    const [isCheckingOut, setIsCheckingOut] =
+        useState(false);
 
     /* =========================================================
        SAVED ITEMS
@@ -254,16 +216,14 @@ export default function CartPage() {
             }
         });
 
-
     const [imageErrors, setImageErrors] =
         useState({});
 
     const [savedStatus, setSavedStatus] =
         useState({});
 
-
     /* =========================================================
-       COMPLETE COLLECTION PRODUCTS
+       COMPLETE COLLECTION
     ========================================================= */
 
     const [
@@ -276,9 +236,8 @@ export default function CartPage() {
         setIsCollectionLoading,
     ] = useState(true);
 
-
     /* =========================================================
-       FETCH COMPLETE COLLECTION
+       FETCH COLLECTION
     ========================================================= */
 
     useEffect(() => {
@@ -321,20 +280,18 @@ export default function CartPage() {
                                 .products
                             : [];
 
-                    /*
-                     * Randomly select only 4 products.
-                     *
-                     * The original product fetching
-                     * logic remains unchanged.
-                     */
-                    const shuffledProducts = [
-                        ...data,
-                    ].sort(
-                        () => Math.random() - 0.5
-                    );
+                    const shuffledProducts =
+                        [...data].sort(
+                            () =>
+                                Math.random() -
+                                0.5
+                        );
 
                     setCollectionProducts(
-                        shuffledProducts.slice(0, 4)
+                        shuffledProducts.slice(
+                            0,
+                            4
+                        )
                     );
                 } catch (error) {
                     console.error(
@@ -363,27 +320,16 @@ export default function CartPage() {
         };
     }, []);
 
-
     /* =========================================================
        SAVE CART
     ========================================================= */
 
     useEffect(() => {
-        /*
-         * Save the exact current state to localStorage.
-         */
         localStorage.setItem(
             CART_STORAGE_KEY,
             JSON.stringify(cartItems)
         );
 
-        /*
-         * Mark this event as coming from this CartPage.
-         *
-         * The flag stays true while dispatchEvent()
-         * executes because browser CustomEvent dispatch
-         * is synchronous.
-         */
         isOwnCartUpdateRef.current = true;
 
         window.dispatchEvent(
@@ -392,12 +338,8 @@ export default function CartPage() {
             })
         );
 
-        /*
-         * Allow external cartUpdated events again.
-         */
         isOwnCartUpdateRef.current = false;
     }, [cartItems]);
-
 
     /* =========================================================
        SAVE FOR LATER
@@ -410,24 +352,14 @@ export default function CartPage() {
         );
     }, [savedItems]);
 
-
     /* =========================================================
-       LISTEN FOR CART UPDATES
+       LISTEN FOR CART EVENTS
     ========================================================= */
 
     useEffect(() => {
         const handleCartUpdated = (
             event
         ) => {
-            /*
-             * IMPORTANT FIX:
-             *
-             * Ignore the cartUpdated event generated
-             * by this CartPage's own saveCart/state save.
-             *
-             * Other components can still update the
-             * cart normally.
-             */
             if (
                 isOwnCartUpdateRef.current
             ) {
@@ -451,7 +383,6 @@ export default function CartPage() {
             }
         };
 
-
         const handleAddToCart = (
             event
         ) => {
@@ -465,7 +396,6 @@ export default function CartPage() {
             addProductToCart(product);
         };
 
-
         window.addEventListener(
             "cartUpdated",
             handleCartUpdated
@@ -475,7 +405,6 @@ export default function CartPage() {
             "addToCart",
             handleAddToCart
         );
-
 
         return () => {
             window.removeEventListener(
@@ -490,9 +419,8 @@ export default function CartPage() {
         };
     }, []);
 
-
     /* =========================================================
-       CART CALCULATIONS
+       CART TOTALS
     ========================================================= */
 
     const totals = useMemo(() => {
@@ -516,17 +444,11 @@ export default function CartPage() {
             count += quantity;
         });
 
-
         const discount =
             subtotal * discountRate;
 
-
-        /*
-         * SHIPPING REMOVED
-         */
-
+        // Shipping intentionally removed.
         const shipping = 0;
-
 
         const taxableAmount =
             Math.max(
@@ -534,22 +456,14 @@ export default function CartPage() {
                 subtotal - discount
             );
 
-
         const tax =
             taxableAmount *
             TAX_RATE;
-
-
-        /*
-         * Total no longer includes
-         * shipping price.
-         */
 
         const total =
             subtotal -
             discount +
             tax;
-
 
         return {
             subtotal,
@@ -564,7 +478,6 @@ export default function CartPage() {
         discountRate,
     ]);
 
-
     /* =========================================================
        ADD PRODUCT
     ========================================================= */
@@ -578,10 +491,8 @@ export default function CartPage() {
             return;
         }
 
-
         const productId =
             getProductId(product);
-
 
         if (!productId) {
             toast.error(
@@ -591,10 +502,8 @@ export default function CartPage() {
             return;
         }
 
-
         const stock =
             getAvailableStock(product);
-
 
         if (stock <= 0) {
             toast.error(
@@ -603,7 +512,6 @@ export default function CartPage() {
 
             return;
         }
-
 
         setCartItems(
             (currentItems) => {
@@ -616,14 +524,12 @@ export default function CartPage() {
                             productId
                     );
 
-
                 if (
                     existingIndex !== -1
                 ) {
                     const updated = [
                         ...currentItems,
                     ];
-
 
                     const currentQuantity =
                         Number(
@@ -632,7 +538,6 @@ export default function CartPage() {
                             ]
                                 .cartQuantity
                         ) || 1;
-
 
                     if (
                         Number.isFinite(
@@ -652,7 +557,6 @@ export default function CartPage() {
                         return currentItems;
                     }
 
-
                     updated[
                         existingIndex
                     ] = {
@@ -665,7 +569,6 @@ export default function CartPage() {
                             1,
                     };
 
-
                     toast.success(
                         `${
                             product.name ||
@@ -673,10 +576,8 @@ export default function CartPage() {
                         } quantity increased.`
                     );
 
-
                     return updated;
                 }
-
 
                 toast.success(
                     `${
@@ -684,7 +585,6 @@ export default function CartPage() {
                         "Product"
                     } added to cart.`
                 );
-
 
                 return [
                     ...currentItems,
@@ -699,7 +599,6 @@ export default function CartPage() {
             }
         );
     }
-
 
     /* =========================================================
        INCREASE QUANTITY
@@ -721,18 +620,15 @@ export default function CartPage() {
                             return item;
                         }
 
-
                         const currentQuantity =
                             Number(
                                 item.cartQuantity
                             ) || 1;
 
-
                         const stock =
                             getAvailableStock(
                                 item
                             );
-
 
                         if (
                             Number.isFinite(
@@ -750,7 +646,6 @@ export default function CartPage() {
                             return item;
                         }
 
-
                         return {
                             ...item,
                             cartQuantity:
@@ -761,7 +656,6 @@ export default function CartPage() {
                 )
         );
     }
-
 
     /* =========================================================
        DECREASE QUANTITY
@@ -783,12 +677,10 @@ export default function CartPage() {
                             return item;
                         }
 
-
                         const currentQuantity =
                             Number(
                                 item.cartQuantity
                             ) || 1;
-
 
                         return {
                             ...item,
@@ -804,7 +696,6 @@ export default function CartPage() {
         );
     }
 
-
     /* =========================================================
        MANUAL QUANTITY
     ========================================================= */
@@ -819,7 +710,6 @@ export default function CartPage() {
                 10
             );
 
-
         if (
             !Number.isFinite(
                 quantity
@@ -828,7 +718,6 @@ export default function CartPage() {
         ) {
             quantity = 1;
         }
-
 
         setCartItems(
             (currentItems) =>
@@ -843,12 +732,10 @@ export default function CartPage() {
                             return item;
                         }
 
-
                         const stock =
                             getAvailableStock(
                                 item
                             );
-
 
                         if (
                             Number.isFinite(
@@ -867,7 +754,6 @@ export default function CartPage() {
                                 );
                         }
 
-
                         return {
                             ...item,
                             cartQuantity:
@@ -878,7 +764,6 @@ export default function CartPage() {
         );
     }
 
-
     /* =========================================================
        REMOVE PRODUCT
     ========================================================= */
@@ -886,11 +771,6 @@ export default function CartPage() {
     function removeProduct(
         productId
     ) {
-        /*
-         * Find product before removing it so
-         * the success message still contains
-         * the product name.
-         */
         const product =
             cartItems.find(
                 (item) =>
@@ -900,14 +780,6 @@ export default function CartPage() {
                     productId
             );
 
-
-        /*
-         * IMPORTANT:
-         * Remove using the functional state update.
-         *
-         * The resulting cart is then automatically
-         * saved by the cartItems useEffect above.
-         */
         setCartItems(
             (currentItems) =>
                 currentItems.filter(
@@ -919,7 +791,6 @@ export default function CartPage() {
                 )
         );
 
-
         toast.success(
             `${
                 product?.name ||
@@ -927,7 +798,6 @@ export default function CartPage() {
             } removed from cart.`
         );
     }
-
 
     /* =========================================================
        CLEAR CART
@@ -944,7 +814,6 @@ export default function CartPage() {
             return;
         }
 
-
         setCartItems([]);
 
         setDiscountRate(0);
@@ -955,12 +824,10 @@ export default function CartPage() {
 
         setPromoSuccess(false);
 
-
         toast.success(
             "Cart cleared successfully."
         );
     }
-
 
     /* =========================================================
        SAVE FOR LATER
@@ -972,6 +839,13 @@ export default function CartPage() {
         const productId =
             getProductId(product);
 
+        if (!productId) {
+            toast.error(
+                "Product ID is missing."
+            );
+
+            return;
+        }
 
         setSavedItems(
             (current) => {
@@ -984,7 +858,6 @@ export default function CartPage() {
                             productId
                     );
 
-
                 if (exists) {
                     toast.error(
                         "Product is already saved."
@@ -993,14 +866,12 @@ export default function CartPage() {
                     return current;
                 }
 
-
                 toast.success(
                     `${
                         product.name ||
                         "Product"
                     } saved for later.`
                 );
-
 
                 return [
                     ...current,
@@ -1012,7 +883,6 @@ export default function CartPage() {
             }
         );
 
-
         setSavedStatus(
             (current) => ({
                 ...current,
@@ -1020,7 +890,6 @@ export default function CartPage() {
             })
         );
     }
-
 
     /* =========================================================
        APPLY PROMO
@@ -1032,14 +901,10 @@ export default function CartPage() {
                 .trim()
                 .toUpperCase();
 
-
         if (!code) {
             setDiscountRate(0);
-
             setPromoMessage("");
-
             setPromoSuccess(false);
-
 
             toast.error(
                 "Please enter a promo code."
@@ -1048,14 +913,11 @@ export default function CartPage() {
             return;
         }
 
-
         if (PROMO_CODES[code]) {
             const rate =
                 PROMO_CODES[code];
 
-
             setDiscountRate(rate);
-
 
             setPromoMessage(
                 `Code applied — ${Math.round(
@@ -1063,18 +925,14 @@ export default function CartPage() {
                 )}% off your order.`
             );
 
-
             setPromoSuccess(true);
-
 
             toast.success(
                 `${code} applied successfully.`
             );
 
-
             return;
         }
-
 
         setDiscountRate(0);
 
@@ -1084,18 +942,24 @@ export default function CartPage() {
 
         setPromoSuccess(false);
 
-
         toast.error(
             "Invalid promo code."
         );
     }
-
 
     /* =========================================================
        CHECKOUT
     ========================================================= */
 
     function handleCheckout() {
+        if (isCheckingOut) {
+            return;
+        }
+
+        /* -----------------------------------------
+           CHECK CART
+        ----------------------------------------- */
+
         if (
             cartItems.length === 0
         ) {
@@ -1106,15 +970,40 @@ export default function CartPage() {
             return;
         }
 
+        /* -----------------------------------------
+           CHECK LOGIN
+        ----------------------------------------- */
+
+        const token =
+            getAuthToken();
+
+        if (!token) {
+            toast.error(
+                "Please login to your account before checkout."
+            );
+
+            navigate("/login", {
+                state: {
+                    from: "/checkout",
+                },
+            });
+
+            return;
+        }
+
+        /* -----------------------------------------
+           LOGIN EXISTS
+           GO TO CHECKOUT PAGE
+        ----------------------------------------- */
+
+        setIsCheckingOut(true);
 
         toast.success(
-            "Proceeding to checkout..."
+            "Opening checkout..."
         );
-
 
         navigate("/checkout");
     }
-
 
     /* =========================================================
        REV GAUGE
@@ -1125,12 +1014,10 @@ export default function CartPage() {
         setScrollProgress,
     ] = useState(0);
 
-
     useEffect(() => {
         const updateGauge = () => {
             const documentElement =
                 document.documentElement;
-
 
             const maxScroll =
                 documentElement
@@ -1138,18 +1025,14 @@ export default function CartPage() {
                 documentElement
                     .clientHeight;
 
-
             if (maxScroll <= 0) {
                 setScrollProgress(0);
-
                 return;
             }
-
 
             const scrolled =
                 window.scrollY /
                 maxScroll;
-
 
             setScrollProgress(
                 Math.min(
@@ -1162,9 +1045,7 @@ export default function CartPage() {
             );
         };
 
-
         updateGauge();
-
 
         window.addEventListener(
             "scroll",
@@ -1174,12 +1055,10 @@ export default function CartPage() {
             }
         );
 
-
         window.addEventListener(
             "resize",
             updateGauge
         );
-
 
         return () => {
             window.removeEventListener(
@@ -1194,7 +1073,6 @@ export default function CartPage() {
         };
     }, []);
 
-
     /* =========================================================
        HERO TEXT
     ========================================================= */
@@ -1208,9 +1086,8 @@ export default function CartPage() {
               } ready for the garage.`
             : "Nothing parked here yet.";
 
-
     /* =========================================================
-       PRODUCT IMAGE ERROR
+       IMAGE ERROR
     ========================================================= */
 
     const handleImageError =
@@ -1227,7 +1104,6 @@ export default function CartPage() {
             []
         );
 
-
     /* =========================================================
        RETURN
     ========================================================= */
@@ -1241,9 +1117,8 @@ export default function CartPage() {
                 text-[#0A0A0A]
             "
         >
-
             {/* =====================================================
-                GOOGLE FONTS + UI HELPERS
+                STYLES
             ===================================================== */}
 
             <style>{`
@@ -1293,20 +1168,6 @@ export default function CartPage() {
                         );
                 }
 
-                .metal-media-pattern {
-                    background-image:
-                        radial-gradient(
-                            circle at 50% 30%,
-                            rgba(255,143,0,.10),
-                            transparent 60%
-                        ),
-                        repeating-linear-gradient(
-                            45deg,
-                            rgba(10,10,10,.03) 0 1px,
-                            transparent 1px 18px
-                        );
-                }
-
                 input[type="number"]::-webkit-inner-spin-button,
                 input[type="number"]::-webkit-outer-spin-button {
                     -webkit-appearance: none;
@@ -1318,7 +1179,6 @@ export default function CartPage() {
                 }
             `}</style>
 
-
             <div className="metal-work metal-selection">
 
                 {/* =====================================================
@@ -1327,9 +1187,8 @@ export default function CartPage() {
 
                 <Header />
 
-
                 {/* =====================================================
-                    SIGNATURE REV GAUGE
+                    REV GAUGE
                 ===================================================== */}
 
                 <div
@@ -1421,7 +1280,6 @@ export default function CartPage() {
                     </div>
                 </div>
 
-
                 {/* =====================================================
                     HERO
                 ===================================================== */}
@@ -1499,7 +1357,6 @@ export default function CartPage() {
                     </div>
                 </section>
 
-
                 {/* =====================================================
                     CART SECTION
                 ===================================================== */}
@@ -1513,7 +1370,6 @@ export default function CartPage() {
                             sm:px-10
                         "
                     >
-
                         <AnimatePresence mode="wait">
 
                             {cartItems.length > 0 ? (
@@ -1555,6 +1411,7 @@ export default function CartPage() {
                                             "
                                         >
                                             <div>
+
                                                 <div
                                                     className="
                                                         metal-mono
@@ -1580,6 +1437,7 @@ export default function CartPage() {
                                                         ? "Product"
                                                         : "Products"}
                                                 </h2>
+
                                             </div>
 
                                             <button
@@ -1605,14 +1463,12 @@ export default function CartPage() {
                                                     hover:text-[#FF3B00]
                                                 "
                                             >
-                                                <Trash2
-                                                    className="h-3.5 w-3.5"
-                                                />
+                                                <Trash2 className="h-3.5 w-3.5" />
 
                                                 Clear Cart
                                             </button>
-                                        </div>
 
+                                        </div>
 
                                         <div className="space-y-4">
 
@@ -1621,6 +1477,7 @@ export default function CartPage() {
                                                     item,
                                                     index
                                                 ) => {
+
                                                     const productId =
                                                         getProductId(
                                                             item
@@ -1696,7 +1553,8 @@ export default function CartPage() {
                                                                                 image
                                                                             }
                                                                             alt={
-                                                                                item.name
+                                                                                item.name ||
+                                                                                "Product"
                                                                             }
                                                                             onError={() =>
                                                                                 handleImageError(
@@ -1729,7 +1587,6 @@ export default function CartPage() {
                                                                     )}
                                                                 </div>
 
-
                                                                 {/* CONTENT */}
 
                                                                 <div
@@ -1759,7 +1616,6 @@ export default function CartPage() {
                                                                                 "Collection"}
                                                                         </div>
 
-
                                                                         <h3
                                                                             className="
                                                                                 mb-2
@@ -1771,7 +1627,6 @@ export default function CartPage() {
                                                                                 item.name
                                                                             }
                                                                         </h3>
-
 
                                                                         <div
                                                                             className="
@@ -1792,7 +1647,6 @@ export default function CartPage() {
                                                                         </div>
 
                                                                     </div>
-
 
                                                                     <div
                                                                         className="
@@ -1838,7 +1692,6 @@ export default function CartPage() {
                                                                                 <Minus className="h-3.5 w-3.5" />
                                                                             </button>
 
-
                                                                             <input
                                                                                 type="number"
                                                                                 min="1"
@@ -1868,7 +1721,6 @@ export default function CartPage() {
                                                                                 "
                                                                             />
 
-
                                                                             <button
                                                                                 type="button"
                                                                                 onClick={() =>
@@ -1891,7 +1743,6 @@ export default function CartPage() {
 
                                                                         </div>
 
-
                                                                         {/* PRICE */}
 
                                                                         <div className="text-right">
@@ -1909,7 +1760,6 @@ export default function CartPage() {
                                                                                 )}
                                                                             </div>
 
-
                                                                             <div
                                                                                 className="
                                                                                     mt-1
@@ -1926,7 +1776,6 @@ export default function CartPage() {
                                                                         </div>
 
                                                                     </div>
-
 
                                                                     {/* ACTIONS */}
 
@@ -1966,7 +1815,6 @@ export default function CartPage() {
                                                                                 : "Save for later"}
                                                                         </button>
 
-
                                                                         <button
                                                                             type="button"
                                                                             onClick={() =>
@@ -1988,6 +1836,7 @@ export default function CartPage() {
                                                                             "
                                                                         >
                                                                             <Trash2 className="h-3.5 w-3.5" />
+
                                                                             Remove
                                                                         </button>
 
@@ -2005,7 +1854,6 @@ export default function CartPage() {
                                         </div>
 
                                     </div>
-
 
                                     {/* =================================================
                                         ORDER SUMMARY
@@ -2049,7 +1897,6 @@ export default function CartPage() {
                                                 GARAGE SUMMARY
                                             </div>
 
-
                                             <h2
                                                 className="
                                                     metal-oswald
@@ -2059,7 +1906,6 @@ export default function CartPage() {
                                             >
                                                 Order Summary
                                             </h2>
-
 
                                             {/* PROMO */}
 
@@ -2076,9 +1922,7 @@ export default function CartPage() {
                                                             e
                                                         ) =>
                                                             setPromoInput(
-                                                                e
-                                                                    .target
-                                                                    .value
+                                                                e.target.value
                                                             )
                                                         }
                                                         placeholder="PROMO CODE"
@@ -2101,7 +1945,6 @@ export default function CartPage() {
                                                             focus:border-[#FF8F00]
                                                         "
                                                     />
-
 
                                                     <button
                                                         type="button"
@@ -2127,7 +1970,6 @@ export default function CartPage() {
 
                                                 </div>
 
-
                                                 {promoMessage && (
                                                     <p
                                                         className={`
@@ -2148,12 +1990,12 @@ export default function CartPage() {
 
                                             </div>
 
-
                                             {/* TOTALS */}
 
                                             <div className="space-y-3 border-t border-[#F5F5DC]/10 pt-5">
 
                                                 <div className="flex justify-between text-[12px] text-[#F5F5DC]/55">
+
                                                     <span>
                                                         Subtotal
                                                     </span>
@@ -2163,12 +2005,13 @@ export default function CartPage() {
                                                             totals.subtotal
                                                         )}
                                                     </span>
-                                                </div>
 
+                                                </div>
 
                                                 {totals.discount >
                                                     0 && (
                                                     <div className="flex justify-between text-[12px] text-[#FF8F00]">
+
                                                         <span>
                                                             Discount
                                                         </span>
@@ -2179,14 +2022,12 @@ export default function CartPage() {
                                                                 totals.discount
                                                             )}
                                                         </span>
+
                                                     </div>
                                                 )}
 
-
-                                                {/* SHIPPING REMOVED */}
-
-
                                                 <div className="flex justify-between text-[12px] text-[#F5F5DC]/55">
+
                                                     <span>
                                                         Tax
                                                     </span>
@@ -2196,10 +2037,10 @@ export default function CartPage() {
                                                             totals.tax
                                                         )}
                                                     </span>
+
                                                 </div>
 
                                             </div>
-
 
                                             {/* GRAND TOTAL */}
 
@@ -2223,7 +2064,6 @@ export default function CartPage() {
                                                         Total
                                                     </span>
 
-
                                                     <span
                                                         className="
                                                             font-mono
@@ -2241,13 +2081,15 @@ export default function CartPage() {
 
                                             </div>
 
-
                                             {/* CHECKOUT */}
 
                                             <button
                                                 type="button"
                                                 onClick={
                                                     handleCheckout
+                                                }
+                                                disabled={
+                                                    isCheckingOut
                                                 }
                                                 className="
                                                     mt-6
@@ -2268,13 +2110,16 @@ export default function CartPage() {
                                                     transition
                                                     hover:bg-[#FFA733]
                                                     hover:shadow-[0_10px_30px_rgba(255,143,0,.2)]
+                                                    disabled:cursor-not-allowed
+                                                    disabled:opacity-60
                                                 "
                                             >
-                                                Proceed to Checkout
+                                                {isCheckingOut
+                                                    ? "Opening Checkout..."
+                                                    : "Proceed to Checkout"}
 
                                                 <ArrowRight className="h-4 w-4" />
                                             </button>
-
 
                                             {/* SECURITY */}
 
@@ -2292,7 +2137,6 @@ export default function CartPage() {
 
                                                 Secure checkout
                                             </div>
-
 
                                             {/* PAYMENT */}
 
@@ -2400,7 +2244,6 @@ export default function CartPage() {
                                         />
                                     </motion.div>
 
-
                                     <h2
                                         className="
                                             metal-oswald
@@ -2410,7 +2253,6 @@ export default function CartPage() {
                                     >
                                         Your garage is empty
                                     </h2>
-
 
                                     <p
                                         className="
@@ -2429,7 +2271,6 @@ export default function CartPage() {
                                         collection.
                                     </p>
 
-
                                     <motion.button
                                         type="button"
                                         whileHover={{
@@ -2439,7 +2280,9 @@ export default function CartPage() {
                                             scale: 0.98,
                                         }}
                                         onClick={() =>
-                                            navigate("/products")
+                                            navigate(
+                                                "/products"
+                                            )
                                         }
                                         className="
                                             inline-flex
@@ -2469,14 +2312,11 @@ export default function CartPage() {
                                     </motion.button>
 
                                 </motion.div>
-
                             )}
 
                         </AnimatePresence>
-
                     </div>
                 </section>
-
 
                 {/* =====================================================
                     COMPLETE THE COLLECTION
@@ -2492,8 +2332,6 @@ export default function CartPage() {
                             sm:px-10
                         "
                     >
-
-                        {/* SECTION TITLE */}
 
                         <div
                             className="
@@ -2516,7 +2354,6 @@ export default function CartPage() {
                                 COMPLETE THE COLLECTION
                             </span>
 
-
                             <span
                                 className="
                                     metal-ticks
@@ -2526,11 +2363,6 @@ export default function CartPage() {
                             />
 
                         </div>
-
-
-                        {/* =================================================
-                            RANDOM 4 PRODUCTS USING PRODUCT CARD
-                        ================================================= */}
 
                         {isCollectionLoading ? (
 
@@ -2681,7 +2513,6 @@ export default function CartPage() {
                                     strokeWidth={1.3}
                                 />
 
-
                                 <h3
                                     className="
                                         metal-oswald
@@ -2690,7 +2521,6 @@ export default function CartPage() {
                                 >
                                     Collection unavailable
                                 </h3>
-
 
                                 <p
                                     className="
@@ -2704,13 +2534,11 @@ export default function CartPage() {
                                 </p>
 
                             </motion.div>
-
                         )}
 
                     </div>
 
                 </section>
-
 
                 {/* =====================================================
                     FOOTER
@@ -2719,14 +2547,12 @@ export default function CartPage() {
                 <Footer />
 
             </div>
-
         </div>
     );
 }
 
-
 /* =========================================================
-   SMALL PLUS ICON
+   PLUS ICON
 ========================================================= */
 
 function PlusIcon() {
@@ -2747,3 +2573,4 @@ function PlusIcon() {
         </svg>
     );
 }
+
