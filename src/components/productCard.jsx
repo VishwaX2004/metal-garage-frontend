@@ -1,4 +1,3 @@
-
 import {
     Heart,
     Plus,
@@ -7,19 +6,26 @@ import {
     Check,
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const CART_STORAGE_KEY = "cart";
 
-export default function ProdcutCard(props) {
-    const product = props.product;
+export default function ProdcutCard({ product }) {
+    const navigate = useNavigate();
 
     // =========================================================
     // PRODUCT DATA
     // =========================================================
 
-    const productName =
-        product?.name || "Unnamed Product";
+    const productName = product?.name || "Unnamed Product";
+
+    const productID =
+        product?.productID ||
+        product?._id ||
+        product?.id ||
+        product?.sku ||
+        product?.name;
 
     const productPrice =
         typeof product?.price === "number"
@@ -34,7 +40,7 @@ export default function ProdcutCard(props) {
     const hasPrice =
         product?.price !== undefined &&
         product?.price !== null &&
-        !isNaN(Number(product?.price));
+        !Number.isNaN(Number(product?.price));
 
     const safeRating = Math.min(
         5,
@@ -52,9 +58,7 @@ export default function ProdcutCard(props) {
     // IMAGES
     // =========================================================
 
-    const validImages = Array.isArray(
-        product?.images
-    )
+    const validImages = Array.isArray(product?.images)
         ? product.images.filter(
               (image) =>
                   typeof image === "string" &&
@@ -62,38 +66,26 @@ export default function ProdcutCard(props) {
           )
         : [];
 
-    const [imageIndex, setImageIndex] =
-        useState(0);
+    const [imageIndex, setImageIndex] = useState(0);
+    const [imageError, setImageError] = useState(false);
+    const [isAdding, setIsAdding] = useState(false);
 
-    const [imageError, setImageError] =
-        useState(false);
-
-    const [isAdding, setIsAdding] =
-        useState(false);
-
-    const currentImage =
-        validImages[imageIndex];
+    const currentImage = validImages[imageIndex];
 
     // =========================================================
     // STOCK
-    // IMPORTANT:
-    // Your MongoDB schema uses "quantity"
+    // Metal Garage uses quantity
     // =========================================================
 
-    const stockQuantity =
-        Number(product?.quantity);
+    const stockQuantity = Number(product?.quantity);
 
-    const isOutOfStock =
-        Number.isFinite(stockQuantity)
-            ? stockQuantity <= 0
-            : product?.stock === 0 ||
-              product?.availability ===
-                  "out-of-stock" ||
-              product?.status ===
-                  "Out of Stock" ||
-              product?.status ===
-                  "out-of-stock" ||
-              product?.isOutOfStock === true;
+    const isOutOfStock = Number.isFinite(stockQuantity)
+        ? stockQuantity <= 0
+        : product?.stock === 0 ||
+          product?.availability === "out-of-stock" ||
+          product?.status === "Out of Stock" ||
+          product?.status === "out-of-stock" ||
+          product?.isOutOfStock === true;
 
     // =========================================================
     // SALE
@@ -105,6 +97,21 @@ export default function ProdcutCard(props) {
         labelledPrice > 0;
 
     // =========================================================
+    // PRODUCT NAVIGATION
+    // =========================================================
+
+    const handleProductClick = () => {
+        if (!productID) {
+            toast.error("Product ID is missing.");
+            return;
+        }
+
+        navigate(
+            `/overview/${encodeURIComponent(productID)}`
+        );
+    };
+
+    // =========================================================
     // IMAGE HANDLERS
     // =========================================================
 
@@ -112,84 +119,70 @@ export default function ProdcutCard(props) {
         setImageError(true);
     };
 
-    const handleImageChange = (index) => {
+    const handleImageChange = (event, index) => {
+        event.stopPropagation();
+
         setImageIndex(index);
         setImageError(false);
-    };
-
-    // =========================================================
-    // GET PRODUCT ID
-    // =========================================================
-
-    const getProductId = () => {
-        return (
-            product?.productID ||
-            product?._id ||
-            product?.id ||
-            product?.sku ||
-            product?.name
-        );
     };
 
     // =========================================================
     // ADD TO CART
     // =========================================================
 
-    const handleAddToCart = () => {
+    const handleAddToCart = (event) => {
+        event.stopPropagation();
+
         if (isAdding) {
             return;
         }
 
         if (isOutOfStock) {
-            toast.error(
-                "This product is out of stock."
-            );
-
+            toast.error("This product is out of stock.");
             return;
         }
 
-        const productId = getProductId();
-
-        if (!productId) {
+        if (!productID) {
             toast.error(
                 "Unable to add product. Product ID is missing."
             );
-
             return;
         }
 
         try {
             const storedCart =
-                localStorage.getItem(
-                    CART_STORAGE_KEY
-                );
+                localStorage.getItem(CART_STORAGE_KEY);
 
             let cart = [];
 
             if (storedCart) {
-                const parsed =
-                    JSON.parse(storedCart);
+                try {
+                    const parsed = JSON.parse(storedCart);
 
-                if (Array.isArray(parsed)) {
-                    cart = parsed;
+                    if (Array.isArray(parsed)) {
+                        cart = parsed;
+                    }
+                } catch {
+                    cart = [];
                 }
             }
 
-            const existingIndex =
-                cart.findIndex((item) => {
-                    const itemId =
+            const existingIndex = cart.findIndex(
+                (item) => {
+                    const itemID =
                         item?.productID ||
                         item?._id ||
                         item?.id ||
                         item?.sku ||
                         item?.name;
 
-                    return itemId === productId;
-                });
+                    return itemID === productID;
+                }
+            );
 
-            // =================================================
-            // PRODUCT ALREADY IN CART
-            // =================================================
+            // =====================================================
+            // EXISTING PRODUCT
+            // =====================================================
 
             if (existingIndex !== -1) {
                 const existingItem =
@@ -204,11 +197,8 @@ export default function ProdcutCard(props) {
                     Number(product?.quantity);
 
                 if (
-                    Number.isFinite(
-                        availableStock
-                    ) &&
-                    currentQuantity >=
-                        availableStock
+                    Number.isFinite(availableStock) &&
+                    currentQuantity >= availableStock
                 ) {
                     toast.error(
                         `Only ${availableStock} ${
@@ -224,6 +214,7 @@ export default function ProdcutCard(props) {
                 cart[existingIndex] = {
                     ...existingItem,
                     ...product,
+                    productID,
                     cartQuantity:
                         currentQuantity + 1,
                 };
@@ -234,12 +225,9 @@ export default function ProdcutCard(props) {
                 );
 
                 window.dispatchEvent(
-                    new CustomEvent(
-                        "cartUpdated",
-                        {
-                            detail: cart,
-                        }
-                    )
+                    new CustomEvent("cartUpdated", {
+                        detail: cart,
+                    })
                 );
 
                 setIsAdding(true);
@@ -255,21 +243,13 @@ export default function ProdcutCard(props) {
                 return;
             }
 
-            // =================================================
+            // =====================================================
             // NEW PRODUCT
-            // =================================================
+            // =====================================================
 
             const cartItem = {
                 ...product,
-
-                // Keep your MongoDB productID
-                productID:
-                    product?.productID ||
-                    productId,
-
-                // IMPORTANT:
-                // quantity = database stock
-                // cartQuantity = customer's quantity
+                productID,
                 cartQuantity: 1,
             };
 
@@ -280,14 +260,16 @@ export default function ProdcutCard(props) {
                 JSON.stringify(cart)
             );
 
-            // Tell other components that cart changed
             window.dispatchEvent(
-                new CustomEvent(
-                    "cartUpdated",
-                    {
-                        detail: cart,
-                    }
-                )
+                new CustomEvent("cartUpdated", {
+                    detail: cart,
+                })
+            );
+
+            window.dispatchEvent(
+                new CustomEvent("addToCart", {
+                    detail: cartItem,
+                })
             );
 
             setIsAdding(true);
@@ -313,13 +295,43 @@ export default function ProdcutCard(props) {
         }
     };
 
+    // =========================================================
+    // WISHLIST
+    // =========================================================
+
+    const handleWishlist = (event) => {
+        event.stopPropagation();
+
+        toast.success(
+            `${productName} wishlist feature ready.`
+        );
+    };
+
+    // =========================================================
+    // RETURN
+    // =========================================================
+
     return (
         <article
+            onClick={handleProductClick}
+            onKeyDown={(event) => {
+                if (
+                    event.key === "Enter" ||
+                    event.key === " "
+                ) {
+                    event.preventDefault();
+                    handleProductClick();
+                }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={`View ${productName}`}
             className="
                 group
                 relative
                 w-full
                 max-w-[341px]
+                cursor-pointer
                 overflow-hidden
                 rounded-[8px]
                 border
@@ -332,6 +344,9 @@ export default function ProdcutCard(props) {
                 hover:-translate-y-1
                 hover:border-black/30
                 hover:shadow-[0_22px_45px_rgba(10,10,10,0.14)]
+                focus:outline-none
+                focus:ring-2
+                focus:ring-[#FF8F00]
             "
         >
             {/* =====================================================
@@ -370,7 +385,6 @@ export default function ProdcutCard(props) {
 
             {/* =====================================================
                 IMAGE SECTION
-                Increased from 250px to 300px
             ===================================================== */}
 
             <div
@@ -443,6 +457,7 @@ export default function ProdcutCard(props) {
                 <button
                     type="button"
                     aria-label={`Add ${productName} to wishlist`}
+                    onClick={handleWishlist}
                     className="
                         absolute
                         right-3
@@ -475,7 +490,6 @@ export default function ProdcutCard(props) {
 
                 {/* =================================================
                     PRODUCT IMAGE
-                    Bigger + more visible
                 ================================================= */}
 
                 {currentImage && !imageError ? (
@@ -498,9 +512,8 @@ export default function ProdcutCard(props) {
                             alt={productName}
                             loading="lazy"
                             decoding="async"
-                            onError={
-                                handleImageError
-                            }
+                            onError={handleImageError}
+                            draggable="false"
                             className="
                                 block
                                 h-auto
@@ -519,10 +532,6 @@ export default function ProdcutCard(props) {
                         />
                     </div>
                 ) : (
-                    /* =================================================
-                       IMAGE FALLBACK
-                    ================================================= */
-
                     <div
                         className="
                             relative
@@ -570,7 +579,7 @@ export default function ProdcutCard(props) {
                 )}
 
                 {/* =================================================
-                    IMAGE COUNT
+                    IMAGE DOTS
                 ================================================= */}
 
                 {validImages.length > 1 &&
@@ -600,11 +609,11 @@ export default function ProdcutCard(props) {
                                         key={index}
                                         type="button"
                                         aria-label={`View image ${
-                                            index +
-                                            1
+                                            index + 1
                                         }`}
-                                        onClick={() =>
+                                        onClick={(event) =>
                                             handleImageChange(
+                                                event,
                                                 index
                                             )
                                         }
@@ -638,9 +647,7 @@ export default function ProdcutCard(props) {
                     pt-[17px]
                 "
             >
-                {/* =================================================
-                    SERIES
-                ================================================= */}
+                {/* SERIES */}
 
                 <div
                     className="
@@ -658,9 +665,7 @@ export default function ProdcutCard(props) {
                         "Collection"}
                 </div>
 
-                {/* =================================================
-                    NAME
-                ================================================= */}
+                {/* NAME */}
 
                 <h3
                     className="
@@ -677,9 +682,7 @@ export default function ProdcutCard(props) {
                     {productName}
                 </h3>
 
-                {/* =================================================
-                    PRODUCT SPECIFICATION
-                ================================================= */}
+                {/* SPECIFICATION */}
 
                 <div
                     className="
@@ -692,8 +695,7 @@ export default function ProdcutCard(props) {
                         text-black/45
                     "
                 >
-                    {product?.scale ||
-                        "1:64 SCALE"}
+                    {product?.scale || "1:64 SCALE"}
 
                     {" — "}
 
@@ -703,13 +705,10 @@ export default function ProdcutCard(props) {
 
                     {" — "}
 
-                    {product?.condition ||
-                        "NEW"}
+                    {product?.condition || "NEW"}
                 </div>
 
-                {/* =================================================
-                    RATING
-                ================================================= */}
+                {/* RATING */}
 
                 <div
                     className="
@@ -755,9 +754,7 @@ export default function ProdcutCard(props) {
                     </span>
                 </div>
 
-                {/* =================================================
-                    STOCK INFO
-                ================================================= */}
+                {/* STOCK */}
 
                 {!isOutOfStock &&
                     Number.isFinite(
@@ -793,9 +790,7 @@ export default function ProdcutCard(props) {
                         </div>
                     )}
 
-                {/* =================================================
-                    PRICE + ADD BUTTON
-                ================================================= */}
+                {/* PRICE + CART */}
 
                 <div
                     className="
@@ -804,8 +799,6 @@ export default function ProdcutCard(props) {
                         justify-between
                     "
                 >
-                    {/* PRICE */}
-
                     <div
                         className="
                             flex
@@ -842,19 +835,13 @@ export default function ProdcutCard(props) {
                         )}
                     </div>
 
-                    {/* =================================================
-                        ADD TO CART BUTTON
-                    ================================================= */}
-
                     <button
                         type="button"
                         disabled={
                             isOutOfStock ||
                             isAdding
                         }
-                        onClick={
-                            handleAddToCart
-                        }
+                        onClick={handleAddToCart}
                         aria-label={
                             isOutOfStock
                                 ? "Product sold out"
@@ -872,7 +859,7 @@ export default function ProdcutCard(props) {
                             duration-200
                             ${
                                 isAdding
-                                    ? "rotate-0 bg-[#FF8F00] text-[#0A0A0A]"
+                                    ? "bg-[#FF8F00] text-[#0A0A0A]"
                                     : "bg-[#0A0A0A] text-[#F5F5DC] hover:-translate-y-0.5 hover:rotate-90 hover:bg-[#FF8F00] hover:text-[#0A0A0A] hover:shadow-[0_7px_18px_rgba(255,143,0,0.25)]"
                             }
                             disabled:pointer-events-none
@@ -881,18 +868,12 @@ export default function ProdcutCard(props) {
                     >
                         {isAdding ? (
                             <Check
-                                className="
-                                    h-[18px]
-                                    w-[18px]
-                                "
+                                className="h-[18px] w-[18px]"
                                 strokeWidth={2.2}
                             />
                         ) : (
                             <Plus
-                                className="
-                                    h-[18px]
-                                    w-[18px]
-                                "
+                                className="h-[18px] w-[18px]"
                                 strokeWidth={2}
                             />
                         )}
@@ -902,4 +883,3 @@ export default function ProdcutCard(props) {
         </article>
     );
 }
-

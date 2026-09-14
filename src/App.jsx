@@ -1,42 +1,78 @@
-import './App.css'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Toaster } from 'react-hot-toast'
-import HomePage from './pages/homePage'
-import LoginPage from './pages/loginPage'
-import AdminPage from './pages/adminPage'
-import ProductPage from './pages/productPage'
-import CartPage from './pages/cartPage'
-import AboutPage from './pages/aboutPage'
+import "./App.css";
+
+import {
+    BrowserRouter,
+    Route,
+    Routes,
+} from "react-router-dom";
+
+import { Toaster } from "react-hot-toast";
+
+import HomePage from "./pages/homePage";
+import LoginPage from "./pages/loginPage";
+import AdminPage from "./pages/adminPage";
+import ProductPage from "./pages/productPage";
+import CartPage from "./pages/cartPage";
+import AboutPage from "./pages/aboutPage";
+import ProductOverview from "./pages/productOverview";
 
 function App() {
+    return (
+        <BrowserRouter>
 
-  return (
-    <BrowserRouter>
+            <Toaster position="top-right" />
 
-      <Toaster position="top-right" />
+            <Routes>
 
-      <Routes path="/">
+                <Route
+                    path="/*"
+                    element={<HomePage />}
+                />
 
-        <Route path="/*" element={<HomePage />} />
+                <Route
+                    path="/products"
+                    element={<ProductPage />}
+                />
 
-        <Route path="/products" element={<ProductPage />} />
+                <Route
+                    path="/contact"
+                    element={<h1>Contact</h1>}
+                />
 
-        <Route path="/contact" element={<h1>Contact</h1>} />
+                <Route
+                    path="/login"
+                    element={<LoginPage />}
+                />
 
-        <Route path="/login" element={<LoginPage />} />
+                <Route
+                    path="/admin/*"
+                    element={<AdminPage />}
+                />
 
-        <Route path="/admin/*" element={<AdminPage />} />
+                <Route
+                    path="/register"
+                    element={<h1>Register</h1>}
+                />
 
-        <Route path="/register" element={<h1>Register</h1>} />
+                <Route
+                    path="/about"
+                    element={<AboutPage />}
+                />
 
-        <Route path="/about" element={<AboutPage />} />
+                <Route
+                    path="/overview/:productID"
+                    element={<ProductOverview />}
+                />
 
-        <Route path="/cart" element={<CartPage />} />
+                <Route
+                    path="/cart"
+                    element={<CartPage />}
+                />
 
-      </Routes>
+            </Routes>
 
-    </BrowserRouter>
-  )
+        </BrowserRouter>
+    );
 }
 
-export default App
+export default App;
