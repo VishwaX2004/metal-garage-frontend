@@ -260,15 +260,15 @@ export default function ProdcutCard({ product }) {
                 JSON.stringify(cart)
             );
 
+            // NOTE: Only dispatch "cartUpdated" here. It already carries
+            // the full, up-to-date cart (including this new item).
+            // Previously an extra "addToCart" event was also dispatched,
+            // and CartPage listened for both events, so a brand new
+            // product ended up being added twice (once from the
+            // cartUpdated sync, once from the addToCart handler).
             window.dispatchEvent(
                 new CustomEvent("cartUpdated", {
                     detail: cart,
-                })
-            );
-
-            window.dispatchEvent(
-                new CustomEvent("addToCart", {
-                    detail: cartItem,
                 })
             );
 
