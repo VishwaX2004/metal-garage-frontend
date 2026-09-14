@@ -21,6 +21,8 @@ import {
     ShoppingBag,
     ArrowRight,
     Loader2,
+    Trash2,
+    AlertTriangle,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -161,6 +163,16 @@ export default function OrderPage() {
     const [error, setError] = useState("");
 
     // =========================================================
+    // DELETE STATE
+    // =========================================================
+
+    const [deleteOrderData, setDeleteOrderData] =
+        useState(null);
+
+    const [deleting, setDeleting] =
+        useState(false);
+
+    // =========================================================
     // FETCH ORDERS
     // =========================================================
 
@@ -273,6 +285,142 @@ export default function OrderPage() {
     );
 
     // =========================================================
+    // DELETE ORDER
+    // =========================================================
+
+    const handleDeleteOrder = async () => {
+        if (!deleteOrderData) {
+            return;
+        }
+
+        const token = getToken();
+
+        if (!token) {
+            setDeleteOrderData(null);
+
+            toast.error(
+                "Please login to delete your order."
+            );
+
+            navigate("/login");
+
+            return;
+        }
+
+        try {
+            setDeleting(true);
+
+            const orderID =
+                deleteOrderData.orderID;
+
+            await axios.delete(
+                `${API_URL}/api/orders/${encodeURIComponent(
+                    orderID
+                )}`,
+                {
+                    headers: {
+                        Authorization:
+                            `Bearer ${token}`,
+                    },
+                }
+            );
+
+            // ---------------------------------------------------
+            // Remove order immediately from UI
+            // ---------------------------------------------------
+
+            setOrders((currentOrders) =>
+                currentOrders.filter(
+                    (order) =>
+                        order.orderID !==
+                        orderID
+                )
+            );
+
+            setDeleteOrderData(null);
+
+            toast.success(
+                "Order deleted successfully."
+            );
+        } catch (err) {
+            console.error(
+                "Delete order error:",
+                err
+            );
+
+            // ---------------------------------------------------
+            // TOKEN INVALID / EXPIRED
+            // ---------------------------------------------------
+
+            if (
+                err.response?.status ===
+                    401 ||
+                err.response?.status === 403
+            ) {
+                localStorage.removeItem(
+                    "token"
+                );
+
+                localStorage.removeItem(
+                    "accessToken"
+                );
+
+                localStorage.removeItem(
+                    "authToken"
+                );
+
+                setDeleteOrderData(null);
+
+                toast.error(
+                    "Your session has expired. Please login again."
+                );
+
+                navigate("/login");
+
+                return;
+            }
+
+            const message =
+                err.response?.data?.message ||
+                "Unable to delete the order.";
+
+            toast.error(message);
+        } finally {
+            setDeleting(false);
+        }
+    };
+
+    // =========================================================
+    // OPEN DELETE CONFIRMATION
+    // =========================================================
+
+    const openDeleteConfirmation = (
+        order
+    ) => {
+        if (!order?.orderID) {
+            toast.error(
+                "Unable to identify this order."
+            );
+
+            return;
+        }
+
+        setDeleteOrderData(order);
+    };
+
+    // =========================================================
+    // CLOSE DELETE CONFIRMATION
+    // =========================================================
+
+    const closeDeleteConfirmation = () => {
+        if (deleting) {
+            return;
+        }
+
+        setDeleteOrderData(null);
+    };
+
+    // =========================================================
     // INITIAL LOAD
     // =========================================================
 
@@ -371,7 +519,9 @@ export default function OrderPage() {
                                     onClick={() =>
                                         fetchOrders(true)
                                     }
-                                    disabled={refreshing}
+                                    disabled={
+                                        refreshing
+                                    }
                                     className="
                                         flex
                                         h-[58px]
@@ -449,7 +599,9 @@ export default function OrderPage() {
                                     <div className="mx-auto mb-7 flex h-24 w-24 items-center justify-center rounded-full bg-[#0A0A0A]">
                                         <ShoppingBag
                                             className="h-10 w-10 text-[#FF8F00]"
-                                            strokeWidth={1.5}
+                                            strokeWidth={
+                                                1.5
+                                            }
                                         />
                                     </div>
 
@@ -512,7 +664,10 @@ export default function OrderPage() {
                         <div className="space-y-8">
 
                             {orders.map(
-                                (order, orderIndex) => {
+                                (
+                                    order,
+                                    orderIndex
+                                ) => {
                                     const status =
                                         order.orderStatus ||
                                         "Pending";
@@ -645,7 +800,7 @@ export default function OrderPage() {
 
                                             <div className="p-5 sm:p-7">
 
-                                                <div className="mb-5 flex items-center justify-between">
+                                                <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
                                                     <div>
                                                         <p className="font-['JetBrains_Mono',monospace] text-[9px] uppercase tracking-[0.18em] text-[#0A0A0A]/40">
@@ -662,6 +817,50 @@ export default function OrderPage() {
                                                                 : "s"}
                                                         </h3>
                                                     </div>
+
+                                                    {/* =================
+                                                        DELETE BUTTON
+                                                    ================== */}
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            openDeleteConfirmation(
+                                                                order
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            deleting
+                                                        }
+                                                        className="
+                                                            inline-flex
+                                                            w-fit
+                                                            items-center
+                                                            gap-2
+                                                            border
+                                                            border-red-500/20
+                                                            bg-red-500/5
+                                                            px-4
+                                                            py-2.5
+                                                            font-['Work_Sans',sans-serif]
+                                                            text-xs
+                                                            font-semibold
+                                                            uppercase
+                                                            tracking-[0.08em]
+                                                            text-red-600
+                                                            transition-all
+                                                            duration-200
+                                                            hover:border-red-500
+                                                            hover:bg-red-500
+                                                            hover:text-white
+                                                            disabled:cursor-not-allowed
+                                                            disabled:opacity-50
+                                                        "
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+
+                                                        Delete Order
+                                                    </button>
 
                                                 </div>
 
@@ -790,26 +989,30 @@ export default function OrderPage() {
 
                                                             <p className="font-semibold text-[#0A0A0A]">
                                                                 {
-                                                                    order.shippingAddress
+                                                                    order
+                                                                        .shippingAddress
                                                                         ?.fullName
                                                                 }
                                                             </p>
 
                                                             <p>
                                                                 {
-                                                                    order.shippingAddress
+                                                                    order
+                                                                        .shippingAddress
                                                                         ?.address
                                                                 }
                                                             </p>
 
                                                             <p>
                                                                 {
-                                                                    order.shippingAddress
+                                                                    order
+                                                                        .shippingAddress
                                                                         ?.city
                                                                 }
                                                                 ,{" "}
                                                                 {
-                                                                    order.shippingAddress
+                                                                    order
+                                                                        .shippingAddress
                                                                         ?.province
                                                                 }
                                                             </p>
@@ -828,7 +1031,8 @@ export default function OrderPage() {
 
                                                             <p className="mt-1">
                                                                 {
-                                                                    order.shippingAddress
+                                                                    order
+                                                                        .shippingAddress
                                                                         ?.phone
                                                                 }
                                                             </p>
@@ -923,6 +1127,151 @@ export default function OrderPage() {
             </main>
 
             <Footer />
+
+            {/* =====================================================
+                DELETE CONFIRMATION MODAL
+            ====================================================== */}
+
+            {deleteOrderData && (
+                <div
+                    className="
+                        fixed
+                        inset-0
+                        z-[2000]
+                        flex
+                        items-center
+                        justify-center
+                        bg-black/70
+                        p-5
+                        backdrop-blur-sm
+                    "
+                    onClick={closeDeleteConfirmation}
+                >
+
+                    <div
+                        className="
+                            w-full
+                            max-w-md
+                            border
+                            border-[#0A0A0A]/10
+                            bg-[#F5F5DC]
+                            p-6
+                            shadow-2xl
+                            sm:p-8
+                        "
+                        onClick={(event) =>
+                            event.stopPropagation()
+                        }
+                    >
+
+                        {/* ICON */}
+
+                        <div className="mb-5 flex h-14 w-14 items-center justify-center bg-red-500/10">
+                            <AlertTriangle className="h-7 w-7 text-red-500" />
+                        </div>
+
+                        {/* TITLE */}
+
+                        <p className="font-['JetBrains_Mono',monospace] text-[10px] uppercase tracking-[0.18em] text-red-500">
+                            Delete Order
+                        </p>
+
+                        <h2 className="mt-2 font-['Oswald',sans-serif] text-3xl font-bold uppercase">
+                            Are you sure?
+                        </h2>
+
+                        <p className="mt-4 text-sm leading-6 text-[#0A0A0A]/60">
+                            This will permanently remove order{" "}
+                            <strong className="text-[#0A0A0A]">
+                                {deleteOrderData.orderID}
+                            </strong>{" "}
+                            from your order history.
+                        </p>
+
+                        <p className="mt-3 text-xs leading-5 text-red-600">
+                            This action cannot be undone.
+                        </p>
+
+                        {/* BUTTONS */}
+
+                        <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+
+                            <button
+                                type="button"
+                                onClick={
+                                    closeDeleteConfirmation
+                                }
+                                disabled={deleting}
+                                className="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    border
+                                    border-[#0A0A0A]/15
+                                    px-5
+                                    py-3
+                                    font-['Work_Sans',sans-serif]
+                                    text-xs
+                                    font-semibold
+                                    uppercase
+                                    tracking-wider
+                                    text-[#0A0A0A]
+                                    transition-all
+                                    duration-200
+                                    hover:border-[#0A0A0A]
+                                    disabled:cursor-not-allowed
+                                    disabled:opacity-50
+                                "
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={
+                                    handleDeleteOrder
+                                }
+                                disabled={deleting}
+                                className="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    gap-2
+                                    bg-red-500
+                                    px-5
+                                    py-3
+                                    font-['Work_Sans',sans-serif]
+                                    text-xs
+                                    font-semibold
+                                    uppercase
+                                    tracking-wider
+                                    text-white
+                                    transition-all
+                                    duration-200
+                                    hover:bg-red-600
+                                    disabled:cursor-not-allowed
+                                    disabled:opacity-60
+                                "
+                            >
+                                {deleting ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Trash2 className="h-4 w-4" />
+                                        Delete Order
+                                    </>
+                                )}
+                            </button>
+
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }
