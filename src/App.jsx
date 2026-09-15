@@ -19,6 +19,7 @@ import CheckoutPage from "./pages/checkoutPage";
 import OrderPage from "./pages/orderPage";
 import ContactPage from "./pages/contactPage";
 import RegisterPage from "./pages/registerPage";
+import AccountPage from "./pages/accountPage";
 
 export default function App() {
     return (
@@ -104,6 +105,25 @@ export default function App() {
                 />
 
                 {/* =================================================
+                    ACCOUNT
+                ================================================== */}
+
+                <Route
+                    path="/account"
+                    element={<AccountPage />}
+                />
+
+                {/* =================================================
+                    ACCOUNT SETTINGS
+                    Uses the same AccountPage
+                ================================================== */}
+
+                <Route
+                    path="/account/settings"
+                    element={<AccountPage />}
+                />
+
+                {/* =================================================
                     ABOUT
                 ================================================== */}
 
@@ -118,9 +138,7 @@ export default function App() {
 
                 <Route
                     path="/contact"
-                    element={
-                        <ContactPage />
-                    }
+                    element={<ContactPage />}
                 />
 
                 {/* =================================================
@@ -132,11 +150,8 @@ export default function App() {
                     element={<AdminPage />}
                 />
 
-                
-
             </Routes>
 
         </BrowserRouter>
     );
 }
-

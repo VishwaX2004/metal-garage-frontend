@@ -1,36 +1,71 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// ============================================================
+// SUPABASE CONFIG
+// ============================================================
+
+const supabaseUrl =
+    import.meta.env.VITE_SUPABASE_URL;
+
+const supabaseAnonKey =
+    import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+// ============================================================
+// VALIDATE ENVIRONMENT
+// ============================================================
 
 if (!supabaseUrl) {
-    throw new Error("VITE_SUPABASE_URL is not configured.");
+    throw new Error(
+        "VITE_SUPABASE_URL is not configured."
+    );
 }
 
 if (!supabaseAnonKey) {
-    throw new Error("VITE_SUPABASE_ANON_KEY is not configured.");
+    throw new Error(
+        "VITE_SUPABASE_ANON_KEY is not configured."
+    );
 }
+
+// ============================================================
+// SUPABASE CLIENT
+// ============================================================
 
 const supabase = createClient(
     supabaseUrl,
     supabaseAnonKey
 );
 
-export default async function mediaUpload(file) {
+// ============================================================
+// MEDIA UPLOADER
+// ============================================================
+
+export default async function mediaUpload(
+    file
+) {
+    // --------------------------------------------------------
+    // CHECK FILE
+    // --------------------------------------------------------
 
     if (!file) {
-        throw new Error("Please select an image first.");
+        throw new Error(
+            "Please select an image first."
+        );
     }
 
     if (!(file instanceof File)) {
-        throw new Error("Invalid image file.");
+        throw new Error(
+            "Invalid image file."
+        );
     }
 
-    // Only allow images
+    // --------------------------------------------------------
+    // ALLOWED FILE TYPES
+    // --------------------------------------------------------
+
     const allowedTypes = [
         "image/jpeg",
         "image/png",
-        "image/webp"
+        "image/webp",
     ];
 
     if (!allowedTypes.includes(file.type)) {
@@ -39,8 +74,12 @@ export default async function mediaUpload(file) {
         );
     }
 
-    // 10 MB maximum
-    const maxSize = 10 * 1024 * 1024;
+    // --------------------------------------------------------
+    // MAX SIZE = 10 MB
+    // --------------------------------------------------------
+
+    const maxSize =
+        10 * 1024 * 1024;
 
     if (file.size > maxSize) {
         throw new Error(
@@ -49,26 +88,38 @@ export default async function mediaUpload(file) {
     }
 
     try {
+        // ----------------------------------------------------
+        // CLEAN FILE NAME
+        // ----------------------------------------------------
 
-        // Clean original filename
-        const cleanFileName = file.name
-            .replace(/[^a-zA-Z0-9.-]/g, "_");
+        const cleanFileName =
+            file.name.replace(
+                /[^a-zA-Z0-9.-]/g,
+                "_"
+            );
 
-        // Unique filename
-        const timestamp = Date.now();
+        // ----------------------------------------------------
+        // UNIQUE FILE NAME
+        // ----------------------------------------------------
 
-        const randomString = Math.random()
-            .toString(36)
-            .substring(2, 10);
+        const timestamp =
+            Date.now();
+
+        const randomString =
+            Math.random()
+                .toString(36)
+                .substring(2, 10);
 
         const fileName =
-            `${timestamp}-${randomString}-${cleanFileName}`;
+            `profiles/${timestamp}-${randomString}-${cleanFileName}`;
 
-        console.log("Uploading image:", fileName);
+        // ----------------------------------------------------
+        // UPLOAD TO SUPABASE
+        // ----------------------------------------------------
 
         const {
             data,
-            error
+            error,
         } = await supabase.storage
             .from("images")
             .upload(
@@ -76,62 +127,52 @@ export default async function mediaUpload(file) {
                 file,
                 {
                     cacheControl: "3600",
-                    contentType: file.type,
-                    upsert: false
+                    contentType:
+                        file.type,
+                    upsert: false,
                 }
             );
 
         if (error) {
             console.error(
-                "Supabase Storage upload error:",
+                "Supabase upload error:",
                 error
             );
 
             throw new Error(
                 error.message ||
-                "Failed to upload image to Supabase."
+                    "Failed to upload image."
             );
         }
 
-        if (!data || !data.path) {
+        if (!data?.path) {
             throw new Error(
-                "Upload succeeded but no file path was returned."
+                "Upload completed but no image path was returned."
             );
         }
 
-        console.log(
-            "Uploaded file path:",
-            data.path
-        );
+        // ----------------------------------------------------
+        // GET PUBLIC URL
+        // ----------------------------------------------------
 
-        // Generate public URL
         const {
-            data: publicUrlData
+            data: publicUrlData,
         } = supabase.storage
             .from("images")
-            .getPublicUrl(data.path);
+            .getPublicUrl(
+                data.path
+            );
 
         if (
-            !publicUrlData ||
-            !publicUrlData.publicUrl
+            !publicUrlData?.publicUrl
         ) {
             throw new Error(
                 "Could not generate public image URL."
             );
         }
 
-        const publicUrl =
-            publicUrlData.publicUrl;
-
-        console.log(
-            "Public image URL:",
-            publicUrl
-        );
-
-        return publicUrl;
-
+        return publicUrlData.publicUrl;
     } catch (error) {
-
         console.error(
             "mediaUpload error:",
             error

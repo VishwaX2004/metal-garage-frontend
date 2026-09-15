@@ -39,6 +39,7 @@ import {
     FiChevronRight,
 } from "react-icons/fi";
 import AdminUpdateProductPage from "./admin/adminUpdateProduct";
+import AdminOrders from "./admin/adminOrders";
 
 
 export default function AdminPage() {
@@ -648,7 +649,7 @@ export default function AdminPage() {
                         <Route
                             path="orders"
                             element={
-                                <SimplePage title="Orders" />
+                                <AdminOrders />
                             }
                         />
 
