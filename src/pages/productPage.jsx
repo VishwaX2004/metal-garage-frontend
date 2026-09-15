@@ -42,6 +42,26 @@ export default function ProductPage() {
     const productsPerPage = 9;
 
 
+    /* ================= SCROLL TO TOP ================= */
+
+    useEffect(() => {
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+
+    }, [
+        currentPage,
+        selectedCategories,
+        selectedScales,
+        selectedAvailability,
+        selectedColor,
+        maxPrice,
+        sortBy,
+    ]);
+
+
     /* ================= FETCH PRODUCTS ================= */
 
     useEffect(() => {

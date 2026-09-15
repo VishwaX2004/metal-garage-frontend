@@ -6,6 +6,18 @@ import { useEffect, useState } from "react";
 
 export default function HomePage() {
   // =========================================================
+  // SCROLL TO TOP
+  // =========================================================
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    });
+  }, []);
+
+  // =========================================================
   // PRODUCTS
   // =========================================================
 
@@ -963,8 +975,6 @@ export default function HomePage() {
 
           <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-10 px-5 lg:grid-cols-2 min-[981px]:px-10">
 
-            {/* HERO LEFT */}
-
             <div className="mg-hero-left">
 
               <div className="mg-hero-label mb-[22px] flex items-center gap-[10px]">
@@ -1042,8 +1052,6 @@ export default function HomePage() {
               </div>
 
             </div>
-
-            {/* HERO RIGHT */}
 
             <div className="mg-hero-right relative order-first flex items-center justify-center lg:order-none">
 
@@ -1284,7 +1292,6 @@ export default function HomePage() {
                 <span className="text-[#FF8F00]">
                   Serious collections.
                 </span>
-
               </h2>
 
               <p className="mb-[34px] max-w-[420px] text-[15.5px] leading-[1.65] text-[#F5F5DC]/70">
@@ -1556,7 +1563,7 @@ export default function HomePage() {
                   title: "Rare & Limited",
                   text: "Discover hard-to-find releases and special editions.",
                   icon: (
-                    <path d="M12 2l2.5 6.9L21 11l-6.5 2.1L12 20l-2.5-6.9L3 11l6.5-2.1z" />
+                    <path d="M12 2l2.5 6.9L21 11l-6.5 2.1L12 20l-2.5-6.9L3 11z" />
                   ),
                 },
                 {
@@ -1637,7 +1644,6 @@ export default function HomePage() {
               <span className="text-[#FF8F00]">
                 It's a passion.
               </span>
-
             </h2>
 
             <p className="mg-community-text mb-[38px] text-[16px] leading-[1.6] text-[#F5F5DC]/70">
@@ -1662,3 +1668,4 @@ export default function HomePage() {
     </div>
   );
 }
+

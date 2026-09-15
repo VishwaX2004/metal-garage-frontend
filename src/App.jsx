@@ -17,6 +17,8 @@ import AboutPage from "./pages/aboutPage";
 import ProductOverview from "./pages/productOverview";
 import CheckoutPage from "./pages/checkoutPage";
 import OrderPage from "./pages/orderPage";
+import ContactPage from "./pages/contactPage";
+import RegisterPage from "./pages/registerPage";
 
 export default function App() {
     return (
@@ -98,9 +100,7 @@ export default function App() {
 
                 <Route
                     path="/register"
-                    element={
-                        <h1>Register</h1>
-                    }
+                    element={<RegisterPage />}
                 />
 
                 {/* =================================================
@@ -119,7 +119,7 @@ export default function App() {
                 <Route
                     path="/contact"
                     element={
-                        <h1>Contact</h1>
+                        <ContactPage />
                     }
                 />
 
@@ -131,6 +131,8 @@ export default function App() {
                     path="/admin/*"
                     element={<AdminPage />}
                 />
+
+                
 
             </Routes>
 

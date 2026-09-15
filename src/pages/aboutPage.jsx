@@ -1,6 +1,7 @@
 import Footer from "../components/footer";
 import Header from "../components/header";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import {
     ArrowRight,
     BadgeCheck,
@@ -14,6 +15,19 @@ import {
 } from "lucide-react";
 
 export default function AboutPage() {
+
+    /* =====================================================
+       SCROLL TO TOP
+    ===================================================== */
+
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "instant",
+        });
+    }, []);
+
     const fadeUp = {
         hidden: {
             opacity: 0,
@@ -502,3 +516,4 @@ export default function AboutPage() {
         </div>
     );
 }
+
