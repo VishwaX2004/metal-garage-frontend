@@ -5,10 +5,12 @@ import { createClient } from "@supabase/supabase-js";
 // ============================================================
 
 const supabaseUrl =
-    import.meta.env.VITE_SUPABASE_URL;
+    import.meta.env.VITE_SUPABASE_URL?.trim();
 
 const supabaseAnonKey =
-    import.meta.env.VITE_SUPABASE_ANON_KEY;
+    import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
+
+const BUCKET_NAME = "images";
 
 // ============================================================
 // VALIDATE ENVIRONMENT
@@ -16,13 +18,40 @@ const supabaseAnonKey =
 
 if (!supabaseUrl) {
     throw new Error(
-        "VITE_SUPABASE_URL is not configured."
+        "VITE_SUPABASE_URL is missing from the .env file."
     );
 }
 
 if (!supabaseAnonKey) {
     throw new Error(
-        "VITE_SUPABASE_ANON_KEY is not configured."
+        "VITE_SUPABASE_ANON_KEY is missing from the .env file."
+    );
+}
+
+// ============================================================
+// NORMALIZE SUPABASE URL
+// ============================================================
+
+const normalizedSupabaseUrl =
+    supabaseUrl.replace(/\/+$/, "");
+
+// ============================================================
+// VALIDATE SUPABASE URL
+// ============================================================
+
+try {
+    const parsedUrl =
+        new URL(normalizedSupabaseUrl);
+
+    if (
+        parsedUrl.protocol !== "https:" &&
+        parsedUrl.protocol !== "http:"
+    ) {
+        throw new Error();
+    }
+} catch {
+    throw new Error(
+        "VITE_SUPABASE_URL is not a valid URL."
     );
 }
 
@@ -31,19 +60,61 @@ if (!supabaseAnonKey) {
 // ============================================================
 
 const supabase = createClient(
-    supabaseUrl,
-    supabaseAnonKey
+    normalizedSupabaseUrl,
+    supabaseAnonKey,
+    {
+        auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+        },
+    }
 );
 
 // ============================================================
-// MEDIA UPLOADER
+// CONSTANTS
 // ============================================================
 
-export default async function mediaUpload(
-    file
-) {
+const ALLOWED_FILE_TYPES = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+];
+
+const MAX_FILE_SIZE =
+    10 * 1024 * 1024;
+
+// ============================================================
+// CREATE UNIQUE FILE PATH
+// ============================================================
+
+const createFilePath = (file) => {
+    const cleanFileName =
+        file.name
+            .trim()
+            .replace(
+                /[^a-zA-Z0-9.-]/g,
+                "_"
+            );
+
+    const timestamp =
+        Date.now();
+
+    const randomString =
+        Math.random()
+            .toString(36)
+            .substring(2, 10);
+
+    return `products/${timestamp}-${randomString}-${cleanFileName}`;
+};
+
+// ============================================================
+// MEDIA UPLOAD
+// ============================================================
+
+export default async function mediaUpload(file) {
     // --------------------------------------------------------
-    // CHECK FILE
+    // FILE VALIDATION
     // --------------------------------------------------------
 
     if (!file) {
@@ -59,79 +130,110 @@ export default async function mediaUpload(
     }
 
     // --------------------------------------------------------
-    // ALLOWED FILE TYPES
+    // FILE TYPE
     // --------------------------------------------------------
 
-    const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/webp",
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
+    if (
+        !ALLOWED_FILE_TYPES.includes(
+            file.type
+        )
+    ) {
         throw new Error(
             "Only JPG, PNG and WEBP images are allowed."
         );
     }
 
     // --------------------------------------------------------
-    // MAX SIZE = 10 MB
+    // FILE SIZE
     // --------------------------------------------------------
 
-    const maxSize =
-        10 * 1024 * 1024;
-
-    if (file.size > maxSize) {
+    if (
+        file.size >
+        MAX_FILE_SIZE
+    ) {
         throw new Error(
             "Image size must be less than 10 MB."
         );
     }
 
+    // --------------------------------------------------------
+    // CREATE PATH
+    // --------------------------------------------------------
+
+    const filePath =
+        createFilePath(file);
+
+    console.log(
+        "========================================"
+    );
+
+    console.log(
+        "SUPABASE IMAGE UPLOAD"
+    );
+
+    console.log(
+        "========================================"
+    );
+
+    console.log(
+        "Supabase URL:",
+        normalizedSupabaseUrl
+    );
+
+    console.log(
+        "Bucket:",
+        BUCKET_NAME
+    );
+
+    console.log(
+        "File:",
+        file.name
+    );
+
+    console.log(
+        "File type:",
+        file.type
+    );
+
+    console.log(
+        "File size:",
+        file.size
+    );
+
+    console.log(
+        "Storage path:",
+        filePath
+    );
+
     try {
         // ----------------------------------------------------
-        // CLEAN FILE NAME
-        // ----------------------------------------------------
-
-        const cleanFileName =
-            file.name.replace(
-                /[^a-zA-Z0-9.-]/g,
-                "_"
-            );
-
-        // ----------------------------------------------------
-        // UNIQUE FILE NAME
-        // ----------------------------------------------------
-
-        const timestamp =
-            Date.now();
-
-        const randomString =
-            Math.random()
-                .toString(36)
-                .substring(2, 10);
-
-        const fileName =
-            `profiles/${timestamp}-${randomString}-${cleanFileName}`;
-
-        // ----------------------------------------------------
-        // UPLOAD TO SUPABASE
+        // UPLOAD
         // ----------------------------------------------------
 
         const {
             data,
             error,
-        } = await supabase.storage
-            .from("images")
-            .upload(
-                fileName,
-                file,
-                {
-                    cacheControl: "3600",
-                    contentType:
-                        file.type,
-                    upsert: false,
-                }
-            );
+        } =
+            await supabase.storage
+                .from(BUCKET_NAME)
+                .upload(
+                    filePath,
+                    file,
+                    {
+                        cacheControl:
+                            "3600",
+
+                        contentType:
+                            file.type,
+
+                        upsert:
+                            false,
+                    }
+                );
+
+        // ----------------------------------------------------
+        // SUPABASE ERROR
+        // ----------------------------------------------------
 
         if (error) {
             console.error(
@@ -139,17 +241,49 @@ export default async function mediaUpload(
                 error
             );
 
+            console.error(
+                "Supabase upload error message:",
+                error.message
+            );
+
+            console.error(
+                "Supabase upload error name:",
+                error.name
+            );
+
+            console.error(
+                "Supabase upload error status:",
+                error.status
+            );
+
             throw new Error(
                 error.message ||
-                    "Failed to upload image."
+                    "Supabase image upload failed."
             );
         }
 
-        if (!data?.path) {
+        // ----------------------------------------------------
+        // CHECK RESPONSE
+        // ----------------------------------------------------
+
+        if (
+            !data ||
+            !data.path
+        ) {
+            console.error(
+                "Invalid Supabase upload response:",
+                data
+            );
+
             throw new Error(
-                "Upload completed but no image path was returned."
+                "Supabase did not return an uploaded file path."
             );
         }
+
+        console.log(
+            "Upload successful:",
+            data
+        );
 
         // ----------------------------------------------------
         // GET PUBLIC URL
@@ -157,26 +291,56 @@ export default async function mediaUpload(
 
         const {
             data: publicUrlData,
-        } = supabase.storage
-            .from("images")
-            .getPublicUrl(
-                data.path
-            );
+        } =
+            supabase.storage
+                .from(BUCKET_NAME)
+                .getPublicUrl(
+                    data.path
+                );
+
+        const publicUrl =
+            publicUrlData?.publicUrl;
 
         if (
-            !publicUrlData?.publicUrl
+            !publicUrl
         ) {
             throw new Error(
-                "Could not generate public image URL."
+                "Supabase did not return a public image URL."
             );
         }
 
-        return publicUrlData.publicUrl;
+        console.log(
+            "Public image URL:",
+            publicUrl
+        );
+
+        console.log(
+            "========================================"
+        );
+
+        return publicUrl;
     } catch (error) {
         console.error(
             "mediaUpload error:",
             error
         );
+
+        // ----------------------------------------------------
+        // NETWORK ERROR
+        // ----------------------------------------------------
+
+        if (
+            error?.message ===
+                "Failed to fetch" ||
+            error?.name ===
+                "TypeError" ||
+            error?.name ===
+                "StorageUnknownError"
+        ) {
+            throw new Error(
+                "Unable to connect to Supabase Storage. Check VITE_SUPABASE_URL, internet/DNS connection, and the Supabase project."
+            );
+        }
 
         throw error;
     }

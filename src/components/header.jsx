@@ -980,9 +980,6 @@ export default function Header() {
                 </nav>
             </header>
 
-            {/* Header spacer */}
-
-            <div className="h-[78px]" />
         </>
     );
 }
