@@ -2,19 +2,78 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import ProdcutCard from "../components/productCard";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function HomePage() {
   // =========================================================
-  // SCROLL TO TOP
+  // PAGE / SCROLL STATE
+  // =========================================================
+
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const scrollRafRef = useRef(null);
+
+  // =========================================================
+  // SCROLL TO TOP + RESPONSIVE RPM GAUGE
   // =========================================================
 
   useEffect(() => {
+    // Always start HomePage from the top
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: "instant",
+      behavior: "auto",
     });
+
+    const updateScrollProgress = () => {
+      if (scrollRafRef.current !== null) {
+        return;
+      }
+
+      scrollRafRef.current = window.requestAnimationFrame(() => {
+        const scrollTop =
+          window.scrollY ||
+          document.documentElement.scrollTop ||
+          document.body.scrollTop ||
+          0;
+
+        const documentHeight = document.documentElement.scrollHeight;
+        const windowHeight = window.innerHeight;
+
+        const scrollableHeight = Math.max(
+          documentHeight - windowHeight,
+          1
+        );
+
+        const progress = Math.min(
+          Math.max(scrollTop / scrollableHeight, 0),
+          1
+        );
+
+        setScrollProgress(progress);
+
+        scrollRafRef.current = null;
+      });
+    };
+
+    updateScrollProgress();
+
+    window.addEventListener("scroll", updateScrollProgress, {
+      passive: true,
+    });
+
+    window.addEventListener("resize", updateScrollProgress, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener("scroll", updateScrollProgress);
+      window.removeEventListener("resize", updateScrollProgress);
+
+      if (scrollRafRef.current !== null) {
+        window.cancelAnimationFrame(scrollRafRef.current);
+        scrollRafRef.current = null;
+      }
+    };
   }, []);
 
   // =========================================================
@@ -30,11 +89,15 @@ export default function HomePage() {
   // =========================================================
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchProducts = async () => {
       try {
         const response = await axios.get(
           import.meta.env.VITE_API_URL + "/api/products"
         );
+
+        if (!mounted) return;
 
         const productData = Array.isArray(response.data)
           ? response.data
@@ -44,26 +107,22 @@ export default function HomePage() {
 
         setProducts(productData);
 
-        // -----------------------------------------------------
-        // RANDOM 4 PRODUCTS FOR TRENDING
-        // -----------------------------------------------------
-
+        // Trending products
         const shuffledTrending = [...productData].sort(
           () => Math.random() - 0.5
         );
 
         setTrendingProducts(shuffledTrending.slice(0, 4));
 
-        // -----------------------------------------------------
-        // RANDOM 4 PRODUCTS FOR NEW ARRIVALS
-        // -----------------------------------------------------
-
+        // New arrivals
         const shuffledArrivals = [...productData].sort(
           () => Math.random() - 0.5
         );
 
         setNewArrivalProducts(shuffledArrivals.slice(0, 4));
       } catch (error) {
+        if (!mounted) return;
+
         console.error("Failed to fetch products:", error);
 
         setProducts([]);
@@ -73,7 +132,36 @@ export default function HomePage() {
     };
 
     fetchProducts();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  // =========================================================
+  // RPM GAUGE
+  // =========================================================
+
+  /*
+    Scroll 0%   -> RPM 0
+    Scroll 25%  -> RPM 2250
+    Scroll 50%  -> RPM 4500
+    Scroll 75%  -> RPM 6750
+    Scroll 100% -> RPM 9000
+  */
+
+  const rpmHeight = `${Math.max(scrollProgress * 100, 2)}%`;
+
+  const rpmMarkerBottom = `${Math.min(
+    Math.max(scrollProgress * 100, 2),
+    98
+  )}%`;
+
+  const rpmValue = Math.round(scrollProgress * 9000);
+
+  // =========================================================
+  // RENDER
+  // =========================================================
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-[#F5F5DC] text-[#0A0A0A] font-['Work_Sans',sans-serif]">
@@ -88,13 +176,17 @@ export default function HomePage() {
           scroll-behavior: smooth;
         }
 
+        body {
+          overflow-x: hidden;
+        }
+
         ::selection {
           background: #FF8F00;
           color: #0A0A0A;
         }
 
         /* =====================================================
-           EXISTING TYPOGRAPHY
+           TYPOGRAPHY
         ====================================================== */
 
         .mg-display {
@@ -111,7 +203,7 @@ export default function HomePage() {
         }
 
         /* =====================================================
-           EXISTING BRACKET
+           BRACKET
         ====================================================== */
 
         .mg-bracket {
@@ -145,7 +237,7 @@ export default function HomePage() {
         }
 
         /* =====================================================
-           EXISTING TICKS
+           TICKS
         ====================================================== */
 
         .mg-ticks {
@@ -165,16 +257,16 @@ export default function HomePage() {
         }
 
         /* =====================================================
-           EXISTING ANIMATIONS
+           BASIC ANIMATIONS
         ====================================================== */
 
         @keyframes mgFloat {
           0%, 100% {
-            transform: translateY(0);
+            transform: translate3d(0, 0, 0);
           }
 
           50% {
-            transform: translateY(-7px);
+            transform: translate3d(0, -7px, 0);
           }
         }
 
@@ -199,61 +291,61 @@ export default function HomePage() {
         }
 
         /* =====================================================
-           NEW PAGE ANIMATIONS
+           PAGE LOAD ANIMATIONS
         ====================================================== */
 
         @keyframes mgFadeUp {
           0% {
             opacity: 0;
-            transform: translateY(35px);
+            transform: translate3d(0, 22px, 0);
           }
 
           100% {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate3d(0, 0, 0);
           }
         }
 
         @keyframes mgFadeDown {
           0% {
             opacity: 0;
-            transform: translateY(-30px);
+            transform: translate3d(0, -20px, 0);
           }
 
           100% {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate3d(0, 0, 0);
           }
         }
 
         @keyframes mgFadeLeft {
           0% {
             opacity: 0;
-            transform: translateX(-40px);
+            transform: translate3d(-25px, 0, 0);
           }
 
           100% {
             opacity: 1;
-            transform: translateX(0);
+            transform: translate3d(0, 0, 0);
           }
         }
 
         @keyframes mgFadeRight {
           0% {
             opacity: 0;
-            transform: translateX(40px);
+            transform: translate3d(25px, 0, 0);
           }
 
           100% {
             opacity: 1;
-            transform: translateX(0);
+            transform: translate3d(0, 0, 0);
           }
         }
 
         @keyframes mgScaleIn {
           0% {
             opacity: 0;
-            transform: scale(.88);
+            transform: scale(.96);
           }
 
           100% {
@@ -264,7 +356,7 @@ export default function HomePage() {
 
         @keyframes mgScaleSoft {
           0% {
-            transform: scale(.96);
+            transform: scale(.98);
             opacity: 0;
           }
 
@@ -294,17 +386,17 @@ export default function HomePage() {
           }
 
           50% {
-            box-shadow: 0 0 30px rgba(255,143,0,.18);
+            box-shadow: 0 0 25px rgba(255,143,0,.15);
           }
         }
 
         @keyframes mgShine {
           0% {
-            transform: translateX(-120%);
+            transform: translateX(-120%) skewX(-20deg);
           }
 
           100% {
-            transform: translateX(120%);
+            transform: translateX(120%) skewX(-20deg);
           }
         }
 
@@ -314,7 +406,7 @@ export default function HomePage() {
           }
 
           50% {
-            transform: scale(1.025);
+            transform: scale(1.02);
           }
         }
 
@@ -334,7 +426,7 @@ export default function HomePage() {
           }
 
           50% {
-            transform: translateX(5px);
+            transform: translateX(4px);
           }
         }
 
@@ -344,12 +436,17 @@ export default function HomePage() {
           }
 
           50% {
-            text-shadow: 0 0 18px rgba(255,143,0,.28);
+            text-shadow: 0 0 15px rgba(255,143,0,.22);
           }
         }
 
+        /* =====================================================
+           CONTINUOUS ANIMATIONS
+        ====================================================== */
+
         .mg-float {
           animation: mgFloat 4s ease-in-out infinite;
+          will-change: transform;
         }
 
         .mg-pulse {
@@ -365,47 +462,49 @@ export default function HomePage() {
         ====================================================== */
 
         .mg-page-enter {
-          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) both;
+          animation: mgFadeUp .55s cubic-bezier(.22,1,.36,1) both;
+          will-change: opacity, transform;
         }
 
         .mg-hero-left {
-          animation: mgFadeLeft .9s cubic-bezier(.22,1,.36,1) .1s both;
+          animation: mgFadeLeft .7s cubic-bezier(.22,1,.36,1) .05s both;
         }
 
         .mg-hero-right {
-          animation: mgFadeRight 1s cubic-bezier(.22,1,.36,1) .15s both;
+          animation: mgFadeRight .75s cubic-bezier(.22,1,.36,1) .08s both;
         }
 
         .mg-hero-label {
-          animation: mgFadeDown .7s ease .25s both;
+          animation: mgFadeDown .55s ease .12s both;
         }
 
         .mg-hero-title {
           animation:
-            mgFadeUp .8s cubic-bezier(.22,1,.36,1) .35s both,
-            mgTextGlow 4s ease-in-out 1.5s infinite;
+            mgFadeUp .65s cubic-bezier(.22,1,.36,1) .18s both,
+            mgTextGlow 5s ease-in-out 1.2s infinite;
         }
 
         .mg-hero-description {
-          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) .5s both;
+          animation: mgFadeUp .65s cubic-bezier(.22,1,.36,1) .28s both;
         }
 
         .mg-hero-buttons {
-          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) .65s both;
+          animation: mgFadeUp .65s cubic-bezier(.22,1,.36,1) .38s both;
         }
 
         .mg-hero-stats {
-          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) .8s both;
+          animation: mgFadeUp .65s cubic-bezier(.22,1,.36,1) .48s both;
         }
 
         /* =====================================================
-           BUTTON ANIMATIONS
+           BUTTONS
         ====================================================== */
 
         .mg-button {
           position: relative;
           overflow: hidden;
           isolation: isolate;
+          transform: translateZ(0);
         }
 
         .mg-button::before {
@@ -418,11 +517,10 @@ export default function HomePage() {
           background: linear-gradient(
             90deg,
             transparent,
-            rgba(255,255,255,.28),
+            rgba(255,255,255,.25),
             transparent
           );
           transform: skewX(-20deg);
-          transition: none;
           pointer-events: none;
         }
 
@@ -439,15 +537,15 @@ export default function HomePage() {
         ====================================================== */
 
         .mg-section-title {
-          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) both;
+          animation: mgFadeUp .7s cubic-bezier(.22,1,.36,1) both;
         }
 
         .mg-section-description {
-          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) .15s both;
+          animation: mgFadeUp .7s cubic-bezier(.22,1,.36,1) .1s both;
         }
 
         .mg-section-line {
-          animation: mgRevealLine 1s cubic-bezier(.22,1,.36,1) .1s both;
+          animation: mgRevealLine .8s cubic-bezier(.22,1,.36,1) .05s both;
         }
 
         /* =====================================================
@@ -455,39 +553,40 @@ export default function HomePage() {
         ====================================================== */
 
         .mg-category-card {
-          animation: mgScaleIn .7s cubic-bezier(.22,1,.36,1) both;
+          animation: mgScaleIn .55s cubic-bezier(.22,1,.36,1) both;
           transition:
-            transform .5s cubic-bezier(.22,1,.36,1),
-            box-shadow .5s ease;
+            transform .35s cubic-bezier(.22,1,.36,1),
+            box-shadow .35s ease;
+          will-change: transform;
         }
 
         .mg-category-card:nth-child(1) {
-          animation-delay: .05s;
+          animation-delay: .03s;
         }
 
         .mg-category-card:nth-child(2) {
-          animation-delay: .12s;
+          animation-delay: .08s;
         }
 
         .mg-category-card:nth-child(3) {
-          animation-delay: .19s;
+          animation-delay: .13s;
         }
 
         .mg-category-card:nth-child(4) {
-          animation-delay: .26s;
+          animation-delay: .18s;
         }
 
         .mg-category-card:nth-child(5) {
-          animation-delay: .33s;
+          animation-delay: .23s;
         }
 
         .mg-category-card:nth-child(6) {
-          animation-delay: .40s;
+          animation-delay: .28s;
         }
 
         .mg-category-card:hover {
-          transform: translateY(-7px);
-          box-shadow: 0 18px 35px rgba(10,10,10,.16);
+          transform: translate3d(0, -5px, 0);
+          box-shadow: 0 14px 30px rgba(10,10,10,.14);
         }
 
         .mg-category-card:hover .mg-category-label {
@@ -495,7 +594,7 @@ export default function HomePage() {
         }
 
         .mg-category-label {
-          transition: transform .3s ease;
+          transition: transform .25s ease;
         }
 
         /* =====================================================
@@ -503,27 +602,27 @@ export default function HomePage() {
         ====================================================== */
 
         .mg-products-wrapper {
-          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) both;
-        }
-
-        .mg-product-item {
           animation: mgFadeUp .7s cubic-bezier(.22,1,.36,1) both;
         }
 
+        .mg-product-item {
+          animation: mgFadeUp .6s cubic-bezier(.22,1,.36,1) both;
+        }
+
         .mg-product-item:nth-child(1) {
-          animation-delay: .05s;
+          animation-delay: .03s;
         }
 
         .mg-product-item:nth-child(2) {
-          animation-delay: .12s;
+          animation-delay: .08s;
         }
 
         .mg-product-item:nth-child(3) {
-          animation-delay: .19s;
+          animation-delay: .13s;
         }
 
         .mg-product-item:nth-child(4) {
-          animation-delay: .26s;
+          animation-delay: .18s;
         }
 
         /* =====================================================
@@ -531,17 +630,17 @@ export default function HomePage() {
         ====================================================== */
 
         .mg-rare-content {
-          animation: mgFadeLeft .9s cubic-bezier(.22,1,.36,1) both;
+          animation: mgFadeLeft .7s cubic-bezier(.22,1,.36,1) both;
         }
 
         .mg-rare-image {
-          animation: mgFadeRight .9s cubic-bezier(.22,1,.36,1) both;
+          animation: mgFadeRight .7s cubic-bezier(.22,1,.36,1) both;
         }
 
         .mg-rare-car {
           animation:
-            mgScaleSoft .9s cubic-bezier(.22,1,.36,1) .2s both,
-            mgFloat 4s ease-in-out 1.1s infinite;
+            mgScaleSoft .7s cubic-bezier(.22,1,.36,1) .12s both,
+            mgFloat 4s ease-in-out .8s infinite;
         }
 
         .mg-rare-glow {
@@ -553,27 +652,27 @@ export default function HomePage() {
         ====================================================== */
 
         .mg-arrivals-header {
-          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) both;
+          animation: mgFadeUp .7s cubic-bezier(.22,1,.36,1) both;
         }
 
         .mg-arrival-item {
-          animation: mgFadeRight .7s cubic-bezier(.22,1,.36,1) both;
+          animation: mgFadeRight .6s cubic-bezier(.22,1,.36,1) both;
         }
 
         .mg-arrival-item:nth-child(1) {
-          animation-delay: .05s;
+          animation-delay: .03s;
         }
 
         .mg-arrival-item:nth-child(2) {
-          animation-delay: .14s;
+          animation-delay: .08s;
         }
 
         .mg-arrival-item:nth-child(3) {
-          animation-delay: .23s;
+          animation-delay: .13s;
         }
 
         .mg-arrival-item:nth-child(4) {
-          animation-delay: .32s;
+          animation-delay: .18s;
         }
 
         /* =====================================================
@@ -582,14 +681,14 @@ export default function HomePage() {
 
         .mg-slider-button {
           transition:
-            transform .25s ease,
-            background-color .25s ease,
-            border-color .25s ease,
-            color .25s ease;
+            transform .2s ease,
+            background-color .2s ease,
+            border-color .2s ease,
+            color .2s ease;
         }
 
         .mg-slider-button:hover {
-          transform: translateY(-3px);
+          transform: translateY(-2px);
         }
 
         .mg-slider-button:active {
@@ -605,19 +704,19 @@ export default function HomePage() {
         ====================================================== */
 
         .mg-story-image {
-          animation: mgFadeLeft .9s cubic-bezier(.22,1,.36,1) both;
+          animation: mgFadeLeft .7s cubic-bezier(.22,1,.36,1) both;
           transition:
-            transform .6s cubic-bezier(.22,1,.36,1),
-            box-shadow .6s ease;
+            transform .45s cubic-bezier(.22,1,.36,1),
+            box-shadow .45s ease;
         }
 
         .mg-story-image:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 25px 45px rgba(10,10,10,.15);
+          transform: translate3d(0, -5px, 0);
+          box-shadow: 0 20px 40px rgba(10,10,10,.13);
         }
 
         .mg-story-content {
-          animation: mgFadeRight .9s cubic-bezier(.22,1,.36,1) .15s both;
+          animation: mgFadeRight .7s cubic-bezier(.22,1,.36,1) .08s both;
         }
 
         /* =====================================================
@@ -625,41 +724,41 @@ export default function HomePage() {
         ====================================================== */
 
         .mg-why-item {
-          animation: mgFadeUp .7s cubic-bezier(.22,1,.36,1) both;
+          animation: mgFadeUp .6s cubic-bezier(.22,1,.36,1) both;
           transition:
-            transform .4s cubic-bezier(.22,1,.36,1),
-            background-color .3s ease;
+            transform .3s cubic-bezier(.22,1,.36,1),
+            background-color .25s ease;
         }
 
         .mg-why-item:nth-child(1) {
-          animation-delay: .05s;
+          animation-delay: .03s;
         }
 
         .mg-why-item:nth-child(2) {
-          animation-delay: .14s;
+          animation-delay: .08s;
         }
 
         .mg-why-item:nth-child(3) {
-          animation-delay: .23s;
+          animation-delay: .13s;
         }
 
         .mg-why-item:nth-child(4) {
-          animation-delay: .32s;
+          animation-delay: .18s;
         }
 
         .mg-why-item:hover {
-          transform: translateY(-6px);
+          transform: translate3d(0, -4px, 0);
         }
 
         .mg-why-icon {
           transition:
-            transform .4s cubic-bezier(.22,1,.36,1),
-            filter .4s ease;
+            transform .3s cubic-bezier(.22,1,.36,1),
+            filter .3s ease;
         }
 
         .mg-why-item:hover .mg-why-icon {
-          transform: scale(1.12) rotate(-5deg);
-          filter: drop-shadow(0 5px 8px rgba(255,143,0,.25));
+          transform: scale(1.08) rotate(-4deg);
+          filter: drop-shadow(0 5px 8px rgba(255,143,0,.2));
         }
 
         /* =====================================================
@@ -667,21 +766,21 @@ export default function HomePage() {
         ====================================================== */
 
         .mg-community {
-          animation: mgFadeUp .9s cubic-bezier(.22,1,.36,1) both;
+          animation: mgFadeUp .75s cubic-bezier(.22,1,.36,1) both;
         }
 
         .mg-community-title {
           animation:
-            mgFadeUp .8s cubic-bezier(.22,1,.36,1) .15s both,
-            mgSoftPulse 5s ease-in-out 1.2s infinite;
+            mgFadeUp .7s cubic-bezier(.22,1,.36,1) .1s both,
+            mgSoftPulse 5s ease-in-out 1s infinite;
         }
 
         .mg-community-text {
-          animation: mgFadeUp .8s cubic-bezier(.22,1,.36,1) .3s both;
+          animation: mgFadeUp .7s cubic-bezier(.22,1,.36,1) .2s both;
         }
 
         .mg-community-button {
-          animation: mgScaleIn .7s cubic-bezier(.22,1,.36,1) .45s both;
+          animation: mgScaleIn .6s cubic-bezier(.22,1,.36,1) .3s both;
         }
 
         /* =====================================================
@@ -694,14 +793,16 @@ export default function HomePage() {
 
         .mg-tech-ring {
           animation: mgRotateSlow 25s linear infinite;
+          will-change: transform;
         }
 
         .mg-tech-ring-reverse {
           animation: mgRotateSlow 35s linear infinite reverse;
+          will-change: transform;
         }
 
         /* =====================================================
-           SCROLLBAR
+           HORIZONTAL SCROLLBAR
         ====================================================== */
 
         .mg-scrollbar::-webkit-scrollbar {
@@ -710,6 +811,194 @@ export default function HomePage() {
 
         .mg-scrollbar {
           scrollbar-width: none;
+        }
+
+        /* =====================================================
+           RPM GAUGE
+        ====================================================== */
+
+        /*
+          Important:
+          The gauge itself is fixed to the viewport.
+          It does NOT move with page content.
+
+          right: 18px
+          top: 50%
+          transform: translateY(-50%)
+
+          This keeps it perfectly centered on the right side
+          regardless of the page height.
+        */
+
+        .mg-rpm-gauge {
+          position: fixed;
+          right: 18px;
+          top: 50%;
+          width: 42px;
+          height: 270px;
+
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          z-index: 500;
+
+          transform: translate3d(0, -50%, 0);
+
+          contain: layout paint;
+
+          pointer-events: none;
+
+          user-select: none;
+        }
+
+        .mg-rpm-track {
+          position: relative;
+
+          width: 3px;
+          height: 230px;
+
+          border-radius: 999px;
+
+          background: rgba(10,10,10,.14);
+
+          box-shadow:
+            0 0 0 1px rgba(10,10,10,.02),
+            0 4px 12px rgba(10,10,10,.06);
+        }
+
+        .mg-rpm-progress {
+          position: absolute;
+
+          left: 0;
+          bottom: 0;
+
+          width: 100%;
+
+          border-radius: 999px;
+
+          will-change: height;
+
+          transform: translateZ(0);
+
+          transition:
+            height .12s linear;
+
+          box-shadow:
+            0 0 10px rgba(255,143,0,.25);
+        }
+
+        .mg-rpm-marker {
+          position: absolute;
+
+          left: 50%;
+
+          width: 16px;
+          height: 16px;
+
+          border-radius: 999px;
+
+          border: 2px solid #FF8F00;
+
+          background: #0A0A0A;
+
+          will-change: bottom;
+
+          transform:
+            translate3d(-50%, 50%, 0);
+
+          transition:
+            bottom .12s linear;
+
+          box-shadow:
+            0 0 12px rgba(255,143,0,.25);
+        }
+
+        .mg-rpm-number {
+          transition: opacity .15s ease;
+        }
+
+        .mg-rpm-label {
+          margin-top: 9px;
+
+          font-family: 'JetBrains Mono', monospace;
+
+          font-size: 9px;
+
+          line-height: 1;
+
+          letter-spacing: .12em;
+
+          color: rgba(10,10,10,.55);
+        }
+
+        .mg-rpm-value {
+          margin-top: 4px;
+
+          font-family: 'JetBrains Mono', monospace;
+
+          font-size: 8px;
+
+          line-height: 1;
+
+          letter-spacing: .05em;
+
+          color: rgba(10,10,10,.4);
+        }
+
+        /* RPM scale marks */
+
+        .mg-rpm-tick {
+          position: absolute;
+
+          right: 8px;
+
+          width: 9px;
+
+          height: 1px;
+
+          background: rgba(10,10,10,.22);
+        }
+
+        .mg-rpm-tick-1 {
+          top: 10%;
+        }
+
+        .mg-rpm-tick-2 {
+          top: 30%;
+        }
+
+        .mg-rpm-tick-3 {
+          top: 50%;
+        }
+
+        .mg-rpm-tick-4 {
+          top: 70%;
+        }
+
+        .mg-rpm-tick-5 {
+          top: 90%;
+        }
+
+        /* Redline area */
+
+        .mg-rpm-redline {
+          position: absolute;
+
+          left: -5px;
+          top: 0;
+
+          width: 13px;
+          height: 14%;
+
+          opacity: .55;
+
+          background:
+            repeating-linear-gradient(
+              45deg,
+              #FF3B00 0 3px,
+              transparent 3px 6px
+            );
         }
 
         /* =====================================================
@@ -725,23 +1014,44 @@ export default function HomePage() {
             scroll-behavior: auto !important;
             transition-duration: .01ms !important;
           }
+
+          .mg-float,
+          .mg-tech-ring,
+          .mg-tech-ring-reverse {
+            animation: none !important;
+          }
+
+          .mg-rpm-progress,
+          .mg-rpm-marker {
+            transition: none !important;
+          }
         }
 
         /* =====================================================
-           MOBILE ANIMATION OPTIMIZATION
+           MOBILE / TABLET
         ====================================================== */
+
+        @media (max-width: 1279px) {
+          .mg-rpm-gauge {
+            display: none;
+          }
+        }
 
         @media (max-width: 768px) {
           .mg-category-card:hover {
-            transform: translateY(-3px);
+            transform: translate3d(0, -3px, 0);
           }
 
           .mg-why-item:hover {
-            transform: translateY(-3px);
+            transform: translate3d(0, -3px, 0);
           }
 
           .mg-story-image:hover {
-            transform: translateY(-3px);
+            transform: translate3d(0, -3px, 0);
+          }
+
+          .mg-page-enter {
+            animation-duration: .4s;
           }
         }
       `}</style>
@@ -940,26 +1250,67 @@ export default function HomePage() {
 
       {/* =====================================================
           RPM GAUGE
+          FIXED CENTER-RIGHT POSITION
       ====================================================== */}
 
       <div
         aria-hidden="true"
-        className="fixed right-[22px] top-1/2 z-[500] hidden h-[280px] w-[34px] -translate-y-1/2 flex-col items-center xl:flex"
+        className="mg-rpm-gauge hidden xl:flex"
       >
-        <div className="relative h-full w-[2px] rounded-full bg-black/15">
-          <div className="absolute left-[-4px] top-0 h-[14%] w-[10px] bg-[repeating-linear-gradient(45deg,#FF3B00_0_3px,transparent_3px_6px)] opacity-50" />
+        <div className="mg-rpm-track">
 
-          <div className="absolute bottom-0 left-0 h-[62%] w-full rounded-full bg-gradient-to-b from-[#FF3B00] via-[#FF8F00] to-[#FF8F00]" />
+          {/* Redline */}
+          <div className="mg-rpm-redline" />
 
-          <div className="mg-pulse absolute bottom-[62%] left-1/2 h-4 w-4 -translate-x-1/2 translate-y-1/2 rounded-full border-2 border-[#FF8F00] bg-[#0A0A0A]" />
+          {/* Scale ticks */}
+          <span className="mg-rpm-tick mg-rpm-tick-1" />
+          <span className="mg-rpm-tick mg-rpm-tick-2" />
+          <span className="mg-rpm-tick mg-rpm-tick-3" />
+          <span className="mg-rpm-tick mg-rpm-tick-4" />
+          <span className="mg-rpm-tick mg-rpm-tick-5" />
+
+          {/* Scroll progress */}
+          <div
+            className="mg-rpm-progress"
+            style={{
+              height: rpmHeight,
+              background:
+                "linear-gradient(to top, #FF8F00, #FF8F00, #FF3B00)",
+            }}
+          />
+
+          {/* Current scroll position */}
+          <div
+            className="mg-rpm-marker"
+            style={{
+              bottom: rpmMarkerBottom,
+            }}
+          />
+
+          {/* Top marker */}
+          <div
+            className="absolute left-1/2 top-0 h-[4px] w-[10px] -translate-x-1/2 rounded-full bg-[#FF3B00]"
+          />
         </div>
 
-        <div className="mg-mono mt-[10px] text-center text-[10px] text-black/60">
+        <div className="mg-rpm-label">
           RPM
+        </div>
+
+        <div className="mg-rpm-value">
+          {rpmValue}
         </div>
       </div>
 
+      {/* =====================================================
+          HEADER
+      ====================================================== */}
+
       <Header />
+
+      {/* =====================================================
+          MAIN CONTENT
+      ====================================================== */}
 
       <main className="w-full mg-page-enter">
 
@@ -978,11 +1329,13 @@ export default function HomePage() {
             <div className="mg-hero-left">
 
               <div className="mg-hero-label mb-[22px] flex items-center gap-[10px]">
+
                 <span className="mg-orange-dot h-[7px] w-[7px] rounded-full bg-[#FF8F00]" />
 
                 <span className="mg-mono text-[12px] tracking-[.22em] text-[#FF8F00]">
                   PREMIUM DIE-CAST · EST. GARAGE 01
                 </span>
+
               </div>
 
               <h1 className="mg-display mg-hero-title mb-[22px] text-[clamp(42px,5.2vw,74px)] text-[#F5F5DC]">
@@ -1056,19 +1409,27 @@ export default function HomePage() {
             <div className="mg-hero-right relative order-first flex items-center justify-center lg:order-none">
 
               <div className="absolute h-[112%] w-[112%] rounded-[6px] border border-[#F5F5DC]/15">
+
                 <div className="absolute inset-[14px] rounded border border-dashed border-[#F5F5DC]/10" />
+
               </div>
 
               <div className="pointer-events-none absolute h-[75%] w-[75%] rounded-full bg-[#FF8F00]/10 blur-[80px] mg-rare-glow" />
 
               <span className="mg-mono absolute left-[-2%] top-[16%] z-20 flex items-center gap-1.5 text-[10px] tracking-[.1em] text-[#FF8F00]">
+
                 <span className="h-px w-4 bg-[#FF8F00]" />
+
                 SCALE 1:18 — ALLOY BODY
+
               </span>
 
               <span className="mg-mono absolute bottom-[20%] right-[-4%] z-20 flex items-center gap-1.5 text-[10px] tracking-[.1em] text-[#FF8F00]">
+
                 <span className="h-px w-4 bg-[#FF8F00]" />
+
                 LTD. RUN — SERIAL 0042
+
               </span>
 
               <div className="relative z-10 flex w-full items-center justify-center">
@@ -1076,6 +1437,9 @@ export default function HomePage() {
                 <img
                   src="/hero.png"
                   alt="Hot Wheels collectible car"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                   className="mg-float h-[300px] w-[78%] max-w-[540px] object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,.65)] transition-transform duration-500 hover:scale-[1.03] sm:h-[340px] lg:h-[390px]"
                 />
 
@@ -1292,6 +1656,7 @@ export default function HomePage() {
                 <span className="text-[#FF8F00]">
                   Serious collections.
                 </span>
+
               </h2>
 
               <p className="mb-[34px] max-w-[420px] text-[15.5px] leading-[1.65] text-[#F5F5DC]/70">
@@ -1323,6 +1688,8 @@ export default function HomePage() {
               <img
                 src="/home5.png"
                 alt="Rare collectible die-cast car"
+                loading="lazy"
+                decoding="async"
                 className="mg-rare-car relative z-10 w-[88%] max-w-[650px] object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,.65)] transition-transform duration-500 hover:scale-[1.04]"
               />
 
@@ -1404,7 +1771,7 @@ export default function HomePage() {
                     strokeWidth="2"
                     className="h-4 w-4"
                   >
-                    <path d="M9 6l6 6-6 6" />
+                    <path d="M9 6l6 6-6-6" />
                   </svg>
 
                 </button>
@@ -1465,6 +1832,8 @@ export default function HomePage() {
               <img
                 src="/home4.png"
                 alt="Metal Garage collectible car collection"
+                loading="lazy"
+                decoding="async"
                 className="mg-float relative z-10 h-full w-full object-contain p-6 drop-shadow-[0_20px_35px_rgba(0,0,0,.55)] transition-transform duration-500 hover:scale-[1.03]"
               />
 
@@ -1644,6 +2013,7 @@ export default function HomePage() {
               <span className="text-[#FF8F00]">
                 It's a passion.
               </span>
+
             </h2>
 
             <p className="mg-community-text mb-[38px] text-[16px] leading-[1.6] text-[#F5F5DC]/70">
@@ -1668,4 +2038,3 @@ export default function HomePage() {
     </div>
   );
 }
-

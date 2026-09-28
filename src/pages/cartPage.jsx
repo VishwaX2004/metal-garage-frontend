@@ -165,6 +165,14 @@ export default function CartPage() {
     const navigate = useNavigate();
 
     /* =========================================================
+       SCROLL TO TOP WHEN CART PAGE LOADS
+    ========================================================= */
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    /* =========================================================
        CART STATE
     ========================================================= */
 
@@ -447,7 +455,6 @@ export default function CartPage() {
         const discount =
             subtotal * discountRate;
 
-        // Shipping intentionally removed.
         const shipping = 0;
 
         const taxableAmount =
@@ -956,10 +963,6 @@ export default function CartPage() {
             return;
         }
 
-        /* -----------------------------------------
-           CHECK CART
-        ----------------------------------------- */
-
         if (
             cartItems.length === 0
         ) {
@@ -969,10 +972,6 @@ export default function CartPage() {
 
             return;
         }
-
-        /* -----------------------------------------
-           CHECK LOGIN
-        ----------------------------------------- */
 
         const token =
             getAuthToken();
@@ -990,11 +989,6 @@ export default function CartPage() {
 
             return;
         }
-
-        /* -----------------------------------------
-           LOGIN EXISTS
-           GO TO CHECKOUT PAGE
-        ----------------------------------------- */
 
         setIsCheckingOut(true);
 
@@ -2574,4 +2568,3 @@ function PlusIcon() {
         </svg>
     );
 }
-
