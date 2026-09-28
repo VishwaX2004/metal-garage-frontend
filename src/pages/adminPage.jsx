@@ -14,12 +14,9 @@ import {
     RxPerson,
     RxReader,
     RxChevronRight,
-    RxHamburgerMenu,
-    RxBell,
-    RxQuestionMarkCircled,
-    RxMagnifyingGlass,
     RxPlus,
     RxDownload,
+    RxHome,
 } from "react-icons/rx";
 
 import {
@@ -28,11 +25,8 @@ import {
     FiUsers,
     FiAlertTriangle,
     FiPackage,
-    FiBarChart2,
-    FiTag,
     FiTrendingUp,
     FiTrendingDown,
-    FiChevronDown,
     FiImage,
 } from "react-icons/fi";
 
@@ -47,6 +41,14 @@ const API = String(
 const PRODUCTS_URL = `${API}/api/products`;
 const ORDERS_URL = `${API}/api/orders/admin/all`;
 const USERS_URL = `${API}/api/users/admin`;
+const ME_URL = `${API}/api/users/me`;
+
+/* ============================================================
+   DEFAULT PROFILE IMAGE
+============================================================ */
+
+const DEFAULT_PROFILE_IMAGE =
+    "https://training.allsoftsolutions.in/images/avtar.png";
 
 /* ============================================================
    HELPERS
@@ -97,26 +99,6 @@ function shortMoney(value) {
 /* ============================================================
    IMAGE HELPERS
 ============================================================ */
-
-/*
-    Product schema:
-
-    images: {
-        type: [String],
-        default: [],
-    }
-
-    Therefore images normally looks like:
-
-    [
-        "https://....jpg",
-        "https://....jpg"
-    ]
-
-    These helpers also support:
-        image: "url"
-        images: "url"
-*/
 
 function getProductImage(product) {
     if (!product) {
@@ -214,12 +196,11 @@ function getItemImage(item) {
         Array.isArray(item.product?.images) &&
         item.product.images.length > 0
     ) {
-        const image =
-            item.product.images.find(
-                (value) =>
-                    typeof value === "string" &&
-                    value.trim()
-            );
+        const image = item.product.images.find(
+            (value) =>
+                typeof value === "string" &&
+                value.trim()
+        );
 
         if (image) {
             return image.trim();
@@ -632,68 +613,80 @@ function useDashboardData() {
 }
 
 /* ============================================================
-   PAGE TITLES
+   LOGGED-IN ADMIN PROFILE HOOK
 ============================================================ */
 
-function getPageMeta(pathname) {
-    if (
-        pathname.startsWith(
-            "/admin/orders"
-        )
-    ) {
-        return {
-            crumb: "Garage / Orders",
-            title: "Orders",
-        };
-    }
+function useCurrentAdmin() {
+    const [admin, setAdmin] =
+        useState(null);
 
-    if (
-        pathname.startsWith(
-            "/admin/products"
-        )
-    ) {
-        return {
-            crumb: "Garage / Catalog",
-            title: "Products",
-        };
-    }
+    const [loading, setLoading] =
+        useState(true);
 
-    if (
-        pathname.startsWith(
-            "/admin/add-product"
-        )
-    ) {
-        return {
-            crumb: "Garage / Catalog",
-            title: "Add Product",
-        };
-    }
+    const [error, setError] =
+        useState(false);
 
-    if (
-        pathname.startsWith(
-            "/admin/update-product"
-        )
-    ) {
-        return {
-            crumb: "Garage / Catalog",
-            title: "Update Product",
-        };
-    }
+    const loadAdmin =
+        useCallback(async () => {
+            try {
+                setLoading(true);
+                setError(false);
 
-    if (
-        pathname.startsWith(
-            "/admin/users"
-        )
-    ) {
-        return {
-            crumb: "Garage / People",
-            title: "Users",
-        };
-    }
+                const token =
+                    localStorage.getItem(
+                        "token"
+                    ) ||
+                    localStorage.getItem(
+                        "accessToken"
+                    );
+
+                if (!token) {
+                    setAdmin(null);
+                    setError(true);
+                    return;
+                }
+
+                const response =
+                    await axios.get(
+                        ME_URL,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+
+                const user =
+                    response?.data?.user;
+
+                if (user) {
+                    setAdmin(user);
+                } else {
+                    setAdmin(null);
+                    setError(true);
+                }
+            } catch (error) {
+                console.error(
+                    "Current admin profile error:",
+                    error
+                );
+
+                setAdmin(null);
+                setError(true);
+            } finally {
+                setLoading(false);
+            }
+        }, []);
+
+    useEffect(() => {
+        loadAdmin();
+    }, [loadAdmin]);
 
     return {
-        crumb: "Garage / Overview",
-        title: "Dashboard",
+        admin,
+        loading,
+        error,
+        reload: loadAdmin,
     };
 }
 
@@ -713,6 +706,9 @@ export default function AdminPage() {
     const data =
         useDashboardData();
 
+    const adminData =
+        useCurrentAdmin();
+
     const pendingCount = useMemo(
         () =>
             data.orders.filter(
@@ -731,12 +727,9 @@ export default function AdminPage() {
         [data.orders]
     );
 
-    const meta = getPageMeta(
-        location.pathname
-    );
-
     return (
         <div className="min-h-screen w-full bg-[#ECE8D6] text-[#0A0A0A]">
+
             {/* MOBILE OVERLAY */}
 
             <div
@@ -759,13 +752,19 @@ export default function AdminPage() {
                         : "-translate-x-full"
                 }`}
             >
+
+                {/* SIDEBAR HEADER */}
+
                 <div className="flex h-[82px] shrink-0 items-center border-b border-[#F5F5DC]/15 px-6">
+
                     <div className="flex items-center gap-3">
+
                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#FF8F00] font-['Oswald'] text-lg font-bold text-[#0A0A0A] shadow-[0_0_25px_rgba(255,143,0,0.18)]">
                             MG
                         </div>
 
                         <div>
+
                             <div className="font-['Oswald'] text-[17px] font-bold uppercase tracking-wide">
                                 Metal Garage
                             </div>
@@ -773,12 +772,21 @@ export default function AdminPage() {
                             <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-[#FF8F00]">
                                 Admin Console
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
 
+                {/* SIDEBAR NAVIGATION */}
+
                 <nav className="flex-1 overflow-y-auto px-[14px] py-[18px]">
+
+                    {/* OVERVIEW */}
+
                     <div className="mb-[22px]">
+
                         <SidebarHeading>
                             Overview
                         </SidebarHeading>
@@ -849,9 +857,13 @@ export default function AdminPage() {
                                 )
                             }
                         />
+
                     </div>
 
-                    <div className="mb-[22px]">
+                    {/* PEOPLE */}
+
+                    <div>
+
                         <SidebarHeading>
                             People
                         </SidebarHeading>
@@ -871,140 +883,146 @@ export default function AdminPage() {
                                 )
                             }
                         />
+
                     </div>
 
-                    <div className="mb-[22px]">
+                    {/* HOME */}
+
+                    <div className="mt-[22px]">
+
                         <SidebarHeading>
-                            Insights
+                            Navigation
                         </SidebarHeading>
 
-                        <SidebarStaticItem
-                            label="Analytics"
+                        <SidebarLink
+                            to="/"
+                            label="Home"
                             icon={
-                                <FiBarChart2 />
+                                <RxHome />
+                            }
+                            active={
+                                location.pathname ===
+                                "/"
+                            }
+                            onClick={() =>
+                                setSidebarOpen(
+                                    false
+                                )
                             }
                         />
 
-                        <SidebarStaticItem
-                            label="Marketing"
-                            icon={
-                                <FiTag />
-                            }
-                        />
                     </div>
 
-                    <div>
-                        <SidebarHeading>
-                            System
-                        </SidebarHeading>
-
-                        <SidebarStaticItem
-                            label="Settings"
-                            icon={
-                                <FiPackage />
-                            }
-                        />
-                    </div>
                 </nav>
 
+                {/* ====================================================
+                   LOGGED-IN ADMIN PROFILE
+                ==================================================== */}
+
                 <div className="shrink-0 border-t border-[#F5F5DC]/15 p-4">
-                    <div className="group flex cursor-pointer items-center gap-[11px] rounded-lg p-2 transition-all duration-200 hover:bg-[#F5F5DC]/[0.06]">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#FF8F00] to-[#CC7000] font-['Oswald'] text-[13px] font-bold text-[#0A0A0A]">
-                            RT
+
+                    <div className="group flex items-center gap-[11px] rounded-lg p-2 transition-all duration-200 hover:bg-[#F5F5DC]/[0.06]">
+
+                        {/* PROFILE IMAGE */}
+
+                        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-[#DFDABF]">
+
+                            {adminData.loading ? (
+                                <div className="flex h-full w-full items-center justify-center bg-[#FF8F00] font-['Oswald'] text-[13px] font-bold text-[#0A0A0A]">
+                                    ...
+                                </div>
+                            ) : (
+                                <img
+                                    src={
+                                        adminData.admin?.profileImage ||
+                                        DEFAULT_PROFILE_IMAGE
+                                    }
+                                    alt={
+                                        adminData.admin
+                                            ? `${adminData.admin.firstName || ""} ${adminData.admin.lastName || ""}`
+                                            : "Admin"
+                                    }
+                                    className="h-full w-full object-cover"
+                                    onError={(event) => {
+                                        event.currentTarget.onerror =
+                                            null;
+                                        event.currentTarget.src =
+                                            DEFAULT_PROFILE_IMAGE;
+                                    }}
+                                />
+                            )}
+
                         </div>
+
+                        {/* ADMIN DETAILS */}
 
                         <div className="min-w-0 flex-1">
-                            <div className="truncate text-[13px] font-semibold text-[#F5F5DC]">
-                                Rae Torres
-                            </div>
 
-                            <div className="text-[11px] text-[#F5F5DC]/50">
-                                Store Admin
-                            </div>
+                            {adminData.loading ? (
+                                <>
+                                    <div className="h-3 w-24 animate-pulse rounded bg-[#F5F5DC]/10" />
+
+                                    <div className="mt-1.5 h-2.5 w-32 animate-pulse rounded bg-[#F5F5DC]/10" />
+                                </>
+                            ) : adminData.admin ? (
+                                <>
+                                    <div className="truncate text-[13px] font-semibold text-[#F5F5DC]">
+                                        {[
+                                            adminData.admin
+                                                .firstName,
+                                            adminData.admin
+                                                .lastName,
+                                        ]
+                                            .filter(
+                                                Boolean
+                                            )
+                                            .join(" ") ||
+                                            "Admin"}
+                                    </div>
+
+                                    <div className="truncate text-[10px] text-[#F5F5DC]/50">
+                                        {adminData.admin.email}
+                                    </div>
+
+                                    <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-[#FF8F00]">
+                                        {adminData.admin.role ||
+                                            "admin"}
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="truncate text-[13px] font-semibold text-[#F5F5DC]">
+                                        Admin
+                                    </div>
+
+                                    <div className="truncate text-[10px] text-[#F5F5DC]/50">
+                                        Profile unavailable
+                                    </div>
+                                </>
+                            )}
+
                         </div>
 
-                        <RxChevronRight className="h-4 w-4 text-[#F5F5DC]/50 transition-transform duration-200 group-hover:translate-x-1" />
+                        <RxChevronRight className="h-4 w-4 shrink-0 text-[#F5F5DC]/50 transition-transform duration-200 group-hover:translate-x-1" />
+
                     </div>
+
                 </div>
+
             </aside>
 
             {/* MAIN */}
 
             <div className="min-h-screen lg:ml-[258px]">
-                <header className="sticky top-0 z-[800] flex min-h-[82px] items-center justify-between gap-6 border-b border-[#0A0A0A]/[0.14] bg-[#F5F5DC] px-4 py-[18px] sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-4">
-                        <button
-                            type="button"
-                            aria-label="Open menu"
-                            onClick={() =>
-                                setSidebarOpen(
-                                    true
-                                )
-                            }
-                            className="flex h-[38px] w-[38px] items-center justify-center rounded-lg border border-[#0A0A0A]/[0.14] text-[#0A0A0A] transition-all duration-200 hover:border-[#0A0A0A] hover:bg-[#ECE8D6] lg:hidden"
-                        >
-                            <RxHamburgerMenu className="text-[18px]" />
-                        </button>
 
-                        <div>
-                            <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.08em] text-[#0A0A0A]/45">
-                                {meta.crumb}
-                            </div>
+                {/* HEADER REMOVED */}
 
-                            <h1 className="font-['Oswald'] text-[22px] font-bold uppercase leading-none tracking-[0.01em]">
-                                {meta.title}
-                            </h1>
-                        </div>
-                    </div>
+                {/* CONTENT */}
 
-                    <div className="hidden w-[320px] max-w-full items-center gap-2.5 rounded-lg border border-[#0A0A0A]/[0.14] bg-[#ECE8D6] px-3.5 py-2.5 xl:flex">
-                        <RxMagnifyingGlass className="shrink-0 text-[16px] text-[#0A0A0A]/40" />
+                <div className="min-h-screen bg-[#ECE8D6]">
 
-                        <input
-                            type="text"
-                            placeholder="Search orders, products, customers..."
-                            className="w-full bg-transparent text-[13px] text-[#0A0A0A] outline-none placeholder:text-[#0A0A0A]/40"
-                        />
-
-                        <span className="rounded border border-[#0A0A0A]/[0.14] px-1.5 py-0.5 font-mono text-[10px] text-[#0A0A0A]/35">
-                            ⌘K
-                        </span>
-                    </div>
-
-                    <div className="flex items-center gap-3.5">
-                        <button
-                            type="button"
-                            aria-label="Notifications"
-                            className="relative flex h-[38px] w-[38px] items-center justify-center rounded-lg border border-[#0A0A0A]/[0.14] text-[#0A0A0A] transition-all duration-200 hover:border-[#0A0A0A] hover:bg-[#ECE8D6]"
-                        >
-                            <RxBell className="text-[17px]" />
-
-                            {pendingCount >
-                                0 && (
-                                <span className="absolute right-[7px] top-[7px] h-[7px] w-[7px] rounded-full border-[1.5px] border-[#F5F5DC] bg-[#FF3B00]" />
-                            )}
-                        </button>
-
-                        <button
-                            type="button"
-                            aria-label="Help"
-                            className="hidden h-[38px] w-[38px] items-center justify-center rounded-lg border border-[#0A0A0A]/[0.14] text-[#0A0A0A] transition-all duration-200 hover:border-[#0A0A0A] hover:bg-[#ECE8D6] sm:flex"
-                        >
-                            <RxQuestionMarkCircled className="text-[17px]" />
-                        </button>
-
-                        <div className="flex items-center gap-2.5 border-l border-[#0A0A0A]/[0.14] pl-3.5">
-                            <div className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-gradient-to-br from-[#FF8F00] to-[#CC7000] font-['Oswald'] text-[12px] font-bold text-[#0A0A0A]">
-                                RT
-                            </div>
-
-                            <FiChevronDown className="hidden text-[14px] text-[#0A0A0A]/40 sm:block" />
-                        </div>
-                    </div>
-                </header>
-
-                <div className="min-h-[calc(100vh-82px)] bg-[#ECE8D6]">
                     <Routes>
+
                         <Route
                             path="/"
                             element={
@@ -1055,9 +1073,13 @@ export default function AdminPage() {
                                 <SimplePage title="404 Not Found" />
                             }
                         />
+
                     </Routes>
+
                 </div>
+
             </div>
+
         </div>
     );
 }
@@ -1077,18 +1099,6 @@ function DashboardContent({
         errors,
         reload,
     } = data;
-
-    /*
-        IMPORTANT:
-
-        Create a product lookup table.
-
-        Example:
-
-        product.productID
-            ->
-        product.images[0]
-    */
 
     const productMap = useMemo(() => {
         const map = new Map();
@@ -1456,15 +1466,6 @@ function DashboardContent({
                                     item
                                 );
 
-                            /*
-                                First try image stored
-                                inside the order item.
-
-                                If not available,
-                                find the product in
-                                /api/products.
-                            */
-
                             const product =
                                 productID
                                     ? productMap.get(
@@ -1580,9 +1581,6 @@ function DashboardContent({
 
     /* ========================================================
        LOW STOCK
-
-       FIX:
-       Only display actual low-stock products.
     ======================================================== */
 
     const lowStockList =
@@ -1727,9 +1725,11 @@ function DashboardContent({
 
     return (
         <div className="px-4 pb-[60px] pt-5 sm:px-6 sm:pt-7 lg:px-8">
-            {/* HEADER */}
+
+            {/* DASHBOARD TOP AREA */}
 
             <div className="mb-[26px] flex flex-wrap items-center justify-between gap-3.5">
+
                 <div className="text-[13px] text-[#0A0A0A]/50">
                     Welcome back — here's
                     what's happening across
@@ -1741,6 +1741,7 @@ function DashboardContent({
                 </div>
 
                 <div className="flex gap-2.5">
+
                     <button
                         type="button"
                         onClick={
@@ -1759,7 +1760,9 @@ function DashboardContent({
                         <RxPlus className="text-[14px]" />
                         Add Product
                     </Link>
+
                 </div>
+
             </div>
 
             {/* API ERRORS */}
@@ -1767,6 +1770,7 @@ function DashboardContent({
             {failed.length >
                 0 && (
                 <div className="mb-[18px] flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#FF3B00]/20 bg-[#FF3B00]/[0.06] px-4 py-3 text-[12px] text-[#FF3B00]">
+
                     <span>
                         Could not load:{" "}
                         <b className="uppercase">
@@ -1788,12 +1792,14 @@ function DashboardContent({
                     >
                         Retry
                     </button>
+
                 </div>
             )}
 
             {/* STAT CARDS */}
 
             <div className="mb-[26px] grid grid-cols-1 gap-[18px] sm:grid-cols-2 xl:grid-cols-4">
+
                 <StatCard
                     icon={
                         <FiDollarSign />
@@ -1876,11 +1882,13 @@ function DashboardContent({
                             : "Inventory looks healthy"
                     }
                 />
+
             </div>
 
             {/* REVENUE + TOP PRODUCTS */}
 
             <div className="mb-[18px] grid grid-cols-1 gap-[18px] xl:grid-cols-[1.7fr_1fr]">
+
                 <Panel
                     title="Revenue Overview"
                     subtitle={`Last 7 days — ${money(
@@ -1897,6 +1905,7 @@ function DashboardContent({
                     />
 
                     <div className="mt-[18px] flex gap-5 border-t border-[#0A0A0A]/[0.14] pt-[18px]">
+
                         <LegendDot
                             color="bg-[#0A0A0A]"
                             label="Completed orders"
@@ -1906,6 +1915,7 @@ function DashboardContent({
                             color="bg-[#FF8F00]"
                             label="Pending orders"
                         />
+
                     </div>
                 </Panel>
 
@@ -1955,11 +1965,13 @@ function DashboardContent({
                         </div>
                     )}
                 </Panel>
+
             </div>
 
             {/* ORDERS + INVENTORY */}
 
             <div className="grid grid-cols-1 gap-[18px] xl:grid-cols-[1.7fr_1fr]">
+
                 <Panel
                     className="min-w-0"
                     title="Recent Orders"
@@ -1981,7 +1993,9 @@ function DashboardContent({
                         <EmptyState text="No orders yet" />
                     ) : (
                         <div className="overflow-x-auto">
+
                             <table className="w-full border-collapse">
+
                                 <thead>
                                     <tr>
                                         {[
@@ -2072,7 +2086,9 @@ function DashboardContent({
                                                     item={
                                                         itemText
                                                     }
-                                                    status={status}
+                                                    status={
+                                                        status
+                                                    }
                                                     type={statusType(
                                                         status
                                                     )}
@@ -2086,7 +2102,9 @@ function DashboardContent({
                                         }
                                     )}
                                 </tbody>
+
                             </table>
+
                         </div>
                     )}
                 </Panel>
@@ -2157,11 +2175,13 @@ function DashboardContent({
                         )
                     )}
                 </Panel>
+
             </div>
 
             {/* QUICK ACTIONS */}
 
             <div className="mt-[18px] grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
+
                 <QuickAction
                     to="/admin/add-product"
                     icon={
@@ -2197,7 +2217,9 @@ function DashboardContent({
                     title="View Users"
                     description="See all registered customers"
                 />
+
             </div>
+
         </div>
     );
 }
@@ -2218,7 +2240,9 @@ function Panel({
             className={`rounded-xl border border-[#0A0A0A]/[0.14] bg-[#F5F5DC] p-5 sm:p-6 ${className}`}
         >
             <div className="mb-[22px] flex flex-wrap items-center justify-between gap-3">
+
                 <div>
+
                     <h3 className="font-['Work_Sans'] text-[15px] font-semibold">
                         {title}
                     </h3>
@@ -2228,12 +2252,15 @@ function Panel({
                             {subtitle}
                         </div>
                     )}
+
                 </div>
 
                 {action}
+
             </div>
 
             {children}
+
         </div>
     );
 }
@@ -2252,11 +2279,13 @@ function LegendDot({
 }) {
     return (
         <div className="flex items-center gap-2 text-[12px] text-[#0A0A0A]/60">
+
             <span
                 className={`h-[9px] w-[9px] rounded-[2px] ${color}`}
             />
 
             {label}
+
         </div>
     );
 }
@@ -2310,7 +2339,9 @@ function StatCard({
 
     return (
         <div className="group relative overflow-hidden rounded-xl border border-[#0A0A0A]/[0.14] bg-[#F5F5DC] p-5 transition-all duration-200 hover:-translate-y-[3px] hover:shadow-[0_16px_30px_rgba(10,10,10,0.08)]">
+
             <div className="mb-3.5 flex items-start justify-between">
+
                 <div
                     className={`flex h-[38px] w-[38px] items-center justify-center rounded-[9px] ${iconClasses[iconType]}`}
                 >
@@ -2330,6 +2361,7 @@ function StatCard({
                             {text}
                         </div>
                     )}
+
             </div>
 
             <div className="mb-1.5 text-[12px] text-[#0A0A0A]/50">
@@ -2347,6 +2379,7 @@ function StatCard({
                     ? ""
                     : sub}
             </div>
+
         </div>
     );
 }
@@ -2378,6 +2411,7 @@ function RevenueChart({
 
     return (
         <div className="flex h-[210px] items-end gap-2.5 overflow-hidden px-1 pt-6 sm:gap-4">
+
             {bars.map(
                 (bar) => {
                     const total =
@@ -2412,12 +2446,14 @@ function RevenueChart({
                             }
                             className="group relative flex h-full flex-1 flex-col items-center justify-end gap-2.5"
                         >
+
                             <div
                                 className="relative flex w-full max-w-[38px] flex-col-reverse rounded-t-[5px] rounded-b-[3px] bg-[#0A0A0A]/10 transition-all duration-200 group-hover:brightness-110"
                                 style={{
                                     height: `${totalH}px`,
                                 }}
                             >
+
                                 <div
                                     className="w-full rounded-b-[3px] bg-[#0A0A0A]"
                                     style={{
@@ -2437,6 +2473,7 @@ function RevenueChart({
                                         total
                                     )}
                                 </div>
+
                             </div>
 
                             <div className="font-mono text-[10px] text-[#0A0A0A]/50">
@@ -2444,10 +2481,12 @@ function RevenueChart({
                                     bar.label
                                 }
                             </div>
+
                         </div>
                     );
                 }
             )}
+
         </div>
     );
 }
@@ -2473,15 +2512,13 @@ function TopProduct({
 
     return (
         <div className="flex items-center gap-3">
+
             <span className="w-4 shrink-0 font-mono text-[11px] text-[#0A0A0A]/35">
                 {rank}
             </span>
 
-            {/* ==================================================
-                REAL PRODUCT IMAGE
-            ================================================== */}
-
             <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#0A0A0A]">
+
                 {showImage ? (
                     <img
                         src={image}
@@ -2497,9 +2534,11 @@ function TopProduct({
                 ) : (
                     <FiImage className="text-[20px] text-[#F5F5DC]/40" />
                 )}
+
             </div>
 
             <div className="min-w-0 flex-1">
+
                 <div className="truncate text-[13px] font-semibold">
                     {name}
                 </div>
@@ -2507,13 +2546,17 @@ function TopProduct({
                 <div className="text-[11px] text-[#0A0A0A]/45">
                     {units}
                 </div>
+
             </div>
 
             <div className="shrink-0 text-right">
+
                 <div className="font-mono text-[13px] font-semibold">
                     {amount}
                 </div>
+
             </div>
+
         </div>
     );
 }
@@ -2551,6 +2594,7 @@ function OrderRow({
 
     return (
         <tr className="transition-colors duration-150 hover:bg-[#ECE8D6]">
+
             <td
                 className={`${cell} whitespace-nowrap font-mono text-[12.5px] font-semibold`}
             >
@@ -2558,12 +2602,15 @@ function OrderRow({
             </td>
 
             <td className={cell}>
+
                 <div className="flex min-w-[150px] items-center gap-2.5">
+
                     <div className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-[#DFDABF] font-['Oswald'] text-[11px] font-bold">
                         {initials}
                     </div>
 
                     <div className="min-w-0">
+
                         <div className="max-w-[160px] truncate text-[12.5px] font-medium">
                             {name}
                         </div>
@@ -2573,8 +2620,11 @@ function OrderRow({
                                 {email}
                             </div>
                         )}
+
                     </div>
+
                 </div>
+
             </td>
 
             <td
@@ -2584,6 +2634,7 @@ function OrderRow({
             </td>
 
             <td className={cell}>
+
                 <span
                     className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-[5px] font-mono text-[10px] font-semibold uppercase tracking-[0.05em] before:h-1.5 before:w-1.5 before:rounded-full ${
                         statusClasses[
@@ -2593,6 +2644,7 @@ function OrderRow({
                 >
                     {status}
                 </span>
+
             </td>
 
             <td
@@ -2600,6 +2652,7 @@ function OrderRow({
             >
                 {amount}
             </td>
+
         </tr>
     );
 }
@@ -2630,8 +2683,11 @@ function StockItem({
                     : "mb-[18px]"
             }
         >
+
             <div className="mb-2 flex items-center justify-between gap-2.5">
+
                 <div className="min-w-0 text-[13px] font-semibold">
+
                     <div className="truncate">
                         {name}
                     </div>
@@ -2639,21 +2695,26 @@ function StockItem({
                     <span className="mt-0.5 block text-[10.5px] font-normal text-[#0A0A0A]/40">
                         {series}
                     </span>
+
                 </div>
 
                 <div className="shrink-0 font-mono text-[12px] font-semibold">
                     {quantity}
                 </div>
+
             </div>
 
             <div className="h-1.5 overflow-hidden rounded-full bg-[#ECE8D6]">
+
                 <div
                     className={`h-full rounded-full transition-all duration-500 ${fillClasses[type]}`}
                     style={{
                         width: percentage,
                     }}
                 />
+
             </div>
+
         </div>
     );
 }
@@ -2738,6 +2799,7 @@ function SidebarLink({
                     : "border-l-transparent text-[#F5F5DC]/70 hover:bg-[#F5F5DC]/[0.06] hover:text-[#F5F5DC]"
             }`}
         >
+
             <span
                 className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center transition-colors duration-200 ${
                     active
@@ -2763,24 +2825,8 @@ function SidebarLink({
                     {count}
                 </span>
             )}
+
         </Link>
-    );
-}
-
-function SidebarStaticItem({
-    label,
-    icon,
-}) {
-    return (
-        <div className="group mb-1 flex min-h-[44px] w-full cursor-default items-center gap-3 rounded-[6px] border-l-2 border-l-transparent px-3 py-[11px] text-[13.5px] font-medium text-[#F5F5DC]/70 transition-all duration-[180ms] hover:bg-[#F5F5DC]/[0.06] hover:text-[#F5F5DC]">
-            <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center text-[#F5F5DC]/85 transition-colors duration-200 group-hover:text-[#F5F5DC]">
-                {icon}
-            </span>
-
-            <span>
-                {label}
-            </span>
-        </div>
     );
 }
 
@@ -2792,12 +2838,16 @@ function SimplePage({
     title,
 }) {
     return (
-        <div className="flex min-h-[calc(100vh-82px)] items-start p-5 sm:p-8">
+        <div className="flex min-h-screen items-start p-5 sm:p-8">
+
             <div className="rounded-xl border border-[#0A0A0A]/[0.14] bg-[#F5F5DC] p-6">
+
                 <h1 className="font-['Oswald'] text-2xl font-bold uppercase">
                     {title}
                 </h1>
+
             </div>
+
         </div>
     );
 }
