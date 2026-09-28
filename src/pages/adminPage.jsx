@@ -40,6 +40,7 @@ import {
 } from "react-icons/fi";
 import AdminUpdateProductPage from "./admin/adminUpdateProduct";
 import AdminOrders from "./admin/adminOrders";
+import AdminUser from "./admin/adminUser";
 
 
 export default function AdminPage() {
@@ -627,7 +628,7 @@ export default function AdminPage() {
                         <Route
                             path="users"
                             element={
-                                <SimplePage title="Users" />
+                               <AdminUser/>
                             }
                         />
 

@@ -2,12 +2,12 @@ import { NavLink, useNavigate } from "react-router-dom";
 import {
     Search,
     ShoppingCart,
-    UserRound,
     Package,
     Settings,
     LogOut,
     ChevronDown,
     UserCircle,
+    LayoutDashboard,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -526,6 +526,7 @@ export default function Header() {
                                 ref={profileRef}
                                 className="relative"
                             >
+
                                 {/* =================================================
                                     LOGGED-IN USER CARD
                                 ================================================== */}
@@ -562,6 +563,7 @@ export default function Header() {
                                         hover:shadow-[0_0_20px_rgba(255,143,0,0.08)]
                                     "
                                 >
+
                                     {/* =================================================
                                         BIGGER USER AVATAR
                                     ================================================== */}
@@ -697,6 +699,7 @@ export default function Header() {
                                             backdrop-blur-xl
                                         "
                                     >
+
                                         {/* =================================================
                                             PROFILE HEADER
                                         ================================================== */}
@@ -1018,6 +1021,75 @@ export default function Header() {
                                                 </span>
                                             </button>
 
+                                            {/* =================================================
+                                                ADMIN DASHBOARD
+                                                ONLY VISIBLE TO ADMIN USERS
+                                            ================================================== */}
+
+                                            {user?.role === "admin" && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setProfileOpen(
+                                                            false
+                                                        );
+                                                        navigate(
+                                                            "/admin"
+                                                        );
+                                                    }}
+                                                    className="
+                                                        group
+                                                        flex
+                                                        w-full
+                                                        items-center
+                                                        gap-3
+                                                        rounded-lg
+                                                        px-3
+                                                        py-3
+                                                        text-left
+                                                        transition-all
+                                                        duration-200
+                                                        hover:bg-[#F5F5DC]/[0.06]
+                                                    "
+                                                >
+                                                    <span
+                                                        className="
+                                                            flex
+                                                            h-9
+                                                            w-9
+                                                            shrink-0
+                                                            items-center
+                                                            justify-center
+                                                            rounded-lg
+                                                            bg-[#F5F5DC]/[0.05]
+                                                            text-[#F5F5DC]/55
+                                                            transition-colors
+                                                            group-hover:bg-[#FF8F00]/10
+                                                            group-hover:text-[#FF8F00]
+                                                        "
+                                                    >
+                                                        <LayoutDashboard
+                                                            size={17}
+                                                            strokeWidth={1.8}
+                                                        />
+                                                    </span>
+
+                                                    <span className="flex-1">
+                                                        <span className="block text-[12px] font-semibold text-[#F5F5DC]">
+                                                            Admin Dashboard
+                                                        </span>
+
+                                                        <span className="mt-0.5 block text-[9px] text-[#F5F5DC]/35">
+                                                            Manage Metal Garage
+                                                        </span>
+                                                    </span>
+
+                                                    <span className="text-[14px] text-[#F5F5DC]/20 transition-colors group-hover:text-[#FF8F00]/70">
+                                                        →
+                                                    </span>
+                                                </button>
+                                            )}
+
                                             <div className="my-2 h-px bg-[#F5F5DC]/10" />
 
                                             {/* LOGOUT */}
@@ -1103,11 +1175,9 @@ export default function Header() {
                             </NavLink>
                         )}
 
-
                     </div>
                 </nav>
             </header>
         </>
     );
 }
-
