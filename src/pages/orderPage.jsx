@@ -529,7 +529,7 @@ export default function OrderPage() {
             <div className="min-h-screen overflow-hidden bg-[#F5F5DC] text-[#0A0A0A]">
                 <Header />
 
-                <main className="pt-[78px]">
+                <main className="pt-[20px]">
                     <div className="mx-auto flex min-h-[70vh] max-w-[1320px] items-center justify-center px-5 sm:px-10">
                         <motion.div
                             initial={{
@@ -611,7 +611,7 @@ export default function OrderPage() {
         >
             <Header />
 
-            <main className="pt-[78px]">
+            <main className="pt-[30px]">
 
                 {/* =================================================
                     PAGE HEADER

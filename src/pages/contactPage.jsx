@@ -123,7 +123,7 @@ export default function ContactPage() {
             <Header />
 
 
-            <main className="mg-body pt-[78px]">
+            <main className="mg-body pt-[20px]">
 
                 {/* =====================================================
                     HERO

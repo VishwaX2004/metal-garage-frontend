@@ -1115,6 +1115,7 @@ export default function CartPage() {
                 overflow-x-hidden
                 bg-[#F5F5DC]
                 text-[#0A0A0A]
+                pt-[20px]
             "
         >
             {/* =====================================================

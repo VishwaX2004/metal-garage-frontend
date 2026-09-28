@@ -967,7 +967,7 @@ export default function HomePage() {
             HERO
         ====================================================== */}
 
-        <section className="relative overflow-hidden bg-[#0A0A0A] px-0 pb-[90px] pt-[170px] text-[#F5F5DC]">
+        <section className="relative overflow-hidden bg-[#0A0A0A] px-0 pb-[90px] pt-[120px] text-[#F5F5DC]">
 
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_78%_40%,rgba(255,143,0,.10),transparent_55%),repeating-linear-gradient(115deg,rgba(245,245,220,.025)_0_1px,transparent_1px_64px)]" />
 

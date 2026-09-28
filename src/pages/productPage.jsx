@@ -797,7 +797,7 @@ export default function ProductPage() {
                 min-h-screen
                 flex
                 flex-col
-                pt-[78px]
+                pt-[20px]
                 bg-[#F5F5DC]
             "
         >

@@ -1,16 +1,13 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import {
     Search,
-    Heart,
     ShoppingCart,
     UserRound,
-    Menu,
     Package,
     Settings,
     LogOut,
     ChevronDown,
     UserCircle,
-    X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -326,7 +323,10 @@ export default function Header() {
             }
         };
 
-        window.addEventListener("resize", handleResize);
+        window.addEventListener(
+            "resize",
+            handleResize
+        );
 
         return () => {
             window.removeEventListener(
@@ -430,7 +430,9 @@ export default function Header() {
 
                     <div className="flex items-center gap-[17px] sm:gap-[21px]">
 
-                        {/* SEARCH */}
+                        {/* =================================================
+                            SEARCH
+                        ================================================== */}
 
                         <button
                             type="button"
@@ -459,64 +461,9 @@ export default function Header() {
                             />
                         </button>
 
-                        {/* WISHLIST */}
-
-                        <button
-                            type="button"
-                            aria-label="Wishlist"
-                            onClick={() =>
-                                navigate("/wishlist")
-                            }
-                            className="
-                                hidden
-                                sm:flex
-                                h-5
-                                w-5
-                                items-center
-                                justify-center
-                                text-[#F5F5DC]
-                                opacity-90
-                                transition-all
-                                duration-200
-                                hover:-translate-y-[1px]
-                                hover:text-[#FF8F00]
-                                hover:opacity-100
-                            "
-                        >
-                            <Heart
-                                className="h-full w-full"
-                                strokeWidth={2}
-                            />
-                        </button>
-
-                        {/* ORDERS */}
-
-                        <NavLink
-                            to="/orders"
-                            aria-label="My Orders"
-                            className="
-                                hidden
-                                sm:flex
-                                h-5
-                                w-5
-                                items-center
-                                justify-center
-                                text-[#F5F5DC]
-                                opacity-90
-                                transition-all
-                                duration-200
-                                hover:-translate-y-[1px]
-                                hover:text-[#FF8F00]
-                                hover:opacity-100
-                            "
-                        >
-                            <Package
-                                className="h-full w-full"
-                                strokeWidth={2}
-                            />
-                        </NavLink>
-
-                        {/* CART */}
+                        {/* =================================================
+                            CART
+                        ================================================== */}
 
                         <NavLink
                             to="/cart"
@@ -571,7 +518,7 @@ export default function Header() {
                         </NavLink>
 
                         {/* =================================================
-                            LOGGED IN USER
+                            USER / LOGIN
                         ================================================== */}
 
                         {user ? (
@@ -579,6 +526,10 @@ export default function Header() {
                                 ref={profileRef}
                                 className="relative"
                             >
+                                {/* =================================================
+                                    LOGGED-IN USER CARD
+                                ================================================== */}
+
                                 <button
                                     type="button"
                                     aria-label="Open user profile"
@@ -596,61 +547,124 @@ export default function Header() {
                                         hidden
                                         sm:flex
                                         items-center
-                                        gap-2.5
+                                        gap-3
                                         rounded-full
                                         border
                                         border-[#F5F5DC]/10
                                         bg-[#F5F5DC]/[0.035]
-                                        py-1
-                                        pl-1
-                                        pr-2.5
+                                        py-1.5
+                                        pl-1.5
+                                        pr-3
                                         transition-all
                                         duration-200
                                         hover:border-[#FF8F00]/50
                                         hover:bg-[#FF8F00]/[0.06]
+                                        hover:shadow-[0_0_20px_rgba(255,143,0,0.08)]
                                     "
                                 >
-                                    {/* Avatar */}
+                                    {/* =================================================
+                                        BIGGER USER AVATAR
+                                    ================================================== */}
 
-                                    <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#FF8F00]/40 bg-[#171717]">
-
+                                    <div
+                                        className="
+                                            relative
+                                            flex
+                                            h-10
+                                            w-10
+                                            shrink-0
+                                            items-center
+                                            justify-center
+                                            overflow-hidden
+                                            rounded-full
+                                            border
+                                            border-[#FF8F00]/50
+                                            bg-[#171717]
+                                            shadow-[0_0_0_2px_rgba(255,143,0,0.05)]
+                                        "
+                                    >
                                         {userImage ? (
                                             <img
                                                 src={userImage}
                                                 alt={userName}
-                                                className="h-full w-full object-cover"
-                                                onError={(event) => {
+                                                className="
+                                                    block
+                                                    h-full
+                                                    w-full
+                                                    object-cover
+                                                "
+                                                onError={(
+                                                    event
+                                                ) => {
                                                     event.currentTarget.style.display =
                                                         "none";
                                                 }}
                                             />
                                         ) : (
-                                            <span className="text-[10px] font-bold tracking-wide text-[#FFB04D]">
+                                            <span className="text-[12px] font-bold tracking-wide text-[#FFB04D]">
                                                 {getUserInitials()}
                                             </span>
                                         )}
 
-                                        <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full border-2 border-[#0A0A0A] bg-[#38D16A]" />
+                                        <span
+                                            className="
+                                                absolute
+                                                bottom-[1px]
+                                                right-[1px]
+                                                h-[9px]
+                                                w-[9px]
+                                                rounded-full
+                                                border-2
+                                                border-[#0A0A0A]
+                                                bg-[#38D16A]
+                                            "
+                                        />
                                     </div>
 
-                                    {/* Name */}
+                                    {/* =================================================
+                                        USER NAME
+                                    ================================================== */}
 
-                                    <div className="hidden max-w-[105px] lg:block">
-                                        <p className="truncate text-left font-['Work_Sans',sans-serif] text-[11px] font-semibold text-[#F5F5DC]">
+                                    <div className="hidden min-w-[105px] max-w-[145px] lg:block">
+                                        <p
+                                            className="
+                                                truncate
+                                                text-left
+                                                font-['Work_Sans',sans-serif]
+                                                text-[12px]
+                                                font-semibold
+                                                text-[#F5F5DC]
+                                            "
+                                        >
                                             {userName}
                                         </p>
 
-                                        <p className="mt-[1px] text-left font-mono text-[7px] uppercase tracking-[0.13em] text-[#F5F5DC]/35">
+                                        <p
+                                            className="
+                                                mt-[2px]
+                                                text-left
+                                                font-mono
+                                                text-[8px]
+                                                uppercase
+                                                tracking-[0.13em]
+                                                text-[#F5F5DC]/40
+                                            "
+                                        >
                                             {user.role === "admin"
                                                 ? "Admin"
                                                 : "Collector"}
                                         </p>
                                     </div>
 
+                                    {/* =================================================
+                                        DROPDOWN ARROW
+                                    ================================================== */}
+
                                     <ChevronDown
-                                        size={13}
+                                        size={14}
                                         strokeWidth={2}
                                         className={`
+                                            shrink-0
                                             text-[#F5F5DC]/50
                                             transition-transform
                                             duration-200
@@ -668,63 +682,161 @@ export default function Header() {
                                 ================================================== */}
 
                                 {profileOpen && (
-                                    <div className="absolute right-0 top-[48px] w-[245px] overflow-hidden rounded-xl border border-[#F5F5DC]/10 bg-[#11110F] shadow-[0_25px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+                                    <div
+                                        className="
+                                            absolute
+                                            right-0
+                                            top-[54px]
+                                            w-[285px]
+                                            overflow-hidden
+                                            rounded-xl
+                                            border
+                                            border-[#F5F5DC]/10
+                                            bg-[#11110F]
+                                            shadow-[0_25px_60px_rgba(0,0,0,0.55)]
+                                            backdrop-blur-xl
+                                        "
+                                    >
+                                        {/* =================================================
+                                            PROFILE HEADER
+                                        ================================================== */}
 
-                                        {/* Profile Header */}
+                                        <div
+                                            className="
+                                                border-b
+                                                border-[#F5F5DC]/10
+                                                bg-gradient-to-br
+                                                from-[#FF8F00]/[0.10]
+                                                to-transparent
+                                                px-5
+                                                py-5
+                                            "
+                                        >
+                                            <div className="flex items-center gap-3.5">
 
-                                        <div className="border-b border-[#F5F5DC]/10 bg-gradient-to-br from-[#FF8F00]/[0.10] to-transparent px-4 py-4">
+                                                {/* Bigger Dropdown Image */}
 
-                                            <div className="flex items-center gap-3">
-
-                                                <div className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#FF8F00]/40 bg-[#1C1C19]">
-
+                                                <div
+                                                    className="
+                                                        relative
+                                                        flex
+                                                        h-14
+                                                        w-14
+                                                        shrink-0
+                                                        items-center
+                                                        justify-center
+                                                        overflow-hidden
+                                                        rounded-full
+                                                        border
+                                                        border-[#FF8F00]/50
+                                                        bg-[#1C1C19]
+                                                        shadow-[0_0_20px_rgba(255,143,0,0.08)]
+                                                    "
+                                                >
                                                     {userImage ? (
                                                         <img
                                                             src={userImage}
                                                             alt={userName}
-                                                            className="h-full w-full object-cover"
-                                                            onError={(event) => {
+                                                            className="
+                                                                block
+                                                                h-full
+                                                                w-full
+                                                                object-cover
+                                                            "
+                                                            onError={(
+                                                                event
+                                                            ) => {
                                                                 event.currentTarget.style.display =
                                                                     "none";
                                                             }}
                                                         />
                                                     ) : (
-                                                        <span className="text-xs font-bold text-[#FFB04D]">
+                                                        <span className="text-sm font-bold text-[#FFB04D]">
                                                             {getUserInitials()}
                                                         </span>
                                                     )}
 
-                                                    <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-[#11110F] bg-[#38D16A]" />
+                                                    <span
+                                                        className="
+                                                            absolute
+                                                            bottom-0
+                                                            right-0
+                                                            h-3
+                                                            w-3
+                                                            rounded-full
+                                                            border-2
+                                                            border-[#11110F]
+                                                            bg-[#38D16A]
+                                                        "
+                                                    />
                                                 </div>
+
+                                                {/* User Information */}
 
                                                 <div className="min-w-0 flex-1">
 
-                                                    <p className="truncate font-['Work_Sans',sans-serif] text-[13px] font-semibold text-[#F5F5DC]">
+                                                    <p
+                                                        className="
+                                                            truncate
+                                                            font-['Work_Sans',sans-serif]
+                                                            text-[14px]
+                                                            font-semibold
+                                                            text-[#F5F5DC]
+                                                        "
+                                                    >
                                                         {userName}
                                                     </p>
 
-                                                    <p className="mt-0.5 truncate text-[10px] text-[#F5F5DC]/40">
+                                                    <p
+                                                        className="
+                                                            mt-1
+                                                            truncate
+                                                            text-[10px]
+                                                            text-[#F5F5DC]/40
+                                                        "
+                                                    >
                                                         {user.email ||
                                                             "Metal Garage Collector"}
                                                     </p>
 
+                                                    <div className="mt-2 flex items-center gap-1.5">
+                                                        <span className="h-1.5 w-1.5 rounded-full bg-[#38D16A]" />
+
+                                                        <span
+                                                            className="
+                                                                text-[8px]
+                                                                font-medium
+                                                                uppercase
+                                                                tracking-[0.12em]
+                                                                text-[#38D16A]/80
+                                                            "
+                                                        >
+                                                            Online
+                                                        </span>
+                                                    </div>
+
                                                 </div>
 
                                             </div>
-
                                         </div>
 
-                                        {/* Dropdown */}
+                                        {/* =================================================
+                                            DROPDOWN MENU
+                                        ================================================== */}
 
-                                        <div className="p-1.5">
+                                        <div className="p-2">
 
                                             {/* ACCOUNT */}
 
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    setProfileOpen(false);
-                                                    navigate("/account");
+                                                    setProfileOpen(
+                                                        false
+                                                    );
+                                                    navigate(
+                                                        "/account"
+                                                    );
                                                 }}
                                                 className="
                                                     group
@@ -734,28 +846,47 @@ export default function Header() {
                                                     gap-3
                                                     rounded-lg
                                                     px-3
-                                                    py-2.5
+                                                    py-3
                                                     text-left
-                                                    transition-colors
+                                                    transition-all
                                                     duration-200
                                                     hover:bg-[#F5F5DC]/[0.06]
                                                 "
                                             >
-                                                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#F5F5DC]/[0.05] text-[#F5F5DC]/55 transition-colors group-hover:bg-[#FF8F00]/10 group-hover:text-[#FF8F00]">
+                                                <span
+                                                    className="
+                                                        flex
+                                                        h-9
+                                                        w-9
+                                                        shrink-0
+                                                        items-center
+                                                        justify-center
+                                                        rounded-lg
+                                                        bg-[#F5F5DC]/[0.05]
+                                                        text-[#F5F5DC]/55
+                                                        transition-colors
+                                                        group-hover:bg-[#FF8F00]/10
+                                                        group-hover:text-[#FF8F00]
+                                                    "
+                                                >
                                                     <UserCircle
-                                                        size={16}
+                                                        size={17}
                                                         strokeWidth={1.8}
                                                     />
                                                 </span>
 
                                                 <span className="flex-1">
-                                                    <span className="block text-[11px] font-semibold text-[#F5F5DC]">
+                                                    <span className="block text-[12px] font-semibold text-[#F5F5DC]">
                                                         My Account
                                                     </span>
 
                                                     <span className="mt-0.5 block text-[9px] text-[#F5F5DC]/35">
                                                         View your profile
                                                     </span>
+                                                </span>
+
+                                                <span className="text-[14px] text-[#F5F5DC]/20 transition-colors group-hover:text-[#FF8F00]/70">
+                                                    →
                                                 </span>
                                             </button>
 
@@ -764,7 +895,9 @@ export default function Header() {
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    setProfileOpen(false);
+                                                    setProfileOpen(
+                                                        false
+                                                    );
                                                     navigate(
                                                         "/account/settings"
                                                     );
@@ -777,28 +910,47 @@ export default function Header() {
                                                     gap-3
                                                     rounded-lg
                                                     px-3
-                                                    py-2.5
+                                                    py-3
                                                     text-left
-                                                    transition-colors
+                                                    transition-all
                                                     duration-200
                                                     hover:bg-[#F5F5DC]/[0.06]
                                                 "
                                             >
-                                                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#F5F5DC]/[0.05] text-[#F5F5DC]/55 transition-colors group-hover:bg-[#FF8F00]/10 group-hover:text-[#FF8F00]">
+                                                <span
+                                                    className="
+                                                        flex
+                                                        h-9
+                                                        w-9
+                                                        shrink-0
+                                                        items-center
+                                                        justify-center
+                                                        rounded-lg
+                                                        bg-[#F5F5DC]/[0.05]
+                                                        text-[#F5F5DC]/55
+                                                        transition-colors
+                                                        group-hover:bg-[#FF8F00]/10
+                                                        group-hover:text-[#FF8F00]
+                                                    "
+                                                >
                                                     <Settings
-                                                        size={16}
+                                                        size={17}
                                                         strokeWidth={1.8}
                                                     />
                                                 </span>
 
                                                 <span className="flex-1">
-                                                    <span className="block text-[11px] font-semibold text-[#F5F5DC]">
+                                                    <span className="block text-[12px] font-semibold text-[#F5F5DC]">
                                                         Account Settings
                                                     </span>
 
                                                     <span className="mt-0.5 block text-[9px] text-[#F5F5DC]/35">
                                                         Manage your account
                                                     </span>
+                                                </span>
+
+                                                <span className="text-[14px] text-[#F5F5DC]/20 transition-colors group-hover:text-[#FF8F00]/70">
+                                                    →
                                                 </span>
                                             </button>
 
@@ -807,8 +959,12 @@ export default function Header() {
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    setProfileOpen(false);
-                                                    navigate("/orders");
+                                                    setProfileOpen(
+                                                        false
+                                                    );
+                                                    navigate(
+                                                        "/orders"
+                                                    );
                                                 }}
                                                 className="
                                                     group
@@ -818,22 +974,37 @@ export default function Header() {
                                                     gap-3
                                                     rounded-lg
                                                     px-3
-                                                    py-2.5
+                                                    py-3
                                                     text-left
-                                                    transition-colors
+                                                    transition-all
                                                     duration-200
                                                     hover:bg-[#F5F5DC]/[0.06]
                                                 "
                                             >
-                                                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#F5F5DC]/[0.05] text-[#F5F5DC]/55 transition-colors group-hover:bg-[#FF8F00]/10 group-hover:text-[#FF8F00]">
+                                                <span
+                                                    className="
+                                                        flex
+                                                        h-9
+                                                        w-9
+                                                        shrink-0
+                                                        items-center
+                                                        justify-center
+                                                        rounded-lg
+                                                        bg-[#F5F5DC]/[0.05]
+                                                        text-[#F5F5DC]/55
+                                                        transition-colors
+                                                        group-hover:bg-[#FF8F00]/10
+                                                        group-hover:text-[#FF8F00]
+                                                    "
+                                                >
                                                     <Package
-                                                        size={16}
+                                                        size={17}
                                                         strokeWidth={1.8}
                                                     />
                                                 </span>
 
                                                 <span className="flex-1">
-                                                    <span className="block text-[11px] font-semibold text-[#F5F5DC]">
+                                                    <span className="block text-[12px] font-semibold text-[#F5F5DC]">
                                                         My Orders
                                                     </span>
 
@@ -841,9 +1012,13 @@ export default function Header() {
                                                         Track your purchases
                                                     </span>
                                                 </span>
+
+                                                <span className="text-[14px] text-[#F5F5DC]/20 transition-colors group-hover:text-[#FF8F00]/70">
+                                                    →
+                                                </span>
                                             </button>
 
-                                            <div className="my-1.5 h-px bg-[#F5F5DC]/10" />
+                                            <div className="my-2 h-px bg-[#F5F5DC]/10" />
 
                                             {/* LOGOUT */}
 
@@ -858,22 +1033,36 @@ export default function Header() {
                                                     gap-3
                                                     rounded-lg
                                                     px-3
-                                                    py-2.5
+                                                    py-3
                                                     text-left
-                                                    transition-colors
+                                                    transition-all
                                                     duration-200
                                                     hover:bg-[#FF3B00]/10
                                                 "
                                             >
-                                                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-[#FF3B00]/[0.07] text-[#FF6A3D] transition-colors group-hover:bg-[#FF3B00]/15">
+                                                <span
+                                                    className="
+                                                        flex
+                                                        h-9
+                                                        w-9
+                                                        shrink-0
+                                                        items-center
+                                                        justify-center
+                                                        rounded-lg
+                                                        bg-[#FF3B00]/[0.07]
+                                                        text-[#FF6A3D]
+                                                        transition-colors
+                                                        group-hover:bg-[#FF3B00]/15
+                                                    "
+                                                >
                                                     <LogOut
-                                                        size={16}
+                                                        size={17}
                                                         strokeWidth={1.8}
                                                     />
                                                 </span>
 
                                                 <span className="flex-1">
-                                                    <span className="block text-[11px] font-semibold text-[#FF6A3D]">
+                                                    <span className="block text-[12px] font-semibold text-[#FF6A3D]">
                                                         Log Out
                                                     </span>
 
@@ -887,66 +1076,6 @@ export default function Header() {
                                     </div>
                                 )}
                             </div>
-                        ) : (
-                            /* NOT LOGGED IN */
-
-                            <NavLink
-                                to="/login"
-                                aria-label="Account"
-                                className="
-                                    hidden
-                                    sm:flex
-                                    h-5
-                                    w-5
-                                    items-center
-                                    justify-center
-                                    text-[#F5F5DC]
-                                    opacity-90
-                                    transition-all
-                                    duration-200
-                                    hover:-translate-y-[1px]
-                                    hover:text-[#FF8F00]
-                                    hover:opacity-100
-                                "
-                            >
-                                <UserRound
-                                    className="h-full w-full"
-                                    strokeWidth={2}
-                                />
-                            </NavLink>
-                        )}
-
-                        {/* =================================================
-                            DESKTOP LOGIN / LOGOUT
-                        ================================================== */}
-
-                        {user ? (
-                            <button
-                                type="button"
-                                onClick={handleLogout}
-                                className="
-                                    hidden
-                                    min-[981px]:block
-                                    rounded-[2px]
-                                    border
-                                    border-[rgba(245,245,220,0.14)]
-                                    px-[18px]
-                                    py-[9px]
-                                    text-[12px]
-                                    font-['Work_Sans',sans-serif]
-                                    font-medium
-                                    uppercase
-                                    tracking-[0.09em]
-                                    text-[#F5F5DC]
-                                    transition-all
-                                    duration-200
-                                    hover:border-[#FF3B00]
-                                    hover:bg-[#FF3B00]/[0.06]
-                                    hover:text-[#FF6A3D]
-                                "
-                            >
-                                Log Out
-                            </button>
                         ) : (
                             <NavLink
                                 to="/login"
@@ -974,12 +1103,11 @@ export default function Header() {
                             </NavLink>
                         )}
 
-                      
 
                     </div>
                 </nav>
             </header>
-
         </>
     );
 }
+
