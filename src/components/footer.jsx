@@ -192,25 +192,18 @@ export default function Footer() {
                             SHOP
                         ================================================== */}
                         <FooterColumn title="SHOP">
-                            <FooterLink to="/shop">
+                            <FooterLink to="/products">
                                 All Products
                             </FooterLink>
 
-                            <FooterLink to="/shop?category=new-arrivals">
-                                New Arrivals
-                            </FooterLink>
-
-                            <FooterLink to="/shop?category=premium">
+                            <FooterLink to="/products">
                                 Premium
                             </FooterLink>
 
-                            <FooterLink to="/shop?category=rare-finds">
+                            <FooterLink to="/products">
                                 Rare Finds
                             </FooterLink>
 
-                            <FooterLink to="/collections">
-                                Collections
-                            </FooterLink>
                         </FooterColumn>
 
 
@@ -225,18 +218,6 @@ export default function Footer() {
                             <FooterLink to="/contact">
                                 Contact
                             </FooterLink>
-
-                            <FooterLink to="/faq">
-                                FAQ
-                            </FooterLink>
-
-                            <FooterLink to="/shipping">
-                                Shipping
-                            </FooterLink>
-
-                            <FooterLink to="/returns">
-                                Returns
-                            </FooterLink>
                         </FooterColumn>
 
 
@@ -250,10 +231,6 @@ export default function Footer() {
 
                             <FooterLink to="/orders">
                                 Orders
-                            </FooterLink>
-
-                            <FooterLink to="/wishlist">
-                                Wishlist
                             </FooterLink>
 
                             <FooterLink to="/cart">

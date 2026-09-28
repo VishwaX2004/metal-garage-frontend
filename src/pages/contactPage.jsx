@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
     ArrowRight,
@@ -20,6 +20,18 @@ export default function ContactPage() {
     });
 
     const [submitted, setSubmitted] = useState(false);
+
+    // ============================================================
+    // SCROLL TO TOP WHEN CONTACT PAGE LOADS
+    // ============================================================
+
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "instant",
+        });
+    }, []);
 
     const fadeUp = {
         hidden: {
@@ -131,8 +143,6 @@ export default function ContactPage() {
 
                 <section className="relative overflow-hidden bg-[#0A0A0A] text-[#F4F0E3]">
 
-                    {/* Background texture */}
-
                     <div
                         className="
                             pointer-events-none
@@ -240,7 +250,6 @@ export default function ContactPage() {
                     <div className="mx-auto max-w-6xl px-5 sm:px-8">
 
                         <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr]">
-
 
                             {/* =================================================
                                 CONTACT INFORMATION
