@@ -8,6 +8,10 @@ import {
 
 import { Toaster } from "react-hot-toast";
 
+// ============================================================
+// MAIN PAGES
+// ============================================================
+
 import HomePage from "./pages/homePage";
 import LoginPage from "./pages/loginPage";
 import AdminPage from "./pages/adminPage";
@@ -21,14 +25,35 @@ import ContactPage from "./pages/contactPage";
 import RegisterPage from "./pages/registerPage";
 import AccountPage from "./pages/accountPage";
 
+// ============================================================
+// PAYHERE PAGES
+// ============================================================
+
+import PaymentSuccess from "./pages/paymentSuccess";
+import PaymentCancel from "./pages/paymentCancel";
+
+
+// ============================================================
+// APP
+// ============================================================
+
 export default function App() {
     return (
         <BrowserRouter>
+
+            {/* =================================================
+                TOAST NOTIFICATIONS
+            ================================================== */}
 
             <Toaster
                 position="top-right"
                 reverseOrder={false}
             />
+
+
+            {/* =================================================
+                APPLICATION ROUTES
+            ================================================== */}
 
             <Routes>
 
@@ -41,6 +66,7 @@ export default function App() {
                     element={<HomePage />}
                 />
 
+
                 {/* =================================================
                     PRODUCTS
                 ================================================== */}
@@ -49,6 +75,7 @@ export default function App() {
                     path="/products"
                     element={<ProductPage />}
                 />
+
 
                 {/* =================================================
                     PRODUCT DETAILS
@@ -59,6 +86,7 @@ export default function App() {
                     element={<ProductOverview />}
                 />
 
+
                 {/* =================================================
                     CART
                 ================================================== */}
@@ -67,6 +95,7 @@ export default function App() {
                     path="/cart"
                     element={<CartPage />}
                 />
+
 
                 {/* =================================================
                     CHECKOUT
@@ -77,6 +106,7 @@ export default function App() {
                     element={<CheckoutPage />}
                 />
 
+
                 {/* =================================================
                     ORDERS
                 ================================================== */}
@@ -85,6 +115,7 @@ export default function App() {
                     path="/orders"
                     element={<OrderPage />}
                 />
+
 
                 {/* =================================================
                     LOGIN
@@ -95,6 +126,7 @@ export default function App() {
                     element={<LoginPage />}
                 />
 
+
                 {/* =================================================
                     REGISTER
                 ================================================== */}
@@ -104,6 +136,7 @@ export default function App() {
                     element={<RegisterPage />}
                 />
 
+
                 {/* =================================================
                     ACCOUNT
                 ================================================== */}
@@ -112,6 +145,7 @@ export default function App() {
                     path="/account"
                     element={<AccountPage />}
                 />
+
 
                 {/* =================================================
                     ACCOUNT SETTINGS
@@ -123,6 +157,7 @@ export default function App() {
                     element={<AccountPage />}
                 />
 
+
                 {/* =================================================
                     ABOUT
                 ================================================== */}
@@ -131,6 +166,7 @@ export default function App() {
                     path="/about"
                     element={<AboutPage />}
                 />
+
 
                 {/* =================================================
                     CONTACT
@@ -141,6 +177,44 @@ export default function App() {
                     element={<ContactPage />}
                 />
 
+
+                {/* =================================================
+                    PAYHERE PAYMENT SUCCESS
+                ==================================================
+
+                    PayHere will redirect here after payment.
+
+                    Example:
+
+                    /payment/success?order_id=MG-12345
+
+                ================================================== */}
+
+                <Route
+                    path="/payment/success"
+                    element={<PaymentSuccess />}
+                />
+
+
+                {/* =================================================
+                    PAYHERE PAYMENT CANCEL
+                ==================================================
+
+                    PayHere will redirect here when the
+                    customer cancels the payment.
+
+                    Example:
+
+                    /payment/cancel?order_id=MG-12345
+
+                ================================================== */}
+
+                <Route
+                    path="/payment/cancel"
+                    element={<PaymentCancel />}
+                />
+
+
                 {/* =================================================
                     ADMIN
                 ================================================== */}
@@ -148,6 +222,40 @@ export default function App() {
                 <Route
                     path="/admin/*"
                     element={<AdminPage />}
+                />
+
+
+                {/* =================================================
+                    OPTIONAL 404 PAGE
+                ==================================================
+
+                    If you don't have a separate 404 page,
+                    this simple fallback prevents a blank page.
+
+                ================================================== */}
+
+                <Route
+                    path="*"
+                    element={
+                        <div
+                            style={{
+                                minHeight: "100vh",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexDirection: "column",
+                                gap: "12px",
+                                padding: "40px",
+                                textAlign: "center",
+                            }}
+                        >
+                            <h1>404</h1>
+
+                            <p>
+                                Page not found.
+                            </p>
+                        </div>
+                    }
                 />
 
             </Routes>
