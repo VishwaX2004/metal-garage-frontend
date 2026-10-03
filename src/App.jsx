@@ -32,7 +32,6 @@ import AccountPage from "./pages/accountPage";
 import PaymentSuccess from "./pages/paymentSuccess";
 import PaymentCancel from "./pages/paymentCancel";
 
-
 // ============================================================
 // APP
 // ============================================================
@@ -40,7 +39,6 @@ import PaymentCancel from "./pages/paymentCancel";
 export default function App() {
     return (
         <BrowserRouter>
-
             {/* =================================================
                 TOAST NOTIFICATIONS
             ================================================== */}
@@ -50,190 +48,102 @@ export default function App() {
                 reverseOrder={false}
             />
 
-
             {/* =================================================
                 APPLICATION ROUTES
             ================================================== */}
 
             <Routes>
-
-                {/* =================================================
-                    HOME
-                ================================================== */}
-
+                {/* HOME */}
                 <Route
                     path="/"
                     element={<HomePage />}
                 />
 
-
-                {/* =================================================
-                    PRODUCTS
-                ================================================== */}
-
+                {/* PRODUCTS */}
                 <Route
                     path="/products"
                     element={<ProductPage />}
                 />
 
-
-                {/* =================================================
-                    PRODUCT DETAILS
-                ================================================== */}
-
+                {/* PRODUCT DETAILS */}
                 <Route
                     path="/overview/:productID"
                     element={<ProductOverview />}
                 />
 
-
-                {/* =================================================
-                    CART
-                ================================================== */}
-
+                {/* CART */}
                 <Route
                     path="/cart"
                     element={<CartPage />}
                 />
 
-
-                {/* =================================================
-                    CHECKOUT
-                ================================================== */}
-
+                {/* CHECKOUT */}
                 <Route
                     path="/checkout"
                     element={<CheckoutPage />}
                 />
 
-
-                {/* =================================================
-                    ORDERS
-                ================================================== */}
-
+                {/* ORDERS */}
                 <Route
                     path="/orders"
                     element={<OrderPage />}
                 />
 
-
-                {/* =================================================
-                    LOGIN
-                ================================================== */}
-
+                {/* LOGIN */}
                 <Route
                     path="/login"
                     element={<LoginPage />}
                 />
 
-
-                {/* =================================================
-                    REGISTER
-                ================================================== */}
-
+                {/* REGISTER */}
                 <Route
                     path="/register"
                     element={<RegisterPage />}
                 />
 
-
-                {/* =================================================
-                    ACCOUNT
-                ================================================== */}
-
+                {/* ACCOUNT */}
                 <Route
                     path="/account"
                     element={<AccountPage />}
                 />
 
-
-                {/* =================================================
-                    ACCOUNT SETTINGS
-                    Uses the same AccountPage
-                ================================================== */}
-
+                {/* ACCOUNT SETTINGS */}
                 <Route
                     path="/account/settings"
                     element={<AccountPage />}
                 />
 
-
-                {/* =================================================
-                    ABOUT
-                ================================================== */}
-
+                {/* ABOUT */}
                 <Route
                     path="/about"
                     element={<AboutPage />}
                 />
 
-
-                {/* =================================================
-                    CONTACT
-                ================================================== */}
-
+                {/* CONTACT */}
                 <Route
                     path="/contact"
                     element={<ContactPage />}
                 />
 
-
-                {/* =================================================
-                    PAYHERE PAYMENT SUCCESS
-                ==================================================
-
-                    PayHere will redirect here after payment.
-
-                    Example:
-
-                    /payment/success?order_id=MG-12345
-
-                ================================================== */}
-
+                {/* PAYHERE SUCCESS */}
                 <Route
                     path="/payment/success"
                     element={<PaymentSuccess />}
                 />
 
-
-                {/* =================================================
-                    PAYHERE PAYMENT CANCEL
-                ==================================================
-
-                    PayHere will redirect here when the
-                    customer cancels the payment.
-
-                    Example:
-
-                    /payment/cancel?order_id=MG-12345
-
-                ================================================== */}
-
+                {/* PAYHERE CANCEL */}
                 <Route
                     path="/payment/cancel"
                     element={<PaymentCancel />}
                 />
 
-
-                {/* =================================================
-                    ADMIN
-                ================================================== */}
-
+                {/* ADMIN */}
                 <Route
                     path="/admin/*"
                     element={<AdminPage />}
                 />
 
-
-                {/* =================================================
-                    OPTIONAL 404 PAGE
-                ==================================================
-
-                    If you don't have a separate 404 page,
-                    this simple fallback prevents a blank page.
-
-                ================================================== */}
-
+                {/* 404 */}
                 <Route
                     path="*"
                     element={
@@ -257,9 +167,7 @@ export default function App() {
                         </div>
                     }
                 />
-
             </Routes>
-
         </BrowserRouter>
     );
 }

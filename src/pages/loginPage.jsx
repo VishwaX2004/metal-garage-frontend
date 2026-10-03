@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,42 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+
+    /*
+     * ============================================================
+     * LOGIN PAGE BACK BUTTON
+     *
+     * If the browser Back button is pressed while the user is
+     * on /login, always send them to the Home page.
+     *
+     * The visible "Back to Metal Garage" button below also uses
+     * the same Home navigation.
+     * ============================================================
+     */
+    useEffect(() => {
+        // Add one temporary history entry while /login is open.
+        // This lets us intercept the browser Back button.
+        window.history.pushState(
+            { loginPage: true },
+            "",
+            window.location.href
+        );
+
+        const handleBrowserBack = () => {
+            navigate("/", {
+                replace: true,
+            });
+        };
+
+        window.addEventListener("popstate", handleBrowserBack);
+
+        return () => {
+            window.removeEventListener(
+                "popstate",
+                handleBrowserBack
+            );
+        };
+    }, [navigate]);
 
     async function login() {
         if (loading) {
@@ -55,15 +91,10 @@ export default function LoginPage() {
             const token = response.data?.token;
             const loggedUser = response.data?.user;
 
-            /*
-             * Make sure backend actually returned
-             * the authentication information.
-             */
             if (!token) {
                 toast.error(
                     "Login failed. Authentication token was not received."
                 );
-
                 return;
             }
 
@@ -71,19 +102,8 @@ export default function LoginPage() {
                 toast.error(
                     "Login failed. User information was not received."
                 );
-
                 return;
             }
-
-            /*
-             * =====================================================
-             * IMPORTANT
-             *
-             * Store BOTH token AND user.
-             *
-             * CheckoutPage needs both of these values.
-             * =====================================================
-             */
 
             localStorage.setItem("token", token);
 
@@ -92,19 +112,11 @@ export default function LoginPage() {
                 JSON.stringify(loggedUser)
             );
 
-            /*
-             * Also keep these optional aliases synchronized.
-             * This makes the authentication state compatible
-             * with any other page that may use these keys.
-             */
             localStorage.setItem(
                 "currentUser",
                 JSON.stringify(loggedUser)
             );
 
-            /*
-             * Notify the application that authentication changed.
-             */
             window.dispatchEvent(
                 new CustomEvent("authUpdated", {
                     detail: loggedUser,
@@ -113,10 +125,6 @@ export default function LoginPage() {
 
             toast.success("Login successful!");
 
-            /*
-             * Navigate only AFTER user and token have
-             * successfully been stored.
-             */
             if (loggedUser.role === "admin") {
                 navigate("/admin", {
                     replace: true,
@@ -288,7 +296,11 @@ export default function LoginPage() {
                             <div className="relative z-10 mt-5 flex h-[54px] shrink-0 items-center px-6 sm:px-10 lg:px-12">
                                 <button
                                     type="button"
-                                    onClick={() => navigate("/")}
+                                    onClick={() =>
+                                        navigate("/", {
+                                            replace: true,
+                                        })
+                                    }
                                     className="group flex items-center gap-2 text-[12px] tracking-wide text-[#0A0A0A]/50 transition-colors duration-200 hover:text-[#CC7000]"
                                 >
                                     <ArrowLeft
@@ -555,4 +567,3 @@ export default function LoginPage() {
         </div>
     );
 }
-

@@ -370,7 +370,7 @@ export default function Header() {
                         DESKTOP NAVIGATION
                     ================================================== */}
 
-                    <div className="hidden min-[981px]:flex items-center">
+                    <div className="hidden lg:flex items-center">
                         <ul className="m-0 flex list-none items-center gap-[30px] p-0">
 
                             {navLinks.map((link) => (
@@ -430,7 +430,7 @@ export default function Header() {
                         RIGHT SIDE
                     ================================================== */}
 
-                    <div className="flex items-center gap-[17px] sm:gap-[21px]">
+                    <div className="flex shrink-0 items-center gap-[17px] sm:gap-[21px]">
 
                         {/* =================================================
                             SEARCH
@@ -1155,7 +1155,7 @@ export default function Header() {
                                 to="/login"
                                 className="
                                     hidden
-                                    min-[981px]:block
+                                    lg:block
                                     rounded-[2px]
                                     border
                                     border-[rgba(245,245,220,0.14)]
@@ -1200,7 +1200,7 @@ export default function Header() {
                                 text-[#F5F5DC]
                                 transition-colors
                                 hover:text-[#FF8F00]
-                                min-[981px]:hidden
+                                lg:hidden
                             "
                         >
                             {mobileMenuOpen ? (
@@ -1214,7 +1214,7 @@ export default function Header() {
                 </nav>
 
                 {mobileMenuOpen && (
-                    <div className="border-t border-[rgba(245,245,220,0.1)] bg-[#0A0A0A] px-5 pb-5 pt-3 min-[981px]:hidden">
+                    <div className="border-t border-[rgba(245,245,220,0.1)] bg-[#0A0A0A] px-5 pb-5 pt-3 lg:hidden">
                         <ul className="m-0 flex list-none flex-col gap-1 p-0">
                             {navLinks.map((link) => (
                                 <li key={link.name}>
