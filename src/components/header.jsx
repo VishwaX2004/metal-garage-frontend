@@ -8,6 +8,8 @@ import {
     ChevronDown,
     UserCircle,
     LayoutDashboard,
+    Menu,
+    X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -1175,8 +1177,71 @@ export default function Header() {
                             </NavLink>
                         )}
 
+                        <button
+                            type="button"
+                            aria-label={
+                                mobileMenuOpen
+                                    ? "Close navigation menu"
+                                    : "Open navigation menu"
+                            }
+                            aria-expanded={mobileMenuOpen}
+                            onClick={() => {
+                                setMobileMenuOpen(
+                                    (previous) => !previous
+                                );
+                                setProfileOpen(false);
+                            }}
+                            className="
+                                flex
+                                h-6
+                                w-6
+                                items-center
+                                justify-center
+                                text-[#F5F5DC]
+                                transition-colors
+                                hover:text-[#FF8F00]
+                                min-[981px]:hidden
+                            "
+                        >
+                            {mobileMenuOpen ? (
+                                <X size={21} strokeWidth={2} />
+                            ) : (
+                                <Menu size={21} strokeWidth={2} />
+                            )}
+                        </button>
+
                     </div>
                 </nav>
+
+                {mobileMenuOpen && (
+                    <div className="border-t border-[rgba(245,245,220,0.1)] bg-[#0A0A0A] px-5 pb-5 pt-3 min-[981px]:hidden">
+                        <ul className="m-0 flex list-none flex-col gap-1 p-0">
+                            {navLinks.map((link) => (
+                                <li key={link.name}>
+                                    <NavLink
+                                        to={link.path}
+                                        onClick={() =>
+                                            setMobileMenuOpen(false)
+                                        }
+                                        className={({ isActive }) => `
+                                            block border-l-2 px-4 py-3
+                                            font-['Work_Sans',sans-serif]
+                                            text-[13px] font-medium uppercase tracking-[0.09em]
+                                            transition-colors duration-200
+                                            ${
+                                                isActive
+                                                    ? "border-[#FF8F00] text-[#F5F5DC]"
+                                                    : "border-transparent text-[rgba(245,245,220,0.7)] hover:border-[#FF8F00] hover:text-[#F5F5DC]"
+                                            }
+                                        `}
+                                    >
+                                        {link.name}
+                                    </NavLink>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </header>
         </>
     );
