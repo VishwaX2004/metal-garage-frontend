@@ -24,7 +24,10 @@ import {
     AlertTriangle,
 } from "lucide-react";
 
-import { useNavigate } from "react-router-dom";
+import {
+    useLocation,
+    useNavigate,
+} from "react-router-dom";
 
 import {
     motion,
@@ -276,6 +279,7 @@ const modalVariants = {
 // =============================================================
 
 export default function OrderPage() {
+    const location = useLocation();
     const navigate = useNavigate();
 
     const [orders, setOrders] = useState([]);
@@ -299,6 +303,19 @@ export default function OrderPage() {
             behavior: "smooth",
         });
     }, []);
+
+    useEffect(() => {
+        if (!location.state?.paymentSuccess) {
+            return;
+        }
+
+        toast.success("Order placed successfully!");
+
+        navigate(location.pathname, {
+            replace: true,
+            state: null,
+        });
+    }, [location.pathname, location.state, navigate]);
 
     // =========================================================
     // FETCH ORDERS

@@ -87,7 +87,12 @@ export default function PaymentSuccess() {
                         })
                     );
 
-                    setStatus("paid");
+                    navigate("/orders", {
+                        replace: true,
+                        state: {
+                            paymentSuccess: true,
+                        },
+                    });
                     return;
                 }
 
@@ -131,7 +136,7 @@ export default function PaymentSuccess() {
                 clearTimeout(timer);
             }
         };
-    }, [orderID]);
+    }, [navigate, orderID]);
 
     /* =====================================================
        PAID
