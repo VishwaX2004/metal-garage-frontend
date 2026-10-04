@@ -20,16 +20,23 @@ export default function Header() {
     const [user, setUser] = useState(null);
     const [profileOpen, setProfileOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchProducts, setSearchProducts] = useState([]);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchError, setSearchError] = useState("");
+    const [searchDismissed, setSearchDismissed] = useState(false);
 
     const profileRef = useRef(null);
+    const searchRef = useRef(null);
 
     const navLinks = [
         { name: "Home", path: "/" },
         { name: "Shop", path: "/products" },
         { name: "About", path: "/about" },
         { name: "Contact", path: "/contact" },
-        { name: "Orders", path: "/orders" },
         { name: "Cart", path: "/cart" },
+        { name: "Orders", path: "/orders" },
     ];
 
     // =========================================================
@@ -299,6 +306,13 @@ export default function Header() {
             ) {
                 setProfileOpen(false);
             }
+
+            if (
+                searchRef.current &&
+                !searchRef.current.contains(event.target)
+            ) {
+                setSearchOpen(false);
+            }
         };
 
         document.addEventListener(
@@ -313,6 +327,100 @@ export default function Header() {
             );
         };
     }, []);
+
+    // =========================================================
+    // PRODUCT SEARCH
+    // =========================================================
+
+    useEffect(() => {
+        if (!searchOpen || searchProducts.length > 0) {
+            return undefined;
+        }
+
+        const apiUrl = import.meta.env.VITE_API_URL;
+
+        if (!apiUrl) {
+            return undefined;
+        }
+
+        const controller = new AbortController();
+
+        fetch(`${apiUrl}/api/products`, {
+            signal: controller.signal,
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Unable to load products.");
+                }
+
+                return response.json();
+            })
+            .then((data) => {
+                const products = Array.isArray(data)
+                    ? data
+                    : Array.isArray(data?.products)
+                        ? data.products
+                        : [];
+
+                setSearchProducts(products);
+            })
+            .catch((error) => {
+                if (error.name !== "AbortError") {
+                    console.error("Unable to load search products:", error);
+                    setSearchError("Search is temporarily unavailable.");
+                }
+            })
+            .finally(() => {
+                if (!controller.signal.aborted) {
+                    setSearchLoading(false);
+                }
+            });
+
+        return () => controller.abort();
+    }, [searchOpen, searchProducts.length]);
+
+    const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+
+    const searchResults = normalizedSearchQuery && !searchDismissed
+        ? searchProducts
+            .filter((product) => {
+                const searchableText = [
+                    product?.name,
+                    product?.category,
+                    product?.series,
+                    product?.model,
+                    product?.manufacturer,
+                    product?.casting,
+                    product?.sku,
+                    product?.productID,
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+                return searchableText.includes(normalizedSearchQuery);
+            })
+            .slice(0, 6)
+        : [];
+
+    const getProductId = (product) =>
+        product?.productID ||
+        product?._id ||
+        product?.id ||
+        product?.sku ||
+        product?.name;
+
+    const handleSearchResultClick = (product) => {
+        const productId = getProductId(product);
+
+        if (!productId) {
+            return;
+        }
+
+        setSearchQuery(product?.name || "");
+        setSearchDismissed(true);
+        navigate(`/overview/${encodeURIComponent(productId)}`);
+    };
 
     // =========================================================
     // CLOSE MOBILE MENU ON ROUTE / RESIZE
@@ -436,13 +544,32 @@ export default function Header() {
                             SEARCH
                         ================================================== */}
 
-                        <button
-                            type="button"
-                            aria-label="Search"
-                            onClick={() =>
-                                navigate("/products")
-                            }
-                            className="
+                        <div
+                            ref={searchRef}
+                            className="relative"
+                        >
+                            <button
+                                type="button"
+                                aria-label="Search"
+                                aria-expanded={searchOpen}
+                                onClick={() => {
+                                    setSearchOpen((previous) => {
+                                        const nextOpen = !previous;
+
+                                        if (
+                                            nextOpen &&
+                                            searchProducts.length === 0 &&
+                                            import.meta.env.VITE_API_URL
+                                        ) {
+                                            setSearchLoading(true);
+                                            setSearchError("");
+                                        }
+
+                                        return nextOpen;
+                                    });
+                                    setProfileOpen(false);
+                                }}
+                                className="
                                 flex
                                 h-5
                                 w-5
@@ -456,12 +583,122 @@ export default function Header() {
                                 hover:text-[#FF8F00]
                                 hover:opacity-100
                             "
-                        >
-                            <Search
-                                className="h-full w-full"
-                                strokeWidth={2}
-                            />
-                        </button>
+                            >
+                                <Search
+                                    className="h-full w-full"
+                                    strokeWidth={2}
+                                />
+                            </button>
+
+                            {searchOpen && (
+                                <div className="absolute right-0 top-[calc(100%+18px)] z-[1100] w-[min(420px,calc(100vw-32px))] overflow-hidden rounded-xl border border-[#F5F5DC]/15 bg-[#11110F] shadow-[0_18px_55px_rgba(0,0,0,0.45)]">
+                                    <div className="flex items-center gap-3 border-b border-[#F5F5DC]/10 px-4 py-3">
+                                        <Search
+                                            className="h-4 w-4 shrink-0 text-[#FF8F00]"
+                                            strokeWidth={2}
+                                        />
+                                        <input
+                                            autoFocus
+                                            type="search"
+                                            value={searchQuery}
+                                            onChange={(event) => {
+                                                setSearchQuery(event.target.value);
+                                                setSearchDismissed(false);
+                                            }}
+                                            placeholder="Search die-cast, series, or model..."
+                                            aria-label="Search products"
+                                            className="min-w-0 flex-1 bg-transparent font-['Work_Sans',sans-serif] text-sm text-[#F5F5DC] outline-none placeholder:text-[#F5F5DC]/35"
+                                        />
+                                        {searchQuery && (
+                                            <button
+                                                type="button"
+                                                aria-label="Clear search"
+                                                onClick={() => {
+                                                    setSearchQuery("");
+                                                    setSearchDismissed(false);
+                                                }}
+                                                className="text-[#F5F5DC]/45 transition-colors hover:text-[#FF8F00]"
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    {searchQuery && (
+                                        <div className="max-h-[min(390px,55vh)] overflow-y-auto p-2">
+                                            {searchLoading && (
+                                                <p className="px-3 py-5 text-center text-xs text-[#F5F5DC]/50">
+                                                    Finding products...
+                                                </p>
+                                            )}
+
+                                            {!searchLoading &&
+                                                (searchError ||
+                                                    !import.meta.env.VITE_API_URL) && (
+                                                <p className="px-3 py-5 text-center text-xs text-[#FF8F00]">
+                                                    {searchError ||
+                                                        "Search is temporarily unavailable."}
+                                                </p>
+                                            )}
+
+                                            {!searchLoading &&
+                                                !searchError &&
+                                                import.meta.env.VITE_API_URL &&
+                                                searchResults.length === 0 && (
+                                                    <p className="px-3 py-5 text-center text-xs text-[#F5F5DC]/50">
+                                                        No matching products found.
+                                                    </p>
+                                                )}
+
+                                            {!searchLoading &&
+                                                searchResults.map((product) => {
+                                                    const productId = getProductId(product);
+                                                    const image = Array.isArray(product?.images)
+                                                        ? product.images[0]
+                                                        : null;
+
+                                                    return (
+                                                        <button
+                                                            type="button"
+                                                            key={productId}
+                                                            onClick={() =>
+                                                                handleSearchResultClick(product)
+                                                            }
+                                                            className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[#F5F5DC]/[0.07]"
+                                                        >
+                                                            <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border border-[#F5F5DC]/10 bg-[#F5F5DC]/[0.05]">
+                                                                {image ? (
+                                                                    <img
+                                                                        src={image}
+                                                                        alt=""
+                                                                        className="h-full w-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <Package
+                                                                        size={17}
+                                                                        className="text-[#FF8F00]"
+                                                                    />
+                                                                )}
+                                                            </span>
+                                                            <span className="min-w-0 flex-1">
+                                                                <span className="block truncate text-sm font-medium text-[#F5F5DC] group-hover:text-[#FF8F00]">
+                                                                    {product?.name || "Unnamed product"}
+                                                                </span>
+                                                                <span className="mt-1 block truncate text-[10px] uppercase tracking-[0.08em] text-[#F5F5DC]/40">
+                                                                    {product?.series || product?.category || "Die-cast collectible"}
+                                                                </span>
+                                                            </span>
+                                                            <span className="text-lg text-[#F5F5DC]/25 transition-colors group-hover:text-[#FF8F00]">
+                                                                →
+                                                            </span>
+                                                        </button>
+                                                    );
+                                                })}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
 
                         {/* =================================================
                             CART
