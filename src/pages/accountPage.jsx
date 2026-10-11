@@ -518,7 +518,7 @@ export default function AccountPage() {
                 );
 
                 let profileImage =
-                    user?.profileImage ||
+                    user?.profileImage || user?.profilePicture ||
                     DEFAULT_PROFILE_IMAGE;
 
                 // ------------------------------------------------
@@ -1049,11 +1049,11 @@ export default function AccountPage() {
                                     <div className="mb-5 flex items-center gap-4">
                                         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border-2 border-[#FF8F00] bg-[#F5F5DC]">
                                             {imagePreview ||
-                                            user?.profileImage ? (
+                                            user?.profileImage || user?.profilePicture ? (
                                                 <img
                                                     src={
                                                         imagePreview ||
-                                                        user.profileImage
+                                                        user?.profileImage || user?.profilePicture
                                                     }
                                                     alt="Profile"
                                                     className="h-full w-full object-cover"
