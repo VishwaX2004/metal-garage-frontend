@@ -1319,11 +1319,11 @@ export default function AccountPage() {
                                                     <div className="relative mx-auto h-28 w-28 shrink-0 sm:mx-0">
                                                         <div className="h-full w-full overflow-hidden rounded-3xl border-4 border-white bg-[#0A0A0A] shadow-lg">
                                                             {imagePreview ||
-                                                            user?.profileImage ? (
+                                                            user?.profileImage || user?.profilePicture ? (
                                                                 <img
                                                                     src={
                                                                         imagePreview ||
-                                                                        user.profileImage
+                                                                        user?.profileImage || user?.profilePicture
                                                                     }
                                                                     alt="Profile preview"
                                                                     className="h-full w-full object-cover"
