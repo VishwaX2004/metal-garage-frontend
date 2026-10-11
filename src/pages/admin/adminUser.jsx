@@ -1331,7 +1331,7 @@ export default function AdminUserPage() {
                                                                 "Unknown User";
 
                                                             const image =
-                                                                item.profileImage ||
+                                                                item.profileImage || item.profilePicture ||
                                                                 DEFAULT_PROFILE_IMAGE;
 
                                                             return (
