@@ -810,6 +810,8 @@ export default function Header() {
                                     <div
                                         className="
                                             relative
+                                            isolate
+                                            z-0
                                             flex
                                             h-10
                                             w-10
