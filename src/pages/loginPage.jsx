@@ -89,6 +89,11 @@ export default function LoginPage() {
                     return;
                 }
 
+                // Normalize profile picture field so all components can use profileImage
+                if (loggedUser && !loggedUser.profileImage && loggedUser.profilePicture) {
+                    loggedUser.profileImage = loggedUser.profilePicture;
+                }
+
                 localStorage.setItem('token', token);
                 localStorage.setItem(
                     'user',
@@ -239,6 +244,11 @@ export default function LoginPage() {
                     "Login failed. User information was not received."
                 );
                 return;
+            }
+
+            // Normalize profile picture field so all components can use profileImage
+            if (loggedUser && !loggedUser.profileImage && loggedUser.profilePicture) {
+                loggedUser.profileImage = loggedUser.profilePicture;
             }
 
             localStorage.setItem("token", token);
