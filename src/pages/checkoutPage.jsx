@@ -10,6 +10,11 @@ import {
     ShoppingBag,
     User,
     CreditCard,
+    MapPin,
+    BookmarkPlus,
+    Trash2,
+    ChevronDown,
+    PlusCircle,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
@@ -19,6 +24,8 @@ import toast from "react-hot-toast";
 
 import Header from "../components/header";
 import Footer from "../components/footer";
+
+import { getSavedAddresses, saveAddress, deleteAddress, setDefaultAddress } from '../utils/addressStorage';
 
 /* =========================================================
    SETTINGS
@@ -199,6 +206,11 @@ export default function CheckoutPage() {
         paymentMethod: "PayHere",
     });
 
+    const [savedAddresses, setSavedAddresses] = useState([]);
+    const [selectedAddressId, setSelectedAddressId] = useState(null);
+    const [showAddressDropdown, setShowAddressDropdown] = useState(false);
+    const [saveThisAddress, setSaveThisAddress] = useState(true);
+
     /* =====================================================
        LOAD USER
     ===================================================== */
@@ -224,6 +236,16 @@ export default function CheckoutPage() {
                         "",
                     email: loggedUser.email || current.email || "",
                 }));
+            }
+
+            // Load saved addresses
+            const addresses = getSavedAddresses();
+            setSavedAddresses(addresses);
+
+            // Find and apply default address
+            const defaultAddr = addresses.find(a => a.isDefault) || addresses[0];
+            if (defaultAddr) {
+                applyAddress(defaultAddr);
             }
         };
 
@@ -315,6 +337,48 @@ export default function CheckoutPage() {
             ...current,
             [name]: value,
         }));
+    }
+
+    /* =====================================================
+       APPLY ADDRESS
+    ===================================================== */
+
+    function applyAddress(addr) {
+        const parts = (addr.fullName || '').split(' ');
+        setForm(cur => ({
+            ...cur,
+            firstName: parts[0] || cur.firstName,
+            lastName: parts.slice(1).join(' ') || cur.lastName,
+            phone: addr.phone || cur.phone,
+            email: addr.email || cur.email,
+            address: addr.address || '',
+            city: addr.city || '',
+            province: addr.province || '',
+            postalCode: addr.postalCode || '',
+        }));
+        setSelectedAddressId(addr.id);
+        setShowAddressDropdown(false);
+    }
+
+    /* =====================================================
+       SAVE CURRENT ADDRESS
+    ===================================================== */
+
+    function handleSaveCurrentAddress() {
+        const addr = {
+            fullName: `${form.firstName.trim()} ${form.lastName.trim()}`,
+            phone: form.phone.trim(),
+            email: form.email.trim(),
+            address: form.address.trim(),
+            city: form.city.trim(),
+            province: form.province.trim(),
+            postalCode: form.postalCode.trim(),
+            isDefault: savedAddresses.length === 0,
+        };
+        const saved = saveAddress(addr);
+        setSavedAddresses(getSavedAddresses());
+        setSelectedAddressId(saved.id);
+        toast.success('Address saved!');
     }
 
     /* =====================================================
@@ -546,6 +610,24 @@ export default function CheckoutPage() {
             ================================================= */
 
             if (form.paymentMethod === "PayHere") {
+                if (saveThisAddress) {
+                    const addr = {
+                        fullName: `${form.firstName.trim()} ${form.lastName.trim()}`,
+                        phone: form.phone.trim(),
+                        email: form.email.trim(),
+                        address: form.address.trim(),
+                        city: form.city.trim(),
+                        province: form.province.trim(),
+                        postalCode: form.postalCode.trim(),
+                        isDefault: savedAddresses.length === 0,
+                    };
+                    // Only save if not already saved (avoid duplicates)
+                    const existing = savedAddresses.find(
+                        a => a.address === addr.address && a.city === addr.city && a.phone === addr.phone
+                    );
+                    if (!existing) saveAddress(addr);
+                }
+
                 /*
                  * Do NOT clear cart here.
                  *
@@ -561,13 +643,35 @@ export default function CheckoutPage() {
                CASH ON DELIVERY
             ================================================= */
 
-            clearCart();
+            if (form.paymentMethod === "Cash on Delivery") {
+                if (saveThisAddress) {
+                    const addr = {
+                        fullName: `${form.firstName.trim()} ${form.lastName.trim()}`,
+                        phone: form.phone.trim(),
+                        email: form.email.trim(),
+                        address: form.address.trim(),
+                        city: form.city.trim(),
+                        province: form.province.trim(),
+                        postalCode: form.postalCode.trim(),
+                        isDefault: savedAddresses.length === 0,
+                    };
+                    // Only save if not already saved (avoid duplicates)
+                    const existing = savedAddresses.find(
+                        a => a.address === addr.address && a.city === addr.city && a.phone === addr.phone
+                    );
+                    if (!existing) saveAddress(addr);
+                }
 
-            setCartItems([]);
+                clearCart();
 
-            toast.success("Order placed successfully!");
+                setCartItems([]);
 
-            navigate("/orders");
+                toast.success("Order placed successfully!");
+
+                navigate("/orders");
+
+                return;
+            }
         } catch (error) {
             console.error("Checkout error:", error);
 
@@ -753,6 +857,81 @@ export default function CheckoutPage() {
                                 />
 
                                 <div className="rounded-[6px] border border-black/10 bg-[#F5F5DC] p-6 sm:p-8">
+                                    {/* SAVED ADDRESS SELECTOR */}
+                                    {savedAddresses.length > 0 && (
+                                        <div className="mb-6">
+                                            <div className="checkout-mono mb-2 text-[9px] font-semibold uppercase tracking-[0.1em] text-black/50">
+                                                Saved Addresses
+                                            </div>
+                                            {/* Dropdown toggle button */}
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowAddressDropdown(v => !v)}
+                                                className="flex w-full items-center justify-between rounded-[3px] border border-black/10 bg-transparent px-4 py-3.5 text-[13px] transition hover:border-[#FF8F00]"
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    <MapPin className="h-4 w-4 text-[#FF8F00]" />
+                                                    {selectedAddressId
+                                                        ? (savedAddresses.find(a => a.id === selectedAddressId)?.fullName || 'Selected') + ' — ' + (savedAddresses.find(a => a.id === selectedAddressId)?.address || '')
+                                                        : 'Select a saved address'}
+                                                </span>
+                                                <ChevronDown className={`h-4 w-4 transition-transform ${showAddressDropdown ? 'rotate-180' : ''}`} />
+                                            </button>
+                                            {/* Dropdown list */}
+                                            {showAddressDropdown && (
+                                                <div className="mt-1 rounded-[3px] border border-black/10 bg-white shadow-lg">
+                                                    {savedAddresses.map(addr => (
+                                                        <div
+                                                            key={addr.id}
+                                                            className={`flex cursor-pointer items-center justify-between px-4 py-3 text-[12px] hover:bg-[#FF8F00]/10 ${
+                                                                addr.id === selectedAddressId ? 'bg-[#FF8F00]/10 font-semibold' : ''
+                                                            }`}
+                                                        >
+                                                            <span onClick={() => applyAddress(addr)} className="flex-1">
+                                                                <span className="font-semibold">{addr.fullName}</span>{' '}
+                                                                <span className="text-black/50">{addr.address}, {addr.city}</span>
+                                                                {addr.isDefault && (
+                                                                    <span className="ml-2 rounded bg-[#FF8F00]/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#FF8F00]">
+                                                                        Default
+                                                                    </span>
+                                                                )}
+                                                            </span>
+                                                            <div className="ml-3 flex items-center gap-2">
+                                                                {!addr.isDefault && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={e => { e.stopPropagation(); setDefaultAddress(addr.id); setSavedAddresses(getSavedAddresses()); toast.success('Default address updated'); }}
+                                                                        className="rounded px-2 py-1 text-[9px] uppercase tracking-wide text-black/40 hover:text-[#FF8F00]"
+                                                                        title="Set as default"
+                                                                    >
+                                                                        Set Default
+                                                                    </button>
+                                                                )}
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={e => { e.stopPropagation(); deleteAddress(addr.id); setSavedAddresses(getSavedAddresses()); if (selectedAddressId === addr.id) setSelectedAddressId(null); toast.success('Address removed'); }}
+                                                                    className="rounded p-1 text-black/30 hover:text-red-500"
+                                                                    title="Delete address"
+                                                                >
+                                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                    {/* Add new address option in dropdown */}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => { setSelectedAddressId(null); setShowAddressDropdown(false); setForm(cur => ({ ...cur, address: '', city: '', province: '', postalCode: '' })); }}
+                                                        className="flex w-full items-center gap-2 border-t border-black/5 px-4 py-3 text-[12px] text-[#FF8F00] hover:bg-[#FF8F00]/5"
+                                                    >
+                                                        <PlusCircle className="h-4 w-4" />
+                                                        Enter a new address
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
                                     <InputField
                                         label="Address"
                                         name="address"
@@ -785,6 +964,29 @@ export default function CheckoutPage() {
                                             onChange={handleChange}
                                             placeholder="Postal code"
                                         />
+                                    </div>
+
+                                    {/* SAVE ADDRESS CHECKBOX */}
+                                    <div className="mt-5 flex items-center gap-3">
+                                        <input
+                                            type="checkbox"
+                                            id="saveAddress"
+                                            checked={saveThisAddress}
+                                            onChange={e => setSaveThisAddress(e.target.checked)}
+                                            className="h-4 w-4 rounded accent-[#FF8F00]"
+                                        />
+                                        <label htmlFor="saveAddress" className="text-[12px] text-black/60 cursor-pointer">
+                                            Save this address for future orders
+                                        </label>
+                                        {/* Manual save button if they don't want to wait for order */}
+                                        <button
+                                            type="button"
+                                            onClick={handleSaveCurrentAddress}
+                                            className="ml-auto flex items-center gap-1.5 rounded-[3px] border border-black/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-black/50 transition hover:border-[#FF8F00] hover:text-[#FF8F00]"
+                                        >
+                                            <BookmarkPlus className="h-3.5 w-3.5" />
+                                            Save Now
+                                        </button>
                                     </div>
                                 </div>
                             </div>
