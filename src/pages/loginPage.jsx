@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 import {
     ArrowLeft,
     ArrowRight,
@@ -15,8 +16,119 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
 
     const navigate = useNavigate();
+
+    /*
+     * ============================================================
+     * GOOGLE LOGIN SETUP
+     * ============================================================
+     */
+    const triggerGoogleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            try {
+                setGoogleLoading(true);
+
+                const res = await fetch(
+                    'https://www.googleapis.com/oauth2/v3/userinfo',
+                    {
+                        headers: {
+                            Authorization: `Bearer ${tokenResponse.access_token}`,
+                        },
+                    }
+                );
+                const profile = await res.json();
+
+                const apiUrl = import.meta.env.VITE_API_URL;
+
+                if (!apiUrl) {
+                    throw new Error(
+                        'VITE_API_URL is not configured.'
+                    );
+                }
+
+                const response = await axios.post(
+                    `${apiUrl}/api/users/google-login`,
+                    {
+                        email: profile.email,
+                        name: profile.name,
+                        googleId: profile.sub,
+                        profilePicture: profile.picture,
+                    }
+                );
+
+                const token = response.data?.token;
+                const loggedUser = response.data?.user;
+
+                if (!token) {
+                    toast.error(
+                        'Google login failed. Authentication token was not received.'
+                    );
+                    return;
+                }
+
+                if (!loggedUser) {
+                    toast.error(
+                        'Google login failed. User information was not received.'
+                    );
+                    return;
+                }
+
+                localStorage.setItem('token', token);
+                localStorage.setItem(
+                    'user',
+                    JSON.stringify(loggedUser)
+                );
+                localStorage.setItem(
+                    'currentUser',
+                    JSON.stringify(loggedUser)
+                );
+
+                window.dispatchEvent(
+                    new CustomEvent('authUpdated', {
+                        detail: loggedUser,
+                    })
+                );
+
+                toast.success('Logged in with Google!');
+
+                if (loggedUser.role === 'admin') {
+                    navigate('/admin', {
+                        replace: true,
+                    });
+                } else {
+                    navigate('/', {
+                        replace: true,
+                    });
+                }
+            } catch (error) {
+                console.error('Google Login Error:', error);
+
+                if (error?.response) {
+                    toast.error(
+                        error.response.data?.message ||
+                            'Google login failed.'
+                    );
+                } else if (error?.request) {
+                    toast.error(
+                        'Cannot connect to the server.'
+                    );
+                } else {
+                    toast.error(
+                        error?.message ||
+                            'Google sign-in failed.'
+                    );
+                }
+            } finally {
+                setGoogleLoading(false);
+            }
+        },
+        onError: () =>
+            toast.error(
+                'Google sign-in was cancelled or failed.'
+            ),
+    });
 
     /*
      * ============================================================
@@ -500,7 +612,9 @@ export default function LoginPage() {
                                     {/* GOOGLE */}
                                     <button
                                         type="button"
-                                        className="mb-5 flex w-full items-center justify-center gap-2 rounded-md border-[1.5px] border-[#0A0A0A]/10 bg-transparent px-3 py-2.5 text-[12px] font-semibold text-[#0A0A0A] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#0A0A0A] hover:bg-[#0A0A0A]/[0.03]"
+                                        onClick={triggerGoogleLogin}
+                                        disabled={googleLoading}
+                                        className="mb-5 flex w-full items-center justify-center gap-2 rounded-md border-[1.5px] border-[#0A0A0A]/10 bg-transparent px-3 py-2.5 text-[12px] font-semibold text-[#0A0A0A] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#0A0A0A] hover:bg-[#0A0A0A]/[0.03] disabled:cursor-not-allowed disabled:opacity-60"
                                     >
                                         <svg
                                             viewBox="0 0 24 24"
@@ -524,7 +638,7 @@ export default function LoginPage() {
                                             />
                                         </svg>
 
-                                        Google
+                                        {googleLoading ? 'Signing in...' : 'Google'}
                                     </button>
 
                                     {/* TERMS */}
