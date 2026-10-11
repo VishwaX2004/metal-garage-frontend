@@ -841,9 +841,13 @@ export default function Header() {
                                                 ) => {
                                                     event.currentTarget.style.display =
                                                         "none";
+                                                    event.currentTarget.parentElement.innerHTML = 
+                                                        `<span class="text-[12px] font-bold tracking-wide text-[#FFB04D]">${getUserInitials()}</span>`;
                                                 }}
                                             />
-                                        ) : (
+                                        ) : null}
+                                        
+                                        {!userImage && (
                                             <span className="text-[12px] font-bold tracking-wide text-[#FFB04D]">
                                                 {getUserInitials()}
                                             </span>
