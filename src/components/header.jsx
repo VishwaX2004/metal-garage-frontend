@@ -83,7 +83,10 @@ export default function Header() {
 
     const getStoredUser = () => {
         try {
-            const storedUser = localStorage.getItem("user");
+            // Support both storage keys used by the existing authentication flows.
+            const storedUser =
+                localStorage.getItem("user") ||
+                localStorage.getItem("currentUser");
 
             if (!storedUser) {
                 setUser(null);
@@ -193,15 +196,35 @@ export default function Header() {
             return null;
         }
 
-        return (
-            user.profileImage ||
-            user.profilePicture ||
-            user.avatar ||
-            user.image ||
-            user.photoURL ||
-            user.picture ||
-            null
-        );
+        // Google sign-in libraries and backend APIs use different names
+        // for the same Google account profile-photo URL. Check common names
+        // at the top level and in nested Google/profile objects.
+        const candidates = [
+            user.profileImage,
+            user.profilePicture,
+            user.profilePic,
+            user.avatarUrl,
+            user.avatarURL,
+            user.avatar,
+            user.imageUrl,
+            user.imageURL,
+            user.image,
+            user.photoURL,
+            user.photoUrl,
+            user.picture,
+            user.googlePicture,
+            user.googleImage,
+            user.google?.picture,
+            user.google?.photoURL,
+            user.google?.image,
+            user.profile?.picture,
+            user.profile?.photoURL,
+            user.profile?.image,
+        ];
+
+        return candidates.find(
+            (value) => typeof value === "string" && value.trim().length > 0
+        ) || null;
     };
 
     // =========================================================
@@ -836,13 +859,8 @@ export default function Header() {
                                                     w-full
                                                     object-cover
                                                 "
-                                                onError={(
-                                                    event
-                                                ) => {
-                                                    event.currentTarget.style.display =
-                                                        "none";
-                                                    event.currentTarget.parentElement.innerHTML = 
-                                                        `<span class="text-[12px] font-bold tracking-wide text-[#FFB04D]">${getUserInitials()}</span>`;
+                                                onError={(event) => {
+                                                    event.currentTarget.style.display = "none";
                                                 }}
                                             />
                                         ) : null}
