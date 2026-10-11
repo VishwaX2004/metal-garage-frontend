@@ -30,7 +30,8 @@ export default function LoginPage() {
             try {
                 setGoogleLoading(true);
 
-                const res = await fetch(
+                // Fetch user profile from Google
+                const profileRes = await fetch(
                     'https://www.googleapis.com/oauth2/v3/userinfo',
                     {
                         headers: {
@@ -38,7 +39,12 @@ export default function LoginPage() {
                         },
                     }
                 );
-                const profile = await res.json();
+
+                if (!profileRes.ok) {
+                    throw new Error('Failed to fetch Google profile');
+                }
+
+                const profile = await profileRes.json();
 
                 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -47,6 +53,14 @@ export default function LoginPage() {
                         'VITE_API_URL is not configured.'
                     );
                 }
+
+                // Log the request being sent for debugging
+                console.log('Sending Google login request:', {
+                    email: profile.email,
+                    name: profile.name,
+                    googleId: profile.sub,
+                    profilePicture: profile.picture,
+                });
 
                 const response = await axios.post(
                     `${apiUrl}/api/users/google-login`,
@@ -106,28 +120,38 @@ export default function LoginPage() {
                 console.error('Google Login Error:', error);
 
                 if (error?.response) {
-                    toast.error(
-                        error.response.data?.message ||
-                            'Google login failed.'
-                    );
+                    // Backend returned an error response
+                    const errorMessage = error.response.data?.message || 
+                        error.response.data?.error ||
+                        `Server error (${error.response.status})`;
+                    
+                    console.error('Backend error details:', error.response.data);
+                    toast.error(errorMessage);
                 } else if (error?.request) {
+                    // Request was made but no response received
                     toast.error(
-                        'Cannot connect to the server.'
+                        'Cannot connect to the server. Check your internet connection.'
                     );
+                } else if (error?.message === 'Failed to fetch Google profile') {
+                    // Failed to get Google profile
+                    toast.error('Failed to fetch your Google profile. Please try again.');
                 } else {
+                    // Other errors
                     toast.error(
                         error?.message ||
-                            'Google sign-in failed.'
+                            'Google sign-in failed. Please try again.'
                     );
                 }
             } finally {
                 setGoogleLoading(false);
             }
         },
-        onError: () =>
+        onError: (error) => {
+            console.error('Google OAuth Error:', error);
             toast.error(
-                'Google sign-in was cancelled or failed.'
-            ),
+                'Google sign-in was cancelled or failed. Please try again.'
+            );
+        },
     });
 
     /*
