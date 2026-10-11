@@ -226,7 +226,7 @@ function AdminUserFormModal({
             user?.isEmailVerified
         ),
         profileImage:
-            user?.profileImage ||
+            user?.profileImage || user?.profilePicture ||
             DEFAULT_PROFILE_IMAGE,
     });
 
