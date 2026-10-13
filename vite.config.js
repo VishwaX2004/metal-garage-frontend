@@ -19,13 +19,25 @@ export default defineConfig({
     target: 'esnext',
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-framer': ['framer-motion'],
-          'vendor-google': ['@react-oauth/google'],
-          'vendor-ui': ['lucide-react', 'react-icons', 'react-hot-toast'],
-          'vendor-http': ['axios'],
-          'vendor-supabase': ['@supabase/supabase-js'],
+        manualChunks(id) {
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
+            return 'vendor-react';
+          }
+          if (id.includes('node_modules/framer-motion')) {
+            return 'vendor-framer';
+          }
+          if (id.includes('node_modules/@react-oauth/google')) {
+            return 'vendor-google';
+          }
+          if (id.includes('node_modules/lucide-react') || id.includes('node_modules/react-icons') || id.includes('node_modules/react-hot-toast')) {
+            return 'vendor-ui';
+          }
+          if (id.includes('node_modules/axios')) {
+            return 'vendor-http';
+          }
+          if (id.includes('node_modules/@supabase')) {
+            return 'vendor-supabase';
+          }
         },
       },
     },
