@@ -13,8 +13,6 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
 
-
-
 const NAV_LINKS = [
     { name: "Home", path: "/" },
     { name: "Shop", path: "/products" },
