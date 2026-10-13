@@ -6,31 +6,33 @@ import {
     Routes,
 } from "react-router-dom";
 
+import { lazy, Suspense } from "react";
 import { Toaster } from "react-hot-toast";
+import { Loader } from "./components/loader";
 
 // ============================================================
-// MAIN PAGES
+// MAIN PAGES (LAZY LOADED)
 // ============================================================
 
-import HomePage from "./pages/homePage";
-import LoginPage from "./pages/loginPage";
-import AdminPage from "./pages/adminPage";
-import ProductPage from "./pages/productPage";
-import CartPage from "./pages/cartPage";
-import AboutPage from "./pages/aboutPage";
-import ProductOverview from "./pages/productOverview";
-import CheckoutPage from "./pages/checkoutPage";
-import OrderPage from "./pages/orderPage";
-import ContactPage from "./pages/contactPage";
-import RegisterPage from "./pages/registerPage";
-import AccountPage from "./pages/accountPage";
+const HomePage = lazy(() => import("./pages/homePage"));
+const LoginPage = lazy(() => import("./pages/loginPage"));
+const AdminPage = lazy(() => import("./pages/adminPage"));
+const ProductPage = lazy(() => import("./pages/productPage"));
+const CartPage = lazy(() => import("./pages/cartPage"));
+const AboutPage = lazy(() => import("./pages/aboutPage"));
+const ProductOverview = lazy(() => import("./pages/productOverview"));
+const CheckoutPage = lazy(() => import("./pages/checkoutPage"));
+const OrderPage = lazy(() => import("./pages/orderPage"));
+const ContactPage = lazy(() => import("./pages/contactPage"));
+const RegisterPage = lazy(() => import("./pages/registerPage"));
+const AccountPage = lazy(() => import("./pages/accountPage"));
 
 // ============================================================
-// PAYHERE PAGES
+// PAYHERE PAGES (LAZY LOADED)
 // ============================================================
 
-import PaymentSuccess from "./pages/paymentSuccess";
-import PaymentCancel from "./pages/paymentCancel";
+const PaymentSuccess = lazy(() => import("./pages/paymentSuccess"));
+const PaymentCancel = lazy(() => import("./pages/paymentCancel"));
 
 // ============================================================
 // APP
@@ -49,10 +51,11 @@ export default function App() {
             />
 
             {/* =================================================
-                APPLICATION ROUTES
+                APPLICATION ROUTES WITH SUSPENSE
             ================================================== */}
 
-            <Routes>
+            <Suspense fallback={<div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center'}}><Loader /></div>}>
+                <Routes>
                 {/* HOME */}
                 <Route
                     path="/"
@@ -168,6 +171,7 @@ export default function App() {
                     }
                 />
             </Routes>
+            </Suspense>
         </BrowserRouter>
     );
 }

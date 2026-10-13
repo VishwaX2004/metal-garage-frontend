@@ -11,9 +11,22 @@ import {
     Menu,
     X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
 
-export default function Header() {
+// =========================================================
+// MODULE LEVEL CONSTANTS
+// =========================================================
+
+const NAV_LINKS = [
+    { name: "Home", path: "/" },
+    { name: "Shop", path: "/products" },
+    { name: "About", path: "/about" },
+    { name: "Contact", path: "/contact" },
+    { name: "Cart", path: "/cart" },
+    { name: "Orders", path: "/orders" },
+];
+
+function Header() {
     const navigate = useNavigate();
 
     const [cartCount, setCartCount] = useState(0);
@@ -22,6 +35,7 @@ export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedQuery, setDebouncedQuery] = useState("");
     const [searchProducts, setSearchProducts] = useState([]);
     const [searchLoading, setSearchLoading] = useState(false);
     const [searchError, setSearchError] = useState("");
@@ -29,21 +43,14 @@ export default function Header() {
 
     const profileRef = useRef(null);
     const searchRef = useRef(null);
-
-    const navLinks = [
-        { name: "Home", path: "/" },
-        { name: "Shop", path: "/products" },
-        { name: "About", path: "/about" },
-        { name: "Contact", path: "/contact" },
-        { name: "Cart", path: "/cart" },
-        { name: "Orders", path: "/orders" },
-    ];
+    const searchDebounceRef = useRef(null);
+    const searchDebounceRef = useRef(null);
 
     // =========================================================
     // CART COUNT
     // =========================================================
 
-    const updateCartCount = () => {
+    const updateCartCount = useCallback(() => {
         try {
             const storedCart = localStorage.getItem("cart");
 
@@ -75,13 +82,13 @@ export default function Header() {
             console.error("Unable to read cart:", error);
             setCartCount(0);
         }
-    };
+    }, []);
 
     // =========================================================
     // GET STORED USER
     // =========================================================
 
-    const getStoredUser = () => {
+    const getStoredUser = useCallback(() => {
         try {
             // Support both storage keys used by the existing authentication flows.
             const storedUser =
@@ -107,125 +114,7 @@ export default function Header() {
             console.error("Unable to read stored user:", error);
             setUser(null);
         }
-    };
-
-    // =========================================================
-    // USER NAME
-    // =========================================================
-
-    const getUserName = () => {
-        if (!user) {
-            return "Account";
-        }
-
-        const firstName =
-            typeof user.firstName === "string"
-                ? user.firstName.trim()
-                : "";
-
-        const lastName =
-            typeof user.lastName === "string"
-                ? user.lastName.trim()
-                : "";
-
-        const fullName =
-            `${firstName} ${lastName}`.trim();
-
-        if (fullName) {
-            return fullName;
-        }
-
-        if (
-            typeof user.name === "string" &&
-            user.name.trim()
-        ) {
-            return user.name.trim();
-        }
-
-        if (
-            typeof user.username === "string" &&
-            user.username.trim()
-        ) {
-            return user.username.trim();
-        }
-
-        if (
-            typeof user.email === "string" &&
-            user.email.trim()
-        ) {
-            return user.email.split("@")[0];
-        }
-
-        return "Collector";
-    };
-
-    // =========================================================
-    // USER INITIALS
-    // =========================================================
-
-    const getUserInitials = () => {
-        const name = getUserName();
-
-        if (!name || name === "Account") {
-            return "MG";
-        }
-
-        const parts = name
-            .trim()
-            .split(/\s+/)
-            .filter(Boolean);
-
-        if (parts.length >= 2) {
-            return (
-                parts[0].charAt(0) +
-                parts[parts.length - 1].charAt(0)
-            ).toUpperCase();
-        }
-
-        return name
-            .substring(0, 2)
-            .toUpperCase();
-    };
-
-    // =========================================================
-    // USER IMAGE
-    // =========================================================
-
-    const getUserImage = () => {
-        if (!user) {
-            return null;
-        }
-
-        // Google sign-in libraries and backend APIs use different names
-        // for the same Google account profile-photo URL. Check common names
-        // at the top level and in nested Google/profile objects.
-        const candidates = [
-            user.profileImage,
-            user.profilePicture,
-            user.profilePic,
-            user.avatarUrl,
-            user.avatarURL,
-            user.avatar,
-            user.imageUrl,
-            user.imageURL,
-            user.image,
-            user.photoURL,
-            user.photoUrl,
-            user.picture,
-            user.googlePicture,
-            user.googleImage,
-            user.google?.picture,
-            user.google?.photoURL,
-            user.google?.image,
-            user.profile?.picture,
-            user.profile?.photoURL,
-            user.profile?.image,
-        ];
-
-        return candidates.find(
-            (value) => typeof value === "string" && value.trim().length > 0
-        ) || null;
-    };
+    }, []);
 
     // =========================================================
     // LOGOUT
@@ -402,10 +291,14 @@ export default function Header() {
         return () => controller.abort();
     }, [searchOpen, searchProducts.length]);
 
-    const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+    const normalizedSearchQuery = debouncedQuery.trim().toLowerCase();
 
-    const searchResults = normalizedSearchQuery && !searchDismissed
-        ? searchProducts
+    const searchResults = useMemo(() => {
+        if (!normalizedSearchQuery || searchDismissed) {
+            return [];
+        }
+
+        return searchProducts
             .filter((product) => {
                 const searchableText = [
                     product?.name,
@@ -423,8 +316,8 @@ export default function Header() {
 
                 return searchableText.includes(normalizedSearchQuery);
             })
-            .slice(0, 6)
-        : [];
+            .slice(0, 6);
+    }, [normalizedSearchQuery, searchDismissed, searchProducts]);
 
     const getProductId = (product) =>
         product?.productID ||
@@ -469,8 +362,141 @@ export default function Header() {
         };
     }, []);
 
-    const userImage = getUserImage();
-    const userName = getUserName();
+    // =========================================================
+    // MEMOIZED USER DATA
+    // =========================================================
+
+    const userName = useMemo(() => {
+        if (!user) {
+            return "Account";
+        }
+
+        const firstName =
+            typeof user.firstName === "string"
+                ? user.firstName.trim()
+                : "";
+
+        const lastName =
+            typeof user.lastName === "string"
+                ? user.lastName.trim()
+                : "";
+
+        const fullName =
+            `${firstName} ${lastName}`.trim();
+
+        if (fullName) {
+            return fullName;
+        }
+
+        if (
+            typeof user.name === "string" &&
+            user.name.trim()
+        ) {
+            return user.name.trim();
+        }
+
+        if (
+            typeof user.username === "string" &&
+            user.username.trim()
+        ) {
+            return user.username.trim();
+        }
+
+        if (
+            typeof user.email === "string" &&
+            user.email.trim()
+        ) {
+            return user.email.split("@")[0];
+        }
+
+        return "Collector";
+    }, [user]);
+
+    const userInitials = useMemo(() => {
+        const name = userName;
+
+        if (!name || name === "Account") {
+            return "MG";
+        }
+
+        const parts = name
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+
+        if (parts.length >= 2) {
+            return (
+                parts[0].charAt(0) +
+                parts[parts.length - 1].charAt(0)
+            ).toUpperCase();
+        }
+
+        return name
+            .substring(0, 2)
+            .toUpperCase();
+    }, [userName]);
+
+    const userImage = useMemo(() => {
+        if (!user) {
+            return null;
+        }
+
+        // Google sign-in libraries and backend APIs use different names
+        // for the same Google account profile-photo URL. Check common names
+        // at the top level and in nested Google/profile objects.
+        const candidates = [
+            user.profileImage,
+            user.profilePicture,
+            user.profilePic,
+            user.avatarUrl,
+            user.avatarURL,
+            user.avatar,
+            user.imageUrl,
+            user.imageURL,
+            user.image,
+            user.photoURL,
+            user.photoUrl,
+            user.picture,
+            user.googlePicture,
+            user.googleImage,
+            user.google?.picture,
+            user.google?.photoURL,
+            user.google?.image,
+            user.profile?.picture,
+            user.profile?.photoURL,
+            user.profile?.image,
+        ];
+
+        return candidates.find(
+            (value) => typeof value === "string" && value.trim().length > 0
+        ) || null;
+    }, [user]);
+
+    // =========================================================
+    // SEARCH DEBOUNCE
+    // =========================================================
+
+    const [debouncedQuery, setDebouncedQuery] = useState("");
+
+    const handleSearchInputChange = useCallback((event) => {
+        const value = event.target.value;
+        setSearchQuery(value);
+        setSearchDismissed(false);
+
+        clearTimeout(searchDebounceRef.current);
+        searchDebounceRef.current = setTimeout(() => {
+            setDebouncedQuery(value);
+        }, 300);
+    }, []);
+
+    // Cleanup debounce timer on unmount
+    useEffect(() => {
+        return () => {
+            if (searchDebounceRef.current) {
+                clearTimeout(searchDebounceRef.current);
+            }
+        };
+    }, []);
 
     return (
         <>
@@ -504,7 +530,7 @@ export default function Header() {
                     <div className="hidden lg:flex items-center">
                         <ul className="m-0 flex list-none items-center gap-[30px] p-0">
 
-                            {navLinks.map((link) => (
+                            {NAV_LINKS.map((link) => (
                                 <li key={link.name}>
                                     <NavLink
                                         to={link.path}
@@ -624,10 +650,7 @@ export default function Header() {
                                             autoFocus
                                             type="search"
                                             value={searchQuery}
-                                            onChange={(event) => {
-                                                setSearchQuery(event.target.value);
-                                                setSearchDismissed(false);
-                                            }}
+                                            onChange={handleSearchInputChange}
                                             placeholder="Search die-cast, series, or model..."
                                             aria-label="Search products"
                                             className="min-w-0 flex-1 bg-transparent font-['Work_Sans',sans-serif] text-sm text-[#F5F5DC] outline-none placeholder:text-[#F5F5DC]/35"
@@ -867,7 +890,7 @@ export default function Header() {
                                         
                                         {!userImage && (
                                             <span className="text-[12px] font-bold tracking-wide text-[#FFB04D]">
-                                                {getUserInitials()}
+                                                {userInitials}
                                             </span>
                                         )}
 
@@ -1018,7 +1041,7 @@ export default function Header() {
                                                         />
                                                     ) : (
                                                         <span className="text-sm font-bold text-[#FFB04D]">
-                                                            {getUserInitials()}
+                                                            {userInitials}
                                                         </span>
                                                     )}
 
@@ -1477,7 +1500,7 @@ export default function Header() {
                 {mobileMenuOpen && (
                     <div className="border-t border-[rgba(245,245,220,0.1)] bg-[#0A0A0A] px-5 pb-5 pt-3 lg:hidden">
                         <ul className="m-0 flex list-none flex-col gap-1 p-0">
-                            {navLinks.map((link) => (
+                            {NAV_LINKS.map((link) => (
                                 <li key={link.name}>
                                     <NavLink
                                         to={link.path}
@@ -1507,3 +1530,5 @@ export default function Header() {
         </>
     );
 }
+
+export default memo(Header);

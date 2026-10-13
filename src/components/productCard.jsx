@@ -5,13 +5,13 @@ import {
     ImageOff,
     Check,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const CART_STORAGE_KEY = "cart";
 
-export default function ProdcutCard({ product }) {
+function ProdcutCard({ product }) {
     const navigate = useNavigate();
 
     // =========================================================
@@ -100,7 +100,7 @@ export default function ProdcutCard({ product }) {
     // PRODUCT NAVIGATION
     // =========================================================
 
-    const handleProductClick = () => {
+    const handleProductClick = useCallback(() => {
         if (!productID) {
             toast.error("Product ID is missing.");
             return;
@@ -109,28 +109,28 @@ export default function ProdcutCard({ product }) {
         navigate(
             `/overview/${encodeURIComponent(productID)}`
         );
-    };
+    }, [navigate, productID]);
 
     // =========================================================
     // IMAGE HANDLERS
     // =========================================================
 
-    const handleImageError = () => {
+    const handleImageError = useCallback(() => {
         setImageError(true);
-    };
+    }, []);
 
-    const handleImageChange = (event, index) => {
+    const handleImageChange = useCallback((event, index) => {
         event.stopPropagation();
 
         setImageIndex(index);
         setImageError(false);
-    };
+    }, []);
 
     // =========================================================
     // ADD TO CART
     // =========================================================
 
-    const handleAddToCart = (event) => {
+    const handleAddToCart = useCallback((event) => {
         event.stopPropagation();
 
         if (isAdding) {
@@ -293,19 +293,19 @@ export default function ProdcutCard({ product }) {
 
             setIsAdding(false);
         }
-    };
+    }, [productID, isAdding, isOutOfStock, productName, product]);
 
     // =========================================================
     // WISHLIST
     // =========================================================
 
-    const handleWishlist = (event) => {
+    const handleWishlist = useCallback((event) => {
         event.stopPropagation();
 
         toast.success(
             `${productName} wishlist feature ready.`
         );
-    };
+    }, [productName]);
 
     // =========================================================
     // RETURN
@@ -883,3 +883,5 @@ export default function ProdcutCard({ product }) {
         </article>
     );
 }
+
+export default memo(ProdcutCard);

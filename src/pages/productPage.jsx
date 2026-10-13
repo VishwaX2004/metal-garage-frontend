@@ -13,6 +13,8 @@ import { Loader } from "../components/loader";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import ProdcutCard from "../components/productCard";
+import ProductCardSkeleton from "../components/productCardSkeleton";
+import ProductCardSkeleton from "../components/productCardSkeleton";
 
 
 export default function ProductPage() {
@@ -1825,14 +1827,10 @@ export default function ProductPage() {
                                     >
 
                                         {
-                                            paginatedProducts.map(
-                                                (item) => (
-
+                                            isLoading ? (
+                                                Array.from({ length: 9 }).map((_, index) => (
                                                     <div
-                                                        key={
-                                                            item.productID ||
-                                                            item._id
-                                                        }
+                                                        key={index}
                                                         className={`
                                                             flex
                                                             ${
@@ -1842,13 +1840,35 @@ export default function ProductPage() {
                                                             }
                                                         `}
                                                     >
-
-                                                        <ProdcutCard
-                                                            product={item}
-                                                        />
-
+                                                        <ProductCardSkeleton />
                                                     </div>
+                                                ))
+                                            ) : (
+                                                paginatedProducts.map(
+                                                    (item) => (
 
+                                                        <div
+                                                            key={
+                                                                item.productID ||
+                                                                item._id
+                                                            }
+                                                            className={`
+                                                                flex
+                                                                ${
+                                                                    viewMode === "grid"
+                                                                        ? "justify-center"
+                                                                        : "justify-start"
+                                                                }
+                                                            `}
+                                                        >
+
+                                                            <ProdcutCard
+                                                                product={item}
+                                                            />
+
+                                                        </div>
+
+                                                    )
                                                 )
                                             )
                                         }
