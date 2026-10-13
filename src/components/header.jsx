@@ -13,9 +13,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
 
-// =========================================================
-// MODULE LEVEL CONSTANTS
-// =========================================================
+
 
 const NAV_LINKS = [
     { name: "Home", path: "/" },
