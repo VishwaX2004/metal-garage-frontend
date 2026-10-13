@@ -44,7 +44,6 @@ function Header() {
     const profileRef = useRef(null);
     const searchRef = useRef(null);
     const searchDebounceRef = useRef(null);
-    const searchDebounceRef = useRef(null);
 
     // =========================================================
     // CART COUNT
@@ -475,8 +474,6 @@ function Header() {
     // =========================================================
     // SEARCH DEBOUNCE
     // =========================================================
-
-    const [debouncedQuery, setDebouncedQuery] = useState("");
 
     const handleSearchInputChange = useCallback((event) => {
         const value = event.target.value;
