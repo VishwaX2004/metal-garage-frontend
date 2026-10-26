@@ -197,6 +197,11 @@ export default function AdminAccountSettings() {
 
             // Refresh admin data
             await fetchAdminData();
+
+            // Navigate to admin dashboard after 1 second
+            setTimeout(() => {
+                navigate("/admin");
+            }, 1000);
         } catch (error) {
             console.error("Error updating profile:", error);
             toast.error(
