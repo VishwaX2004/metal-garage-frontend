@@ -1682,7 +1682,12 @@ export default function AdminOrders() {
                                                                         order._id ||
                                                                         index
                                                                     }
-                                                                    className="metal-row border-b border-black/[0.07] hover:bg-[#ECE8D6]"
+                                                                    onClick={() =>
+                                                                        setSelectedOrder(
+                                                                            order
+                                                                        )
+                                                                    }
+                                                                    className="metal-row cursor-pointer border-b border-black/[0.07] hover:bg-[#ECE8D6]"
                                                                     style={{
                                                                         animationDelay: `${index * 30}ms`,
                                                                     }}
