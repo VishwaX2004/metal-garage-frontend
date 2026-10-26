@@ -49,7 +49,7 @@ export default function AdminAccountSettings() {
             }
 
             const response = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/users/profile`,
+                `${import.meta.env.VITE_API_URL}/api/users/me`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -148,7 +148,7 @@ export default function AdminAccountSettings() {
             const response = await axios.put(
                 `${
                     import.meta.env.VITE_API_URL
-                }/api/users/profile/update`,
+                }/api/users/me`,
                 payload,
                 {
                     headers: {
