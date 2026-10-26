@@ -736,7 +736,7 @@ export default function ProductOverview() {
                                 <span className="text-white/40">/</span>
 
                                 <Link
-                                    to="/product"
+                                    to="/products"
                                     className="mg-mono shrink-0 text-xs font-semibold text-white/75 transition-colors hover:text-[#FF8F00]"
                                 >
                                     Collection
