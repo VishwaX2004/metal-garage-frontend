@@ -1515,30 +1515,7 @@ export default function AdminUserPage() {
                                                                                 <FaRegEdit />
                                                                             </button>
 
-                                                                            <button
-                                                                                type="button"
-                                                                                title={
-                                                                                    item.isBlock
-                                                                                        ? "Unblock user"
-                                                                                        : "Block user"
-                                                                                }
-                                                                                onClick={() =>
-                                                                                    openEditUser(
-                                                                                        item
-                                                                                    )
-                                                                                }
-                                                                                className={`flex h-[31px] w-[31px] items-center justify-center rounded-[6px] ${
-                                                                                    item.isBlock
-                                                                                        ? "text-[#2F7A45] hover:bg-[#2F7A45]/10"
-                                                                                        : "text-[#FF8F00] hover:bg-[#FF8F00]/10"
-                                                                                }`}
-                                                                            >
-                                                                                {item.isBlock ? (
-                                                                                    <FaCheckCircle />
-                                                                                ) : (
-                                                                                    <FaBan />
-                                                                                )}
-                                                                            </button>
+
 
                                                                             <button
                                                                                 type="button"
