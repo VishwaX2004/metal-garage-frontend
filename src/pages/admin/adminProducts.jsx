@@ -200,6 +200,7 @@ export default function AdminProductPage() {
 
     useEffect(() => {
         fetchProducts();
+        window.scrollTo(0, 0);
     }, []);
 
     /*
