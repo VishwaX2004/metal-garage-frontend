@@ -29,3 +29,195 @@ body {
 * {
   box-sizing: border-box;
 }
+
+@layer utilities {
+  /* KEYFRAMES */
+  @keyframes mgFloat {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -7px, 0); }
+  }
+
+  @keyframes mgPulse {
+    0%, 100% { opacity: 0.65; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes mgSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes mgFadeUp {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 22px, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes mgFadeDown {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, -20px, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes mgFadeLeft {
+    0% {
+      opacity: 0;
+      transform: translate3d(-25px, 0, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes mgFadeRight {
+    0% {
+      opacity: 0;
+      transform: translate3d(25px, 0, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes mgScaleIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes mgScaleSoft {
+    0% {
+      transform: scale(0.98);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes mgRevealLine {
+    0% {
+      transform: scaleX(0);
+      transform-origin: left;
+      opacity: 0;
+    }
+    100% {
+      transform: scaleX(1);
+      transform-origin: left;
+      opacity: 1;
+    }
+  }
+
+  @keyframes mgGlow {
+    0%, 100% { box-shadow: 0 0 0 rgba(255, 143, 0, 0); }
+    50% { box-shadow: 0 0 25px rgba(255, 143, 0, 0.15); }
+  }
+
+  @keyframes mgShine {
+    0% { transform: translateX(-120%) skewX(-20deg); }
+    100% { transform: translateX(120%) skewX(-20deg); }
+  }
+
+  @keyframes mgSoftPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+  }
+
+  @keyframes mgRotateSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes mgBounceArrow {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
+  }
+
+  @keyframes mgTextGlow {
+    0%, 100% { text-shadow: 0 0 0 rgba(255, 143, 0, 0); }
+    50% { text-shadow: 0 0 15px rgba(255, 143, 0, 0.22); }
+  }
+
+  /* ANIMATION UTILITIES */
+  .animate-mg-float {
+    animation: mgFloat 4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .animate-mg-pulse {
+    animation: mgPulse 2s ease-in-out infinite;
+  }
+
+  .animate-mg-spin {
+    animation: mgSpin 18s linear infinite;
+  }
+
+  .animate-mg-fade-up {
+    animation: mgFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    will-change: opacity, transform;
+  }
+
+  .animate-mg-fade-down {
+    animation: mgFadeDown 0.55s ease 0.12s both;
+  }
+
+  .animate-mg-fade-left {
+    animation: mgFadeLeft 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-mg-fade-right {
+    animation: mgFadeRight 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-mg-scale-in {
+    animation: mgScaleIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-mg-scale-soft {
+    animation: mgScaleSoft 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+  }
+
+  .animate-mg-reveal-line {
+    animation: mgRevealLine 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+  }
+
+  .animate-mg-soft-pulse {
+    animation: mgSoftPulse 4s ease-in-out infinite;
+  }
+
+  .animate-mg-rotate-slow {
+    animation: mgRotateSlow 25s linear infinite;
+    will-change: transform;
+  }
+
+  .animate-mg-rotate-slow-reverse {
+    animation: mgRotateSlow 35s linear infinite reverse;
+    will-change: transform;
+  }
+
+  .animate-mg-bounce-arrow {
+    animation: mgBounceArrow 0.6s ease infinite;
+  }
+
+  .animate-mg-text-glow {
+    animation: mgTextGlow 5s ease-in-out infinite;
+  }
+}

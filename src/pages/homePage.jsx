@@ -4,7 +4,6 @@ import ProdcutCard from "../components/productCard";
 import ProductCardSkeleton from "../components/productCardSkeleton";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import './homePage.css';
 
 export default function HomePage() {
   // =========================================================
@@ -374,23 +373,25 @@ export default function HomePage() {
 
       <div
         aria-hidden="true"
-        className="mg-rpm-gauge hidden xl:flex"
+        className="fixed right-[18px] top-1/2 w-[42px] h-[270px] flex flex-col items-center z-[500] -translate-y-1/2 pointer-events-none select-none hidden xl:flex motion-reduce:hidden"
       >
-        <div className="mg-rpm-track">
+        <div className="relative w-[3px] h-[230px] rounded-full bg-black/14 shadow-[0_0_0_1px_rgba(10,10,10,0.02),0_4px_12px_rgba(10,10,10,0.06)]">
 
           {/* Redline */}
-          <div className="mg-rpm-redline" />
+          <div className="absolute left-[-5px] top-0 w-[13px] h-[14%] opacity-55" style={{
+            backgroundImage: 'repeating-linear-gradient(45deg, #FF3B00 0 3px, transparent 3px 6px)'
+          }} />
 
           {/* Scale ticks */}
-          <span className="mg-rpm-tick mg-rpm-tick-1" />
-          <span className="mg-rpm-tick mg-rpm-tick-2" />
-          <span className="mg-rpm-tick mg-rpm-tick-3" />
-          <span className="mg-rpm-tick mg-rpm-tick-4" />
-          <span className="mg-rpm-tick mg-rpm-tick-5" />
+          <span className="absolute right-[8px] w-[9px] h-px bg-black/22" style={{ top: '10%' }} />
+          <span className="absolute right-[8px] w-[9px] h-px bg-black/22" style={{ top: '30%' }} />
+          <span className="absolute right-[8px] w-[9px] h-px bg-black/22" style={{ top: '50%' }} />
+          <span className="absolute right-[8px] w-[9px] h-px bg-black/22" style={{ top: '70%' }} />
+          <span className="absolute right-[8px] w-[9px] h-px bg-black/22" style={{ top: '90%' }} />
 
           {/* Scroll progress */}
           <div
-            className="mg-rpm-progress"
+            className="absolute left-0 bottom-0 w-full rounded-full will-change-[height] transition-[height_0.12s_linear] shadow-[0_0_10px_rgba(255,143,0,.25)]"
             style={{
               height: rpmHeight,
               background:
@@ -400,7 +401,7 @@ export default function HomePage() {
 
           {/* Current scroll position */}
           <div
-            className="mg-rpm-marker"
+            className="absolute left-1/2 w-[16px] h-[16px] rounded-full border-2 border-[#FF8F00] bg-[#0A0A0A] -translate-x-1/2 translate-y-1/2 shadow-[0_0_12px_rgba(255,143,0,0.25)] will-change-[bottom] transition-[bottom_0.12s_linear]"
             style={{
               bottom: rpmMarkerBottom,
             }}
@@ -412,11 +413,11 @@ export default function HomePage() {
           />
         </div>
 
-        <div className="mg-rpm-label">
+        <div className="mt-[9px] font-mono text-[9px] leading-none tracking-[0.12em] text-black/55 uppercase">
           RPM
         </div>
 
-        <div className="mg-rpm-value">
+        <div className="mt-1 font-mono text-[8px] leading-none tracking-[0.05em] text-black/40">
           {rpmValue}
         </div>
       </div>
@@ -431,7 +432,7 @@ export default function HomePage() {
           MAIN CONTENT
       ====================================================== */}
 
-      <main className="w-full mg-page-enter">
+      <main className="w-full animate-mg-fade-up motion-reduce:animate-none">
 
         {/* =====================================================
             HERO
@@ -445,19 +446,19 @@ export default function HomePage() {
 
           <div className="relative mx-auto grid max-w-[1320px] grid-cols-1 items-center gap-10 px-5 lg:grid-cols-2 min-[981px]:px-10">
 
-            <div className="mg-hero-left">
+            <div className="animate-mg-fade-left motion-reduce:animate-none" style={{animationDelay: '0.05s'}}>
 
-              <div className="mg-hero-label mb-[22px] flex items-center gap-[10px]">
+              <div className="mb-[22px] flex items-center gap-[10px] animate-mg-fade-down motion-reduce:animate-none" style={{animationDelay: '0.12s'}}>
 
-                <span className="mg-orange-dot h-[7px] w-[7px] rounded-full bg-[#FF8F00]" />
+                <span className="h-[7px] w-[7px] rounded-full bg-[#FF8F00] animate-mg-pulse motion-reduce:animate-none" />
 
-                <span className="mg-mono text-[12px] tracking-[.22em] text-[#FF8F00]">
+                <span className="font-mono text-[12px] tracking-[.22em] text-[#FF8F00]">
                   PREMIUM DIE-CAST · EST. GARAGE 01
                 </span>
 
               </div>
 
-              <h1 className="mg-display mg-hero-title mb-[22px] text-[clamp(42px,5.2vw,74px)] text-[#F5F5DC]">
+              <h1 className="font-display font-bold uppercase tracking-[.01em] leading-[1.02] mb-[22px] text-[clamp(42px,5.2vw,74px)] text-[#F5F5DC] animate-mg-fade-up motion-reduce:animate-none" style={{animation: 'mgFadeUp 0.65s cubic-bezier(0.22,1,0.36,1) 0.18s both, mgTextGlow 5s ease-in-out 1.2s infinite'}}>
                 Build your
                 <br />
 
@@ -466,33 +467,33 @@ export default function HomePage() {
                 </span>
               </h1>
 
-              <p className="mg-hero-description mb-[38px] max-w-[440px] text-[17px] leading-[1.6] text-[#F5F5DC]/70">
+              <p className="mb-[38px] max-w-[440px] text-[17px] leading-[1.6] text-[#F5F5DC]/70 animate-mg-fade-up motion-reduce:animate-none" style={{animationDelay: '0.28s'}}>
                 Discover legendary die-cast cars, rare releases, and collector
                 favorites — all in one garage.
               </p>
 
-              <div className="mg-hero-buttons flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4 animate-mg-fade-up motion-reduce:animate-none" style={{animationDelay: '0.38s'}}>
 
                 <a
                   href="#shop"
-                  className="mg-button inline-flex items-center gap-[10px] rounded-[2px] border border-transparent bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#ffa733] hover:shadow-[0_10px_24px_rgba(255,143,0,.25)]"
+                  className="relative overflow-hidden isolate inline-flex items-center gap-[10px] rounded-[2px] border border-transparent bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#ffa733] hover:shadow-[0_10px_24px_rgba(255,143,0,.25)]"
                 >
                   Shop Collection
                 </a>
 
                 <a
                   href="#rare"
-                  className="mg-button inline-flex items-center gap-[10px] rounded-[2px] border border-[#F5F5DC]/15 px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#F5F5DC] transition-all duration-200 hover:border-[#FF8F00] hover:text-[#FF8F00]"
+                  className="relative overflow-hidden isolate inline-flex items-center gap-[10px] rounded-[2px] border border-[#F5F5DC]/15 px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#F5F5DC] transition-all duration-200 hover:border-[#FF8F00] hover:text-[#FF8F00]"
                 >
                   Explore Rare Finds
                 </a>
 
               </div>
 
-              <div className="mg-hero-stats mt-[52px] flex gap-9 border-t border-[#F5F5DC]/15 pt-7">
+              <div className="mt-[52px] flex gap-9 border-t border-[#F5F5DC]/15 pt-7 animate-mg-fade-up motion-reduce:animate-none" style={{animationDelay: '0.48s'}}>
 
                 <div>
-                  <div className="mg-mono text-[26px] text-[#F5F5DC]">
+                  <div className="font-mono text-[26px] text-[#F5F5DC]">
                     4,200+
                   </div>
 
@@ -502,7 +503,7 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                  <div className="mg-mono text-[26px] text-[#F5F5DC]">
+                  <div className="font-mono text-[26px] text-[#F5F5DC]">
                     1:64
                   </div>
 
@@ -512,7 +513,7 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                  <div className="mg-mono text-[26px] text-[#F5F5DC]">
+                  <div className="font-mono text-[26px] text-[#F5F5DC]">
                     180+
                   </div>
 
@@ -525,7 +526,7 @@ export default function HomePage() {
 
             </div>
 
-            <div className="mg-hero-right relative order-first flex items-center justify-center lg:order-none">
+            <div className="relative order-first flex items-center justify-center lg:order-none animate-mg-fade-right motion-reduce:animate-none" style={{animationDelay: '0.08s'}}>
 
               <div className="absolute h-[112%] w-[112%] rounded-[6px] border border-[#F5F5DC]/15">
 
@@ -533,9 +534,9 @@ export default function HomePage() {
 
               </div>
 
-              <div className="pointer-events-none absolute h-[75%] w-[75%] rounded-full bg-[#FF8F00]/10 blur-[80px] mg-rare-glow" />
+              <div className="pointer-events-none absolute h-[75%] w-[75%] rounded-full bg-[#FF8F00]/10 blur-[80px] animate-mg-soft-pulse motion-reduce:animate-none" />
 
-              <span className="mg-mono absolute left-[-2%] top-[16%] z-20 flex items-center gap-1.5 text-[10px] tracking-[.1em] text-[#FF8F00]">
+              <span className="font-mono absolute left-[-2%] top-[16%] z-20 flex items-center gap-1.5 text-[10px] tracking-[.1em] text-[#FF8F00]">
 
                 <span className="h-px w-4 bg-[#FF8F00]" />
 
@@ -543,7 +544,7 @@ export default function HomePage() {
 
               </span>
 
-              <span className="mg-mono absolute bottom-[20%] right-[-4%] z-20 flex items-center gap-1.5 text-[10px] tracking-[.1em] text-[#FF8F00]">
+              <span className="font-mono absolute bottom-[20%] right-[-4%] z-20 flex items-center gap-1.5 text-[10px] tracking-[.1em] text-[#FF8F00]">
 
                 <span className="h-px w-4 bg-[#FF8F00]" />
 
@@ -559,7 +560,7 @@ export default function HomePage() {
                   loading="eager"
                   fetchPriority="high"
                   decoding="async"
-                  className="mg-float h-[300px] w-[78%] max-w-[540px] object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,.65)] transition-transform duration-500 hover:scale-[1.03] sm:h-[340px] lg:h-[390px]"
+                  className="h-[300px] w-[78%] max-w-[540px] object-contain drop-shadow-[0_30px_50px_rgba(0,0,0,.65)] transition-transform duration-500 hover:scale-[1.03] sm:h-[340px] lg:h-[390px] animate-mg-float motion-reduce:animate-none"
                 />
 
               </div>
@@ -583,21 +584,21 @@ export default function HomePage() {
 
             <div className="mb-[18px] flex items-center gap-[6px]">
 
-              <span className="mg-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
+              <span className="font-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
                 01 — CATEGORIES
               </span>
 
-              <div className="mg-ticks mg-section-line h-2 flex-1" />
+              <div className="h-2 flex-1 animate-mg-reveal-line motion-reduce:animate-none" style={{backgroundImage: 'repeating-linear-gradient(90deg, rgba(10,10,10,.14) 0 1px, transparent 1px 10px)'}} />
 
             </div>
 
             <div className="mb-14 max-w-[640px]">
 
-              <h2 className="mg-display mg-section-title mb-[14px] text-[clamp(30px,3.4vw,44px)]">
+              <h2 className="font-display font-bold uppercase tracking-[.01em] leading-[1.02] mb-[14px] text-[clamp(30px,3.4vw,44px)] animate-mg-fade-up motion-reduce:animate-none">
                 Explore the garage
               </h2>
 
-              <p className="mg-section-description text-[15.5px] leading-[1.6] text-black/60">
+              <p className="text-[15.5px] leading-[1.6] text-black/60 animate-mg-fade-up motion-reduce:animate-none" style={{animationDelay: '0.1s'}}>
                 Six curated corners of the collection, from pocket-sized JDM
                 icons to full-throttle supercars.
               </p>
@@ -619,13 +620,16 @@ export default function HomePage() {
                   key={title}
                   href={index < 3 ? "/products" : "#"}
                   className={[
-                    "mg-category-card group relative block h-[200px] overflow-hidden rounded-[6px] bg-[#0A0A0A] lg:h-auto",
+                    "group relative block h-[200px] overflow-hidden rounded-[6px] bg-[#0A0A0A] lg:h-auto animate-mg-scale-in motion-reduce:animate-none transition-all duration-[350ms] cubic-bezier(0.22,1,0.36,1) hover:translate-y-[-5px] md:hover:translate-y-[-3px] hover:shadow-[0_14px_30px_rgba(10,10,10,0.14)]",
                     index === 0
                       ? "lg:col-span-3 lg:row-span-2"
                       : index === 1 || index === 2
                       ? "lg:col-span-3"
                       : "lg:col-span-2",
                   ].join(" ")}
+                  style={{
+                    animationDelay: `${[0.03, 0.08, 0.13, 0.18, 0.23, 0.28][index]}s`,
+                  }}
                 >
 
                   <div
@@ -656,11 +660,11 @@ export default function HomePage() {
 
                   <div className="absolute bottom-5 left-[22px] right-[22px] text-[#F5F5DC]">
 
-                    <span className="mg-category-label mg-mono mb-1.5 block text-[10.5px] text-[#FF8F00]">
+                    <span className="font-mono mb-1.5 block text-[10.5px] text-[#FF8F00] transition-all duration-200 group-hover:translate-x-1">
                       {label}
                     </span>
 
-                    <h3 className="mg-display mb-2.5 text-[22px]">
+                    <h3 className="font-display font-bold uppercase tracking-[.01em] leading-[1.02] mb-2.5 text-[22px]">
                       {title}
                     </h3>
 
@@ -691,25 +695,25 @@ export default function HomePage() {
 
           <div className="mx-auto max-w-[1320px] px-5 lg:px-10">
 
-            <div className="mg-products-wrapper mb-[56px]">
+            <div className="animate-mg-fade-up motion-reduce:animate-none mb-[56px]">
 
               <div className="mb-[18px] flex items-center gap-[6px]">
 
-                <span className="mg-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
+                <span className="font-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
                   02 — TRENDING
                 </span>
 
-                <div className="mg-ticks mg-section-line h-2 flex-1" />
+                <div className="h-2 flex-1 animate-mg-reveal-line motion-reduce:animate-none" style={{backgroundImage: 'repeating-linear-gradient(90deg, rgba(10,10,10,.14) 0 1px, transparent 1px 10px)'}} />
 
               </div>
 
               <div className="max-w-[640px]">
 
-                <h2 className="mg-display mg-section-title mb-[14px] text-[clamp(30px,3.4vw,44px)]">
+                <h2 className="font-display font-bold uppercase tracking-[.01em] leading-[1.02] mb-[14px] text-[clamp(30px,3.4vw,44px)]">
                   Hot in the garage
                 </h2>
 
-                <p className="mg-section-description text-[15.5px] leading-[1.6] text-black/60">
+                <p className="text-[15.5px] leading-[1.6] text-black/60">
                   The four models collectors keep coming back for, this week.
                 </p>
 
@@ -728,9 +732,9 @@ export default function HomePage() {
                     product?.id ||
                     product?.name
                   }
-                  className="mg-product-item"
+                  className="animate-mg-fade-up motion-reduce:animate-none"
                   style={{
-                    animationDelay: `${index * 0.09}s`,
+                    animationDelay: `${[0.03, 0.08, 0.13, 0.18][index]}s`,
                   }}
                 >
                   <ProdcutCard product={product} />
@@ -755,19 +759,19 @@ export default function HomePage() {
 
           <div className="grid min-h-[520px] grid-cols-1 lg:grid-cols-2">
 
-            <div className="mg-rare-content relative z-10 flex flex-col justify-center px-7 py-[60px] lg:px-[60px] lg:py-[90px]">
+            <div className="animate-mg-fade-left motion-reduce:animate-none relative z-10 flex flex-col justify-center px-7 py-[60px] lg:px-[60px] lg:py-[90px]">
 
               <div className="mb-[18px] flex items-center gap-[6px]">
 
-                <span className="mg-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
+                <span className="font-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
                   03 — RARE FINDS
                 </span>
 
-                <div className="mg-ticks-dark mg-section-line h-2 flex-1" />
+                <div className="h-2 flex-1 animate-mg-reveal-line motion-reduce:animate-none" style={{backgroundImage: 'repeating-linear-gradient(90deg, rgba(245,245,220,.14) 0 1px, transparent 1px 10px)'}} />
 
               </div>
 
-              <h2 className="mg-display mb-5 text-[clamp(32px,3.6vw,50px)]">
+              <h2 className="font-display font-bold uppercase tracking-[.01em] leading-[1.02] mb-5 text-[clamp(32px,3.6vw,50px)]">
 
                 Rare finds.
                 <br />
@@ -787,7 +791,7 @@ export default function HomePage() {
 
                 <a
                   href="#arrivals"
-                  className="mg-button inline-flex items-center gap-[10px] rounded-[2px] border border-transparent bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all hover:-translate-y-0.5 hover:bg-[#ffa733]"
+                  className="relative overflow-hidden isolate inline-flex items-center gap-[10px] rounded-[2px] border border-transparent bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all hover:-translate-y-0.5 hover:bg-[#ffa733]"
                 >
                   Discover Rare Cars
                 </a>
@@ -796,20 +800,20 @@ export default function HomePage() {
 
             </div>
 
-            <div className="mg-rare-image relative flex min-h-[420px] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_60%_50%,rgba(255,143,0,.14),transparent_60%),repeating-linear-gradient(-45deg,rgba(245,245,220,.03)_0_1px,transparent_1px_26px),#111]">
+            <div className="animate-mg-fade-right motion-reduce:animate-none relative flex min-h-[420px] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_60%_50%,rgba(255,143,0,.14),transparent_60%),repeating-linear-gradient(-45deg,rgba(245,245,220,.03)_0_1px,transparent_1px_26px),#111]">
 
-              <div className="mg-tech-ring absolute h-[420px] w-[420px] rounded-full border border-[#FF8F00]/15" />
+              <div className="absolute h-[420px] w-[420px] rounded-full border border-[#FF8F00]/15 animate-mg-rotate-slow motion-reduce:animate-none" />
 
-              <div className="mg-tech-ring-reverse absolute h-[340px] w-[340px] rounded-full border border-[#FF8F00]/30" />
+              <div className="absolute h-[340px] w-[340px] rounded-full border border-[#FF8F00]/30 animate-mg-rotate-slow-reverse motion-reduce:animate-none" />
 
-              <div className="mg-rare-glow pointer-events-none absolute h-[55%] w-[55%] rounded-full bg-[#FF8F00]/10 blur-[70px]" />
+              <div className="pointer-events-none absolute h-[55%] w-[55%] rounded-full bg-[#FF8F00]/10 blur-[70px] animate-mg-soft-pulse motion-reduce:animate-none" />
 
               <img
                 src="/home5.png"
                 alt="Rare collectible die-cast car"
                 loading="lazy"
                 decoding="async"
-                className="mg-rare-car relative z-10 w-[88%] max-w-[650px] object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,.65)] transition-transform duration-500 hover:scale-[1.04]"
+                className="relative z-10 w-[88%] max-w-[650px] object-contain drop-shadow-[0_25px_45px_rgba(0,0,0,.65)] transition-transform duration-500 hover:scale-[1.04] animate-mg-scale-soft animate-mg-float motion-reduce:animate-none"
               />
 
             </div>
@@ -829,27 +833,27 @@ export default function HomePage() {
 
           <div className="mx-auto max-w-[1320px] px-5 lg:px-10">
 
-            <div className="mg-arrivals-header mb-[56px] flex flex-wrap items-end justify-between gap-6">
+            <div className="animate-mg-fade-up motion-reduce:animate-none mb-[56px] flex flex-wrap items-end justify-between gap-6">
 
               <div>
 
                 <div className="mb-[18px] flex items-center gap-[6px]">
 
-                  <span className="mg-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
+                  <span className="font-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
                     04 — NEW ARRIVALS
                   </span>
 
-                  <div className="mg-ticks mg-section-line h-2 w-[200px]" />
+                  <div className="h-2 w-[200px] animate-mg-reveal-line motion-reduce:animate-none" style={{backgroundImage: 'repeating-linear-gradient(90deg, rgba(10,10,10,.14) 0 1px, transparent 1px 10px)'}} />
 
                 </div>
 
                 <div className="max-w-[640px]">
 
-                  <h2 className="mg-display mg-section-title mb-[14px] text-[clamp(30px,3.4vw,44px)]">
+                  <h2 className="font-display font-bold uppercase tracking-[.01em] leading-[1.02] mb-[14px] text-[clamp(30px,3.4vw,44px)]">
                     Just dropped
                   </h2>
 
-                  <p className="mg-section-description text-[15.5px] leading-[1.6] text-black/60">
+                  <p className="text-[15.5px] leading-[1.6] text-black/60">
                     The newest die-cast releases, fresh off the line.
                   </p>
 
@@ -862,7 +866,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   aria-label="Previous"
-                  className="mg-slider-button flex h-11 w-11 items-center justify-center rounded-full border border-black/15 transition-all hover:border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FF8F00]"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-black/15 transition-all duration-200 hover:border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FF8F00] hover:translate-y-[-2px] active:translate-y-0 active:scale-[0.94]"
                 >
 
                   <svg
@@ -880,7 +884,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   aria-label="Next"
-                  className="mg-slider-button flex h-11 w-11 items-center justify-center rounded-full border border-black/15 transition-all hover:border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FF8F00]"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-black/15 transition-all duration-200 hover:border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FF8F00] hover:translate-y-[-2px] active:translate-y-0 active:scale-[0.94]"
                 >
 
                   <svg
@@ -888,7 +892,7 @@ export default function HomePage() {
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
-                    className="h-4 w-4"
+                    className="h-4 w-4 hover:animate-mg-bounce-arrow motion-reduce:hover:animate-none"
                   >
                     <path d="M9 6l6 6-6-6" />
                   </svg>
@@ -899,7 +903,7 @@ export default function HomePage() {
 
             </div>
 
-            <div className="mg-scrollbar flex gap-[22px] overflow-x-auto pb-2">
+            <div className="flex gap-[22px] overflow-x-auto pb-2 scrollbar-hide">
 
               {newArrivalProducts.map((product, index) => (
 
@@ -910,9 +914,9 @@ export default function HomePage() {
                     product?.id ||
                     product?.name
                   }
-                  className="mg-arrival-item min-w-[280px] snap-start"
+                  className="min-w-[280px] snap-start animate-mg-fade-right motion-reduce:animate-none"
                   style={{
-                    animationDelay: `${index * 0.1}s`,
+                    animationDelay: `${[0.03, 0.08, 0.13, 0.18][index]}s`,
                   }}
                 >
                   <ProdcutCard product={product} />
@@ -937,7 +941,7 @@ export default function HomePage() {
 
           <div className="mx-auto grid max-w-[1320px] items-center gap-[60px] px-5 lg:grid-cols-2 lg:px-10">
 
-            <div className="mg-story-image relative flex aspect-[4/3.3] items-center justify-center overflow-hidden rounded-[6px] bg-[#0A0A0A]">
+            <div className="animate-mg-fade-left motion-reduce:animate-none relative flex aspect-[4/3.3] items-center justify-center overflow-hidden rounded-[6px] bg-[#0A0A0A] transition-all duration-[450ms] cubic-bezier(0.22,1,0.36,1) hover:translate-y-[-5px] md:hover:translate-y-[-3px] hover:shadow-[0_20px_40px_rgba(10,10,10,0.13)]">
 
               <div
                 className="absolute inset-0"
@@ -953,24 +957,24 @@ export default function HomePage() {
                 alt="Metal Garage collectible car collection"
                 loading="lazy"
                 decoding="async"
-                className="mg-float relative z-10 h-full w-full object-contain p-6 drop-shadow-[0_20px_35px_rgba(0,0,0,.55)] transition-transform duration-500 hover:scale-[1.03]"
+                className="relative z-10 h-full w-full object-contain p-6 drop-shadow-[0_20px_35px_rgba(0,0,0,.55)] transition-transform duration-500 hover:scale-[1.03] animate-mg-float motion-reduce:animate-none"
               />
 
             </div>
 
-            <div className="mg-story-content">
+            <div className="animate-mg-fade-right motion-reduce:animate-none" style={{animationDelay: '0.08s'}}>
 
               <div className="mb-[22px] flex items-center gap-[6px]">
 
-                <span className="mg-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
+                <span className="font-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
                   05 — OUR STORY
                 </span>
 
-                <div className="mg-ticks mg-section-line h-2 flex-1" />
+                <div className="h-2 flex-1 animate-mg-reveal-line motion-reduce:animate-none" style={{backgroundImage: 'repeating-linear-gradient(90deg, rgba(10,10,10,.14) 0 1px, transparent 1px 10px)'}} />
 
               </div>
 
-              <h2 className="mg-display mb-5 text-[clamp(30px,3.2vw,44px)]">
+              <h2 className="font-display font-bold uppercase tracking-[.01em] leading-[1.02] mb-5 text-[clamp(30px,3.2vw,44px)]">
 
                 Welcome to
                 <br />
@@ -987,7 +991,7 @@ export default function HomePage() {
 
               <a
                 href="#"
-                className="mg-button inline-flex items-center gap-[10px] rounded-[2px] border border-black/15 px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] transition-all hover:border-[#FF8F00] hover:text-[#CC7000]"
+                className="relative overflow-hidden isolate inline-flex items-center gap-[10px] rounded-[2px] border border-black/15 px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] transition-all hover:border-[#FF8F00] hover:text-[#CC7000]"
               >
                 Our Story →
               </a>
@@ -1008,17 +1012,17 @@ export default function HomePage() {
 
             <div className="mb-[18px] flex items-center gap-[6px]">
 
-              <span className="mg-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
+              <span className="font-mono whitespace-nowrap text-[11px] tracking-[.18em] text-[#FF8F00]">
                 06 — WHY US
               </span>
 
-              <div className="mg-ticks mg-section-line h-2 flex-1" />
+              <div className="h-2 flex-1 animate-mg-reveal-line motion-reduce:animate-none" style={{backgroundImage: 'repeating-linear-gradient(90deg, rgba(10,10,10,.14) 0 1px, transparent 1px 10px)'}} />
 
             </div>
 
             <div className="mb-14 max-w-[640px]">
 
-              <h2 className="mg-display mg-section-title text-[clamp(30px,3.4vw,44px)]">
+              <h2 className="font-display font-bold uppercase tracking-[.01em] leading-[1.02] text-[clamp(30px,3.4vw,44px)]">
                 Why collectors choose Metal Garage
               </h2>
 
@@ -1068,13 +1072,13 @@ export default function HomePage() {
 
                 <div
                   key={item.title}
-                  className="mg-why-item bg-[#F5F5DC] px-[30px] py-10"
+                  className="bg-[#F5F5DC] px-[30px] py-10 animate-mg-fade-up motion-reduce:animate-none transition-all duration-300 cubic-bezier(0.22,1,0.36,1) hover:translate-y-[-4px] group"
                   style={{
-                    animationDelay: `${index * 0.1}s`,
+                    animationDelay: `${[0.03, 0.08, 0.13, 0.18][index]}s`,
                   }}
                 >
 
-                  <div className="mg-why-icon mb-[22px] h-9 w-9 text-[#FF8F00]">
+                  <div className="mb-[22px] h-9 w-9 text-[#FF8F00] transition-all duration-300 cubic-bezier(0.22,1,0.36,1) group-hover:scale-[1.08] group-hover:rotate-[-4deg] group-hover:drop-shadow-[0_5px_8px_rgba(255,143,0,0.2)]">
 
                     <svg
                       viewBox="0 0 24 24"
@@ -1114,17 +1118,17 @@ export default function HomePage() {
 
           <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(115deg,rgba(255,143,0,.035)_0_2px,transparent_2px_90px)]" />
 
-          <div className="mg-community relative z-10 mx-auto max-w-[640px] px-5">
+          <div className="animate-mg-fade-up motion-reduce:animate-none relative z-10 mx-auto max-w-[640px] px-5">
 
             <div className="mb-[18px] flex justify-center">
 
-              <span className="mg-mono mg-orange-dot text-[11px] tracking-[.18em] text-[#FF8F00]">
+              <span className="font-mono text-[11px] tracking-[.18em] text-[#FF8F00]">
                 07 — COMMUNITY
               </span>
 
             </div>
 
-            <h2 className="mg-display mg-community-title mb-5 text-[clamp(30px,4vw,52px)]">
+            <h2 className="font-display font-bold uppercase tracking-[.01em] leading-[1.02] mb-5 text-[clamp(30px,4vw,52px)] animate-mg-soft-pulse motion-reduce:animate-none" style={{animationDelay: '1s'}}>
 
               More than a collection.
               <br />
@@ -1135,14 +1139,15 @@ export default function HomePage() {
 
             </h2>
 
-            <p className="mg-community-text mb-[38px] text-[16px] leading-[1.6] text-[#F5F5DC]/70">
+            <p className="mb-[38px] text-[16px] leading-[1.6] text-[#F5F5DC]/70 animate-mg-fade-up motion-reduce:animate-none" style={{animationDelay: '0.2s'}}>
               Join a growing community of collectors, discover new releases,
               and stay ahead of the latest drops.
             </p>
 
             <a
               href="#"
-              className="mg-button mg-community-button inline-flex items-center gap-[10px] rounded-[2px] bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all hover:-translate-y-0.5 hover:bg-[#ffa733]"
+              className="relative overflow-hidden isolate inline-flex items-center gap-[10px] rounded-[2px] bg-[#FF8F00] px-[30px] py-4 text-[13px] font-semibold uppercase tracking-[.1em] text-[#0A0A0A] transition-all hover:-translate-y-0.5 hover:bg-[#ffa733] animate-mg-scale-in motion-reduce:animate-none"
+              style={{animationDelay: '0.3s'}}
             >
               Join the Garage
             </a>
