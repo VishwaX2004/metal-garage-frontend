@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import {
     ChevronLeft,
     ChevronRight,
     Grid2X2,
     List,
+    Search,
     SlidersHorizontal,
     X,
 } from "lucide-react";
@@ -27,6 +28,12 @@ export default function ProductPage() {
     const [selectedScales, setSelectedScales] = useState([]);
     const [selectedAvailability, setSelectedAvailability] = useState([]);
     const [selectedColor, setSelectedColor] = useState(null);
+
+    /* ================= SEARCH STATES ================= */
+
+    const [searchQuery, setSearchQuery] = useState("");
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+    const searchDebounceRef = useRef(null);
 
     /*
      * IMPORTANT:
@@ -61,6 +68,20 @@ export default function ProductPage() {
         maxPrice,
         sortBy,
     ]);
+
+    /* ================= SEARCH DEBOUNCE ================= */
+
+    useEffect(() => {
+        clearTimeout(searchDebounceRef.current);
+        searchDebounceRef.current = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+            setCurrentPage(1);
+        }, 300);
+
+        return () => {
+            clearTimeout(searchDebounceRef.current);
+        };
+    }, [searchQuery]);
 
 
     /* ================= FETCH PRODUCTS ================= */
@@ -423,6 +444,26 @@ export default function ProductPage() {
 
     };
 
+    /* ================= SEARCH MATCHING ================= */
+
+    const matchesSearch = (product, query) => {
+        if (!query || query.trim() === "") {
+            return true;
+        }
+
+        const searchTerm = normalize(query);
+
+        return (
+            normalize(product?.name).includes(searchTerm) ||
+            normalize(product?.series).includes(searchTerm) ||
+            normalize(product?.category).includes(searchTerm) ||
+            normalize(product?.model).includes(searchTerm) ||
+            normalize(product?.manufacturer).includes(searchTerm) ||
+            normalize(product?.casting).includes(searchTerm) ||
+            normalize(product?.sku).includes(searchTerm) ||
+            normalize(product?.productID).includes(searchTerm)
+        );
+    };
 
     /* ================= FILTER + SORT ================= */
 
@@ -538,6 +579,19 @@ export default function ProductPage() {
 
         }
 
+        /* ---------- SEARCH ---------- */
+
+        if (debouncedSearchQuery) {
+
+            result = result.filter(
+                (product) =>
+                    matchesSearch(
+                        product,
+                        debouncedSearchQuery
+                    )
+            );
+
+        }
 
         /* ---------- SORT ---------- */
 
@@ -619,6 +673,7 @@ export default function ProductPage() {
         maxPrice,
         currentMaxPrice,
         sortBy,
+        debouncedSearchQuery,
     ]);
 
 
@@ -1440,6 +1495,100 @@ export default function ProductPage() {
 
                         <div className="min-w-0">
 
+                            {/* ================= SEARCH BAR ================= */}
+
+                            <div className="mb-[26px]">
+                                <div
+                                    className="
+                                        relative
+                                        flex
+                                        items-center
+                                    "
+                                >
+                                    <Search
+                                        className="
+                                            absolute
+                                            left-4
+                                            h-[18px]
+                                            w-[18px]
+                                            text-[#CC7000]
+                                            pointer-events-none
+                                        "
+                                        strokeWidth={1.8}
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Search products by name, series, model..."
+                                        value={searchQuery}
+                                        onChange={(e) => {
+                                            setSearchQuery(e.target.value);
+                                        }}
+                                        className="
+                                            w-full
+                                            h-[48px]
+                                            bg-white
+                                            border
+                                            border-black/10
+                                            rounded-[4px]
+                                            pl-[46px]
+                                            pr-[46px]
+                                            text-[14px]
+                                            text-[#0A0A0A]
+                                            placeholder:text-black/40
+                                            transition-all
+                                            focus:outline-none
+                                            focus:border-[#FF8F00]
+                                            focus:ring-2
+                                            focus:ring-[#FF8F00]/20
+                                        "
+                                    />
+                                    {searchQuery && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setSearchQuery("");
+                                                setDebouncedSearchQuery("");
+                                            }}
+                                            className="
+                                                absolute
+                                                right-4
+                                                h-[18px]
+                                                w-[18px]
+                                                flex
+                                                items-center
+                                                justify-center
+                                                text-black/40
+                                                hover:text-[#FF8F00]
+                                                transition-colors
+                                                cursor-pointer
+                                            "
+                                        >
+                                            <X strokeWidth={2} />
+                                        </button>
+                                    )}
+                                </div>
+
+                                {debouncedSearchQuery && (
+                                    <div className="mt-2 flex items-center gap-2">
+                                        <span className="text-[12px] text-black/60">
+                                            Search results for:{" "}
+                                            <strong className="text-[#FF8F00]">
+                                                "{debouncedSearchQuery}"
+                                            </strong>
+                                        </span>
+                                        {filteredProducts.length === 0 && (
+                                            <span className="text-[12px] text-[#FF3B00]">
+                                                — No products found
+                                            </span>
+                                        )}
+                                        {filteredProducts.length > 0 && (
+                                            <span className="text-[12px] text-black/60">
+                                                ({filteredProducts.length} found)
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
 
                             {/* ================= TOOLBAR ================= */}
 

@@ -26,7 +26,7 @@ import ProdcutCard from "../components/productCard";
    CART SETTINGS
 ========================================================= */
 
-const TAX_RATE = 0.0825;
+const SHIPPING_COST = 350;
 
 const PROMO_CODES = {
     GARAGE10: 0.1,
@@ -455,29 +455,21 @@ export default function CartPage() {
         const discount =
             subtotal * discountRate;
 
-        const shipping = 0;
-
-        const taxableAmount =
-            Math.max(
-                0,
-                subtotal - discount
-            );
-
-        const tax =
-            taxableAmount *
-            TAX_RATE;
+        // A fixed shipping charge of Rs.350 replaces tax.
+        // Do not charge shipping when the cart is empty.
+        const shipping =
+            cartItems.length > 0 ? SHIPPING_COST : 0;
 
         const total =
             subtotal -
             discount +
-            tax;
+            shipping;
 
         return {
             subtotal,
             count,
             discount,
             shipping,
-            tax,
             total,
         };
     }, [
@@ -668,38 +660,35 @@ export default function CartPage() {
        DECREASE QUANTITY
     ========================================================= */
 
-    function decreaseQuantity(
-        productId
-    ) {
-        setCartItems(
-            (currentItems) =>
-                currentItems.map(
-                    (item) => {
-                        if (
-                            getProductId(
-                                item
-                            ) !==
-                            productId
-                        ) {
-                            return item;
-                        }
+    function decreaseQuantity(productId) {
+        // If the quantity is already 1, the minus button removes the item.
+        const targetItem = cartItems.find(
+            (item) => getProductId(item) === productId
+        );
 
-                        const currentQuantity =
-                            Number(
-                                item.cartQuantity
-                            ) || 1;
+        if (!targetItem) {
+            return;
+        }
 
-                        return {
-                            ...item,
-                            cartQuantity:
-                                Math.max(
-                                    1,
-                                    currentQuantity -
-                                        1
-                                ),
-                        };
-                    }
-                )
+        const currentQuantity =
+            Number(targetItem.cartQuantity) || 1;
+
+        if (currentQuantity <= 1) {
+            removeProduct(productId);
+            return;
+        }
+
+        setCartItems((currentItems) =>
+            currentItems.map((item) => {
+                if (getProductId(item) !== productId) {
+                    return item;
+                }
+
+                return {
+                    ...item,
+                    cartQuantity: (Number(item.cartQuantity) || 1) - 1,
+                };
+            })
         );
     }
 
@@ -2024,12 +2013,12 @@ export default function CartPage() {
                                                 <div className="flex justify-between text-[12px] text-[#F5F5DC]/55">
 
                                                     <span>
-                                                        Tax
+                                                        Shipping
                                                     </span>
 
                                                     <span className="font-mono">
                                                         {currency(
-                                                            totals.tax
+                                                            totals.shipping
                                                         )}
                                                     </span>
 
