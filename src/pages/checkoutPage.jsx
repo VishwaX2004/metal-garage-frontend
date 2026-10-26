@@ -636,6 +636,11 @@ export default function CheckoutPage() {
 
                 await startPayHerePayment(createdOrderID, token);
 
+                // Clear cart after PayHere form is submitted
+                // (it will also be cleared when user returns from payment gateway)
+                clearCart();
+                setCartItems([]);
+
                 return;
             }
 
