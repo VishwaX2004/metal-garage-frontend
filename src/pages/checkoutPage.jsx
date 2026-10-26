@@ -667,13 +667,14 @@ export default function CheckoutPage() {
                     if (!existing) saveAddress(addr);
                 }
 
-                clearCart();
-
-                setCartItems([]);
-
                 toast.success("Order placed successfully!");
 
-                navigate("/orders");
+                // Navigate BEFORE clearing cart to prevent the empty cart effect from redirecting to cart page
+                navigate("/orders", { replace: true });
+
+                // Clear cart after navigation
+                clearCart();
+                setCartItems([]);
 
                 return;
             }
