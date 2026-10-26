@@ -1,4 +1,4 @@
-import { Link, Route, Routes, useLocation } from "react-router-dom";
+import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
@@ -7,6 +7,7 @@ import AdminAddProduct from "./admin/adminAddProduct";
 import AdminUpdateProductPage from "./admin/adminUpdateProduct";
 import AdminOrders from "./admin/adminOrders";
 import AdminUser from "./admin/adminUser";
+import AdminAccountSettings from "./admin/adminAccountSettings";
 
 import {
     RxDashboard,
@@ -698,6 +699,9 @@ export default function AdminPage() {
     const location =
         useLocation();
 
+    const navigate =
+        useNavigate();
+
     const [
         sidebarOpen,
         setSidebarOpen,
@@ -921,7 +925,14 @@ export default function AdminPage() {
 
                 <div className="shrink-0 border-t border-[#F5F5DC]/15 p-4">
 
-                    <div className="group flex items-center gap-[11px] rounded-lg p-2 transition-all duration-200 hover:bg-[#F5F5DC]/[0.06]">
+                    <div
+                        onClick={() =>
+                            navigate(
+                                "/admin/account"
+                            )
+                        }
+                        className="group cursor-pointer flex items-center gap-[11px] rounded-lg p-2 transition-all duration-200 hover:bg-[#F5F5DC]/[0.06]"
+                    >
 
                         {/* PROFILE IMAGE */}
 
@@ -1064,6 +1075,13 @@ export default function AdminPage() {
                             path="update-product"
                             element={
                                 <AdminUpdateProductPage />
+                            }
+                        />
+
+                        <Route
+                            path="account"
+                            element={
+                                <AdminAccountSettings />
                             }
                         />
 
