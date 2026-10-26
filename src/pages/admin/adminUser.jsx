@@ -19,6 +19,8 @@ import {
     FaEnvelope,
     FaLock,
     FaImage,
+    FaEye,
+    FaEyeSlash,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Loader } from "../../components/loader";
@@ -214,6 +216,8 @@ function AdminUserFormModal({
     const isEdit = Boolean(user);
 
     const [isSaving, setIsSaving] = useState(false);
+
+    const [showPassword, setShowPassword] = useState(false);
 
     const [form, setForm] = useState({
         firstName: user?.firstName || "",
@@ -468,6 +472,14 @@ function AdminUserFormModal({
                                 type="password"
                                 icon={<FaLock />}
                                 required={!isEdit}
+                                showPassword={
+                                    showPassword
+                                }
+                                onTogglePasswordVisibility={() =>
+                                    setShowPassword(
+                                        !showPassword
+                                    )
+                                }
                             />
 
                             {isEdit && (
@@ -1675,7 +1687,11 @@ function FormInput({
     type = "text",
     required = false,
     icon = null,
+    onTogglePasswordVisibility,
+    showPassword = false,
 }) {
+    const isPasswordField = type === "password";
+
     return (
         <div>
             <label className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.06em] text-black/50">
@@ -1690,7 +1706,13 @@ function FormInput({
                 )}
 
                 <input
-                    type={type}
+                    type={
+                        isPasswordField
+                            ? showPassword
+                                ? "text"
+                                : "password"
+                            : type
+                    }
                     value={value}
                     required={required}
                     onChange={(event) =>
@@ -1701,10 +1723,31 @@ function FormInput({
                     placeholder={placeholder}
                     className={`w-full rounded-[7px] border border-black/[0.14] bg-[#ECE8D6] py-[11px] text-[12px] outline-none transition focus:border-[#FF8F00] ${
                         icon
-                            ? "pl-9 pr-3"
-                            : "px-[13px]"
+                            ? "pl-9"
+                            : "pl-[13px]"
+                    } ${
+                        isPasswordField
+                            ? "pr-10"
+                            : "pr-[13px]"
                     }`}
                 />
+
+                {isPasswordField && (
+                    <button
+                        type="button"
+                        onClick={
+                            onTogglePasswordVisibility
+                        }
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-black/40 transition hover:text-[#0A0A0A]"
+                        tabIndex="-1"
+                    >
+                        {showPassword ? (
+                            <FaEyeSlash className="text-[12px]" />
+                        ) : (
+                            <FaEye className="text-[12px]" />
+                        )}
+                    </button>
+                )}
             </div>
         </div>
     );
