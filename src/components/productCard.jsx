@@ -512,6 +512,7 @@ function ProdcutCard({ product }) {
                             alt={productName}
                             loading="lazy"
                             decoding="async"
+                            crossOrigin="anonymous"
                             onError={handleImageError}
                             draggable="false"
                             className="

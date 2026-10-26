@@ -711,6 +711,7 @@ function Header() {
                                                                     <img
                                                                         src={image}
                                                                         alt=""
+                                                                        crossOrigin="anonymous"
                                                                         className="h-full w-full object-cover"
                                                                     />
                                                                 ) : (
@@ -873,6 +874,7 @@ function Header() {
                                             <img
                                                 src={userImage}
                                                 alt={userName}
+                                                crossOrigin="anonymous"
                                                 className="
                                                     block
                                                     h-full
@@ -1026,6 +1028,7 @@ function Header() {
                                                         <img
                                                             src={userImage}
                                                             alt={userName}
+                                                            crossOrigin="anonymous"
                                                             className="
                                                                 block
                                                                 h-full

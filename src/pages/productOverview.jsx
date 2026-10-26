@@ -835,6 +835,7 @@ export default function ProductOverview() {
                                         <img
                                             key={`${selectedImage}-${images[selectedImage]}`}
                                             src={images[selectedImage]}
+                                            crossOrigin="anonymous"
                                             alt={product.name}
                                             onError={() =>
                                                 setImageError(true)
@@ -917,6 +918,7 @@ export default function ProductOverview() {
                                                 <img
                                                     src={image}
                                                     alt={`${product.name} ${index + 1}`}
+                                                    crossOrigin="anonymous"
                                                     className="h-full w-full object-contain p-1.5"
                                                     onError={(event) => {
                                                         event.currentTarget.style.display =
