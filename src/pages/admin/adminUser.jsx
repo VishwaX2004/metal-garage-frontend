@@ -829,6 +829,7 @@ export default function AdminUserPage() {
 
     useEffect(() => {
         fetchUsers();
+        window.scrollTo(0, 0);
     }, []);
 
     /* =====================================================

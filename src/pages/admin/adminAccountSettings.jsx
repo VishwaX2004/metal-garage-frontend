@@ -40,6 +40,7 @@ export default function AdminAccountSettings() {
 
     useEffect(() => {
         fetchAdminData();
+        window.scrollTo(0, 0);
     }, []);
 
     async function fetchAdminData() {

@@ -1063,6 +1063,7 @@ export default function AdminOrders() {
 
     useEffect(() => {
         fetchOrders();
+        window.scrollTo(0, 0);
     }, []);
 
     /* =====================================================
