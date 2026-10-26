@@ -215,6 +215,7 @@ function Header() {
             }
 
             if (
+                window.innerWidth >= 1024 &&
                 searchRef.current &&
                 !searchRef.current.contains(event.target)
             ) {
@@ -495,7 +496,7 @@ function Header() {
         <>
             <header className="fixed left-0 right-0 top-0 z-[1000] w-full border-b border-[rgba(245,245,220,0.14)] bg-[#0A0A0A]">
 
-                <nav className="mx-auto flex h-[78px] w-full max-w-[1320px] items-center justify-between px-5 sm:px-10">
+                <nav className="mx-auto flex h-[68px] sm:h-[78px] w-full max-w-[1320px] items-center justify-between px-3 sm:px-10">
 
                     {/* =================================================
                         LOGO
@@ -512,7 +513,7 @@ function Header() {
                         <img
                             src="/logo.png"
                             alt="Metal Garage"
-                            className="block h-[36px] w-auto sm:h-[46px]"
+                            className="block h-[30px] w-auto sm:h-[46px]"
                         />
                     </NavLink>
 
@@ -580,7 +581,7 @@ function Header() {
                         RIGHT SIDE
                     ================================================== */}
 
-                    <div className="flex shrink-0 items-center gap-[17px] sm:gap-[21px]">
+                    <div className="flex shrink-0 items-center gap-2.5 sm:gap-[21px]">
 
                         {/* =================================================
                             SEARCH
@@ -588,7 +589,7 @@ function Header() {
 
                         <div
                             ref={searchRef}
-                            className="relative"
+                            className="relative hidden lg:block"
                         >
                             <button
                                 type="button"
@@ -748,7 +749,7 @@ function Header() {
                             aria-label="Shopping Cart"
                             className="
                                 relative
-                                flex
+                                hidden lg:flex
                                 h-5
                                 w-5
                                 items-center
@@ -815,25 +816,26 @@ function Header() {
                                     aria-expanded={
                                         profileOpen
                                     }
-                                    onClick={() =>
-                                        setProfileOpen(
-                                            (previous) =>
-                                                !previous
-                                        )
-                                    }
+                                    onClick={() => {
+                                        setProfileOpen((previous) => !previous);
+                                        setMobileMenuOpen(false);
+                                    }}
                                     className="
                                         group
-                                        hidden
-                                        sm:flex
+                                        flex
                                         items-center
-                                        gap-3
+                                        gap-1.5
+                                        sm:gap-3
                                         rounded-full
                                         border
                                         border-[#F5F5DC]/10
                                         bg-[#F5F5DC]/[0.035]
-                                        py-1.5
-                                        pl-1.5
-                                        pr-3
+                                        py-1
+                                        pl-1
+                                        pr-1.5
+                                        sm:py-1.5
+                                        sm:pl-1.5
+                                        sm:pr-3
                                         transition-all
                                         duration-200
                                         hover:border-[#FF8F00]/50
@@ -852,8 +854,10 @@ function Header() {
                                             isolate
                                             z-0
                                             flex
-                                            h-10
-                                            w-10
+                                            h-8
+                                            w-8
+                                            sm:h-10
+                                            sm:w-10
                                             shrink-0
                                             items-center
                                             justify-center
@@ -906,13 +910,14 @@ function Header() {
                                         USER NAME
                                     ================================================== */}
 
-                                    <div className="hidden min-w-[105px] max-w-[145px] lg:block">
+                                    <div className="block min-w-0 max-w-[76px] sm:hidden lg:block lg:min-w-[105px] lg:max-w-[145px]">
                                         <p
                                             className="
                                                 truncate
                                                 text-left
                                                 font-['Work_Sans',sans-serif]
-                                                text-[12px]
+                                                text-[10px]
+                                                sm:text-[12px]
                                                 font-semibold
                                                 text-[#F5F5DC]
                                             "
@@ -967,8 +972,10 @@ function Header() {
                                         className="
                                             absolute
                                             right-0
-                                            top-[54px]
-                                            w-[285px]
+                                            top-[calc(100%+10px)]
+                                            w-[min(285px,calc(100vw-24px))]
+                                            sm:top-[54px]
+                                            sm:w-[285px]
                                             overflow-hidden
                                             rounded-xl
                                             border
@@ -1430,15 +1437,23 @@ function Header() {
                         ) : (
                             <NavLink
                                 to="/login"
+                                onClick={() => {
+                                    setMobileMenuOpen(false);
+                                    setProfileOpen(false);
+                                }}
                                 className="
-                                    hidden
+                                    flex
                                     lg:block
+                                    shrink-0
                                     rounded-[2px]
                                     border
                                     border-[rgba(245,245,220,0.14)]
-                                    px-[18px]
-                                    py-[9px]
-                                    text-[12px]
+                                    px-2.5
+                                    py-2
+                                    text-[10px]
+                                    sm:px-[18px]
+                                    sm:py-[9px]
+                                    sm:text-[12px]
                                     font-['Work_Sans',sans-serif]
                                     font-medium
                                     uppercase
@@ -1463,10 +1478,22 @@ function Header() {
                             }
                             aria-expanded={mobileMenuOpen}
                             onClick={() => {
-                                setMobileMenuOpen(
-                                    (previous) => !previous
-                                );
+                                const nextOpen = !mobileMenuOpen;
+                                setMobileMenuOpen(nextOpen);
                                 setProfileOpen(false);
+
+                                if (nextOpen) {
+                                    setSearchOpen(true);
+                                    if (
+                                        searchProducts.length === 0 &&
+                                        import.meta.env.VITE_API_URL
+                                    ) {
+                                        setSearchLoading(true);
+                                        setSearchError("");
+                                    }
+                                } else {
+                                    setSearchOpen(false);
+                                }
                             }}
                             className="
                                 flex
@@ -1491,17 +1518,123 @@ function Header() {
                 </nav>
 
                 {mobileMenuOpen && (
-                    <div className="border-t border-[rgba(245,245,220,0.1)] bg-[#0A0A0A] px-5 pb-5 pt-3 lg:hidden">
+                    <div className="fixed left-0 right-0 top-[68px] max-h-[calc(100dvh-68px)] overflow-y-auto overscroll-contain border-t border-[rgba(245,245,220,0.12)] bg-[#0A0A0A]/[0.98] px-4 pb-6 pt-4 shadow-[0_22px_45px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:top-[78px] sm:max-h-[calc(100dvh-78px)] sm:px-5 lg:hidden">
+                        {/* Mobile search lives inside the menu; no header search/cart icons on mobile. */}
+                        <div className="mb-4 overflow-hidden rounded-xl border border-[#F5F5DC]/15 bg-[#11110F] shadow-[0_8px_24px_rgba(0,0,0,0.22)]">
+                            <div className="flex min-h-12 items-center gap-3 px-4">
+                                <Search
+                                    size={18}
+                                    className="shrink-0 text-[#FF8F00]"
+                                    strokeWidth={2}
+                                />
+                                <input
+                                    type="search"
+                                    value={searchQuery}
+                                    onChange={handleSearchInputChange}
+                                    placeholder="Search die-cast, series, or model..."
+                                    aria-label="Search products"
+                                    className="min-w-0 flex-1 bg-transparent py-3 text-sm text-[#F5F5DC] outline-none placeholder:text-[#F5F5DC]/40"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        type="button"
+                                        aria-label="Clear search"
+                                        onClick={() => {
+                                            setSearchQuery("");
+                                            setSearchDismissed(false);
+                                        }}
+                                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#F5F5DC]/55 transition-colors hover:bg-[#F5F5DC]/[0.07] hover:text-[#FF8F00]"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                )}
+                            </div>
+
+                            {searchQuery && (
+                                <div className="max-h-[min(300px,38dvh)] overflow-y-auto border-t border-[#F5F5DC]/10 p-2">
+                                    {searchLoading && (
+                                        <p className="px-3 py-4 text-center text-xs text-[#F5F5DC]/50">
+                                            Finding products...
+                                        </p>
+                                    )}
+
+                                    {!searchLoading &&
+                                        (searchError || !import.meta.env.VITE_API_URL) && (
+                                            <p className="px-3 py-4 text-center text-xs text-[#FF8F00]">
+                                                {searchError || "Search is temporarily unavailable."}
+                                            </p>
+                                        )}
+
+                                    {!searchLoading &&
+                                        !searchError &&
+                                        import.meta.env.VITE_API_URL &&
+                                        searchResults.length === 0 && (
+                                            <p className="px-3 py-4 text-center text-xs text-[#F5F5DC]/50">
+                                                No matching products found.
+                                            </p>
+                                        )}
+
+                                    {!searchLoading &&
+                                        searchResults.map((product) => {
+                                            const productId = getProductId(product);
+                                            const image = Array.isArray(product?.images)
+                                                ? product.images[0]
+                                                : null;
+
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    key={productId}
+                                                    onClick={() => {
+                                                        handleSearchResultClick(product);
+                                                        setMobileMenuOpen(false);
+                                                        setSearchOpen(false);
+                                                    }}
+                                                    className="group flex min-h-14 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[#F5F5DC]/[0.07] active:bg-[#F5F5DC]/[0.1]"
+                                                >
+                                                    <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-[#F5F5DC]/10 bg-[#F5F5DC]/[0.05]">
+                                                        {image ? (
+                                                            <img
+                                                                src={image}
+                                                                alt=""
+                                                                className="h-full w-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <Package size={17} className="text-[#FF8F00]" />
+                                                        )}
+                                                    </span>
+                                                    <span className="min-w-0 flex-1">
+                                                        <span className="block truncate text-sm font-medium text-[#F5F5DC] group-hover:text-[#FF8F00]">
+                                                            {product?.name || "Unnamed product"}
+                                                        </span>
+                                                        <span className="mt-1 block truncate text-[10px] uppercase tracking-[0.08em] text-[#F5F5DC]/40">
+                                                            {product?.series || product?.category || "Die-cast collectible"}
+                                                        </span>
+                                                    </span>
+                                                    <span className="text-lg text-[#F5F5DC]/25 group-hover:text-[#FF8F00]">
+                                                        →
+                                                    </span>
+                                                </button>
+                                            );
+                                        })}
+                                </div>
+                            )}
+                        </div>
+
+                        <p className="mb-2 px-4 font-['Work_Sans',sans-serif] text-[10px] font-semibold uppercase tracking-[0.16em] text-[#F5F5DC]/35">
+                            Navigation
+                        </p>
                         <ul className="m-0 flex list-none flex-col gap-1 p-0">
                             {NAV_LINKS.map((link) => (
                                 <li key={link.name}>
                                     <NavLink
                                         to={link.path}
-                                        onClick={() =>
-                                            setMobileMenuOpen(false)
-                                        }
+                                        onClick={() => {
+                                            setMobileMenuOpen(false);
+                                            setProfileOpen(false);
+                                        }}
                                         className={({ isActive }) => `
-                                            block border-l-2 px-4 py-3
+                                            block min-h-12 border-l-2 px-4 py-3.5
                                             font-['Work_Sans',sans-serif]
                                             text-[13px] font-medium uppercase tracking-[0.09em]
                                             transition-colors duration-200
