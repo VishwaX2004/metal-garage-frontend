@@ -284,8 +284,10 @@ export default function CheckoutPage() {
        CART CHECK
     ===================================================== */
 
+    const orderCompleteRef = useRef(false);
+
     useEffect(() => {
-        if (cartItems.length === 0) {
+        if (cartItems.length === 0 && !orderCompleteRef.current) {
             toast.error("Your cart is empty.");
 
             navigate("/cart", {
@@ -636,6 +638,9 @@ export default function CheckoutPage() {
 
                 await startPayHerePayment(createdOrderID, token);
 
+                // Mark order as complete to prevent useEffect redirect
+                orderCompleteRef.current = true;
+
                 // Clear cart after PayHere form is submitted
                 // (it will also be cleared when user returns from payment gateway)
                 clearCart();
@@ -668,6 +673,9 @@ export default function CheckoutPage() {
                 }
 
                 toast.success("Order placed successfully!");
+
+                // Mark order as complete to prevent useEffect redirect
+                orderCompleteRef.current = true;
 
                 // Navigate BEFORE clearing cart to prevent the empty cart effect from redirecting to cart page
                 navigate("/orders", { replace: true });
