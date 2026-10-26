@@ -588,7 +588,15 @@ export default function AdminProductPage() {
                                                                         item.productID ||
                                                                         index
                                                                     }
-                                                                    className="metal-row border-b border-black/[0.07] hover:bg-[#ECE8D6]"
+                                                                    onClick={() =>
+                                                                        navigate(
+                                                                            "/admin/update-product",
+                                                                            {
+                                                                                state: item,
+                                                                            }
+                                                                        )
+                                                                    }
+                                                                    className="metal-row cursor-pointer border-b border-black/[0.07] hover:bg-[#ECE8D6]"
                                                                     style={{
                                                                         animationDelay: `${index * 30}ms`,
                                                                     }}
