@@ -21,9 +21,11 @@ import {
     FaImage,
     FaEye,
     FaEyeSlash,
+    FaCloud,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Loader } from "../../components/loader";
+import mediaUpload from "../../utils/mediaUpload";
 
 /* =========================================================
    DEFAULT PROFILE IMAGE
@@ -219,6 +221,8 @@ function AdminUserFormModal({
 
     const [showPassword, setShowPassword] = useState(false);
 
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+
     const [form, setForm] = useState({
         firstName: user?.firstName || "",
         lastName: user?.lastName || "",
@@ -239,6 +243,28 @@ function AdminUserFormModal({
             ...previous,
             [field]: value,
         }));
+    }
+
+    async function handleImageUpload(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setIsUploadingImage(true);
+
+        try {
+            const publicUrl = await mediaUpload(file);
+            updateField("profileImage", publicUrl);
+            toast.success("Image uploaded successfully");
+        } catch (error) {
+            console.error("Image upload error:", error);
+            toast.error(
+                error.message || "Failed to upload image"
+            );
+        } finally {
+            setIsUploadingImage(false);
+            // Reset input
+            event.target.value = "";
+        }
     }
 
     async function handleSubmit(event) {
@@ -639,32 +665,31 @@ function AdminUserFormModal({
                                 </div>
 
                                 <div className="flex-1">
-                                    <div className="relative">
-                                        <FaImage className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/30" />
+                                    <label className="flex cursor-pointer items-center justify-center gap-2 rounded-[7px] border border-dashed border-black/[0.14] bg-[#ECE8D6] px-4 py-3 transition hover:border-[#FF8F00] hover:bg-[#F5F5DC]">
+                                        <FaCloud className="text-black/40" />
+
+                                        <span className="text-[11px] font-semibold text-black/60">
+                                            {isUploadingImage
+                                                ? "Uploading..."
+                                                : "Click to upload"}
+                                        </span>
 
                                         <input
-                                            type="url"
-                                            value={
-                                                form.profileImage
+                                            type="file"
+                                            accept="image/jpeg,image/png,image/webp"
+                                            onChange={
+                                                handleImageUpload
                                             }
-                                            onChange={(
-                                                event
-                                            ) =>
-                                                updateField(
-                                                    "profileImage",
-                                                    event
-                                                        .target
-                                                        .value
-                                                )
+                                            disabled={
+                                                isUploadingImage
                                             }
-                                            placeholder="https://example.com/profile.jpg"
-                                            className="w-full rounded-[7px] border border-black/[0.14] bg-[#ECE8D6] py-[11px] pl-9 pr-3 text-[12px] outline-none focus:border-[#FF8F00]"
+                                            className="hidden"
                                         />
-                                    </div>
+                                    </label>
 
                                     <p className="mt-2 text-[9px] text-black/35">
-                                        Enter a public image
-                                        URL.
+                                        JPG, PNG or WEBP.
+                                        Max 10 MB.
                                     </p>
                                 </div>
 
